@@ -1,16 +1,19 @@
 #!/bin/bash
 
 # Base template PoC setup
+# Two nodes in the same subnet connected through a switch
 
 
 # launching containers
-docker run -id --name node1 --network none node:1.0 /bin/ash
-docker run -id --name node2 --network none node:1.0 /bin/ash
+docker run -id --name node1 --network none node:1.0.0 /bin/ash
+docker run -id --name node2 --network none node:1.0.0 /bin/ash
 
 
 node1PID=`docker inspect -f "{{.State.Pid}}" node1`
 node2PID=`docker inspect -f "{{.State.Pid}}" node2`
 
+
+sudo mkdir /var/run/netns/ 2> /dev/null
 
 # linking containers' namespaces to be used by ip netns
 sudo ln -s "/proc/${node1PID}/ns/net" "/var/run/netns/${node1PID}"
@@ -51,10 +54,10 @@ sudo ip netns exec "${node2PID}" ip link set dev veth-node2 up
 sudo ip netns exec "${node2PID}" ip addr add 10.0.0.2/24 dev veth-node2
 
 echo "pinging node2 from node1"
-docker exec -it node1 ping -c 4 10.0.0.2
+docker exec -it node1 ping -c 2 10.0.0.2
 
 echo "pinging node1 from node2"
-docker exec -it node2 ping -c 4 10.0.0.1
+docker exec -it node2 ping -c 2 10.0.0.1
 
 echo "done!"
 

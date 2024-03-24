@@ -2,4 +2,4 @@
 FROM alpine:latest
 
 # Required packages
-RUN apk add --no-cache net-tools iproute2
+RUN apk add --no-cache net-tools iproute2 tcpdump iptables
