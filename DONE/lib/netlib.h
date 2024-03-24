@@ -10,6 +10,8 @@
 int addNode(char *name, char type);
 int delNode(char *name);
 
+int addExternalInterface(char *name, char *interface);
+
 int addSwitch(char *name);
 int delSwitch(char *name);
 
@@ -18,3 +20,5 @@ int delCableBetweenNodes(char *firstNode, char *secondNode);
 
 int addCableBetweenNodeAndSwitch(char *nodeName, char *switchName);
 int delCableBetweenNodeAndSwitch(char *nodeName, char *switchName);
+
+int sendNetworkSetupCommand(char *pid, char *command);

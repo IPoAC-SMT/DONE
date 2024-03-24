@@ -138,7 +138,58 @@ int delSwitch(char *name)
     return -1;
 }
 
+int addExternalInterface(char *name, char *interface)
+{
+
+    char command[MAX_COMMAND_SIZE];
+
+    if (name != NULL && strlen(name) <= MAX_NAME_SIZE && interface != NULL && strlen(interface) <= MAX_NAME_SIZE)
+    {
+        strcpy(command, "sudo docker run -id --name ");
+        strcat(command, name);
+        strcat(command, " --network ");
+        strcat(command, interface);
+        strcat(command, " node:1.0.0 /bin/ash");
+
+        if (!system(command))
+        { // once the node is created, adding the node's namespace to the netns folder
+
+            // retrieving the container's PID
+            strcpy(command, "sudo docker inspect -f '{{.State.Pid}}' ");
+            strcat(command, name);
+            char *pid = getContainerPID(name);
+
+            if (pid != NULL)
+            {
+
+                strcpy(command, "sudo ln -s /proc/");
+                strcat(command, pid);
+                strcat(command, "/ns/net /var/run/netns/");
+                strcat(command, pid);
+
+                if (!system(command))
+                { // if the file creation was succesfull, eventually perfom the last step for routers, by enabling the IP forwarding
+                    strcpy(command, "sudo ip netns exec ");
+                    strcat(command, pid);
+                    strcat(command, " sysctl net.ipv4.ip_forward=1");
+
+                    free(pid);
+
+                    return system(command);
+                }
+            }
+        }
+    }
+    return -1;
+}
+
 // Add a new cable between two nodes
+// Used to connect:
+// - two hosts
+// - two routers
+// - a host and a router
+// - a host and an external interface
+// - a host and an externat NATted interface
 int addCableBetweenNodes(char *firstNode, char *secondNode)
 {
     char command[MAX_COMMAND_SIZE];
@@ -338,6 +389,23 @@ int delCableBetweenNodeAndSwitch(char *nodeName, char *switchName)
 
             return system(command);
         }
+    }
+    return -1;
+}
+
+// Send a command to a container's network namespace
+int sendNetworkSetupCommand(char *pid, char *command)
+{
+    char fullCommand[MAX_COMMAND_SIZE];
+
+    if (pid != NULL && command != NULL && strlen(pid) <= MAX_PID_SIZE)
+    {
+        strcpy(fullCommand, "sudo ip netns exec ");
+        strcat(fullCommand, pid);
+        strcat(fullCommand, " ");
+        strcat(fullCommand, command);
+
+        return system(fullCommand);
     }
     return -1;
 }
