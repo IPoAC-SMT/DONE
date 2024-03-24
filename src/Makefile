@@ -1,11 +1,11 @@
 CC = gcc
 CFLAGS = -Wall -Wextra
 
-poc: poc.c composer.o
-	$(CC) $(CFLAGS) poc.c composer.o -o poc
+poc: poc.c netlib.o
+	$(CC) $(CFLAGS) poc.c netlib.o -o poc
 
-composer.o: composer.c
-	$(CC) $(CFLAGS) -c composer.c
+netlib.o: netlib.c
+	$(CC) $(CFLAGS) -c netlib.c
 
 clean:
 	rm -f poc *.o
