@@ -1,1 +1,1 @@
-void helloworld(settings_t * settings);
+void helloworld(settings_t *settings);

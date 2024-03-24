@@ -1,3 +1,4 @@
-typedef struct {
+typedef struct
+{
 
 } link_t;

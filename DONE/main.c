@@ -14,42 +14,43 @@ char*completePath(char*name){ // took this from SO, not my responsibility
     return result;
 }*/
 
-int main(){
+int main()
+{
 
-    interface_t * interface = init_interface((pulsante_t[NUMPULSANTI]){
-        {24,129,100,100,"router.png",helloworld},
-        {24,234,100,100,"router.png",helloworld},
-        {24,339,100,100,"router.png",helloworld},
-        {24,444,100,100,"router.png",helloworld},
-        {24,549,100,100,"router.png",helloworld},
-        {24,654,100,100,"router.png",helloworld},
-        {24,759,100,100,"router.png",helloworld},
-        {24,864,100,100,"router.png",helloworld},
-        {129,24,100,100,"router.png",helloworld},
-        {234,24,100,100,"router.png",helloworld},
-        {339,24,100,100,"router.png",helloworld},
-        {444,24,100,100,"router.png",helloworld},
-        {549,24,100,100,"router.png",helloworld},
-        {654,24,100,100,"router.png",helloworld},
-        {759,24,100,100,"router.png",helloworld},
-        {864,24,100,100,"router.png",helloworld}
-    },NULL,NULL);
+    interface_t *interface = init_interface((pulsante_t[NUMPULSANTI]){
+                                                {24, 129, 100, 100, "router.png", helloworld},
+                                                {24, 234, 100, 100, "router.png", helloworld},
+                                                {24, 339, 100, 100, "router.png", helloworld},
+                                                {24, 444, 100, 100, "router.png", helloworld},
+                                                {24, 549, 100, 100, "router.png", helloworld},
+                                                {24, 654, 100, 100, "router.png", helloworld},
+                                                {24, 759, 100, 100, "router.png", helloworld},
+                                                {24, 864, 100, 100, "router.png", helloworld},
+                                                {129, 24, 100, 100, "router.png", helloworld},
+                                                {234, 24, 100, 100, "router.png", helloworld},
+                                                {339, 24, 100, 100, "router.png", helloworld},
+                                                {444, 24, 100, 100, "router.png", helloworld},
+                                                {549, 24, 100, 100, "router.png", helloworld},
+                                                {654, 24, 100, 100, "router.png", helloworld},
+                                                {759, 24, 100, 100, "router.png", helloworld},
+                                                {864, 24, 100, 100, "router.png", helloworld}},
+                                            NULL, NULL);
 
-
-	InitWindow(WIDTH, HEIGHT, TITLE);
+    InitWindow(WIDTH, HEIGHT, TITLE);
     SetTargetFPS(30);
 
     settings_t settings = {1};
 
-	while (!WindowShouldClose()) {
-		BeginDrawing();
-	
-		ClearBackground(RAYWHITE); //colore di sfondo, per crearne altri si deve usare CLITERAL(Color){R,G,B,A}, numeri interi da 0 a 255
-        
-        DrawGUI(&settings,interface);
+    while (!WindowShouldClose())
+    {
+        BeginDrawing();
 
-		EndDrawing();
-	}
+        ClearBackground(RAYWHITE); // colore di sfondo, per crearne altri si deve usare CLITERAL(Color){R,G,B,A}, numeri interi da 0 a 255
 
-	return 0;
+        DrawGUI(&settings, interface);
+
+        EndDrawing();
+    }
+
+    return 0;
 }

@@ -189,7 +189,7 @@ int addExternalInterface(char *name, char *interface)
 // - two routers
 // - a host and a router
 // - a host and an external interface
-// - a host and an externat NATted interface
+// - a host and an external NATted interface
 int addCableBetweenNodes(char *firstNode, char *secondNode)
 {
     char command[MAX_COMMAND_SIZE];

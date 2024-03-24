@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-typedef struct {
+typedef struct
+{
     char interfaceHidden;
 } settings_t;
 
-void toggleInterface(settings_t* settings);
+void toggleInterface(settings_t *settings);
