@@ -1,6 +1,6 @@
 // Docker orchestration commands library
 
-#include "./headers/netlib.h"
+#include "../lib/netlib.h"
 
 // This functions exclusively include the interactions with the Linux system and docker API
 // All the logical controls about already existing nodes, switches and cables must be added outside of this library
