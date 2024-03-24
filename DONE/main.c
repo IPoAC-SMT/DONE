@@ -14,7 +14,7 @@ char*completePath(char*name){ // took this from SO, not my responsibility
     return result;
 }*/
 
-int main(int argc, const char* argv[]){
+int main(){
 
     interface_t * interface = init_interface((pulsante_t[NUMPULSANTI]){
         {24,129,100,100,"router.png",helloworld},
