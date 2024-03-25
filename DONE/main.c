@@ -1,8 +1,7 @@
 #include "./lib/GUI.h"
-
 #define WIDTH 1900
 #define HEIGHT 1000
-#define TITLE "Docker Orchestrator for Network Emulation"
+#define TITLE "Docker Orchestrator for Networks Emulation"
 
 /*
 char*completePath(char*name){ // took this from SO, not my responsibility
@@ -42,14 +41,15 @@ int main()
 
     InitWindow(WIDTH, HEIGHT, TITLE);
     SetTargetFPS(30);
+    //change
+    SetExitKey(KEY_NULL);
 
     settings_t settings = {0,0,0,""};
     
     while (!WindowShouldClose())
     {
         BeginDrawing();
-
-        ClearBackground(RAYWHITE); // colore di sfondo, per crearne altri si deve usare CLITERAL(Color){R,G,B,A}, numeri interi da 0 a 255
+        ClearBackground(CLITERAL(Color){0, 0, 63,0}); // colore di sfondo, per crearne altri si deve usare CLITERAL(Color){R,G,B,A}, numeri interi da 0 a 255
 
         DrawGUI(&settings, interface);
 
