@@ -491,3 +491,19 @@ int sendNetworkSetupCommand(char *pid, char *command)
     }
     return -1;
 }
+
+// open a shell in a device (host or switch)
+int openShell(char *name)
+{
+    char command[MAX_COMMAND_SIZE];
+
+    if (name != NULL && strlen(name) <= MAX_NAME_SIZE)
+    {
+        strcpy(command, "sudo docker exec -it ");
+        strcat(command, name);
+        strcat(command, " /bin/ash");
+
+        return system(command);
+    }
+    return -1;
+}
