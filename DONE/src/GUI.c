@@ -33,8 +33,6 @@ int max(int a,int b){
 }
 
 void DrawLink(link_t link, settings_t* settings,node_t* nodi){
-    // if hovering then increase thickness TODO
-    // if right click then open configuration TODO
     Vector2 positions[2] = {getPos(nodi,link.nodo1),getPos(nodi,link.nodo2)};
     // breve digressione matematica: per verificare se sono su una linea verifico che la distanza del punto dalla linea sia minore di un qualcosa, diciamo 5 pixel.
     // ora, questo significa che posso rappresentare la mia linea con la seguente equazione:
