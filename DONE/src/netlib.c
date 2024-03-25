@@ -399,9 +399,7 @@ int openNodeShell(char *name)
 
     if (name != NULL && strlen(name) <= MAX_NAME_SIZE)
     {
-        strcpy(command, "konsole -e sudo docker exec -it ");
-        strcat(command, name);
-        strcat(command, " /bin/bash");
+        snprintf(command, MAX_COMMAND_SIZE, "konsole -e sudo docker exec -it %s /bin/bash", name);
         pid_t pid = fork(); 
         if (pid == 0)
         {

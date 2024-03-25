@@ -24,3 +24,7 @@ docs/piano_progetto/studio.log
 docs/piano_progetto/indent.log
 
 *.sty
+
+DONE/bin/
+
+DONE/obj/

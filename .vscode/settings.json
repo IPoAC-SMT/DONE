@@ -2,6 +2,10 @@
     "files.associations": {
         "settings.h": "c",
         "gui.h": "c",
-        "functions.h": "c"
+        "functions.h": "c",
+        "netcontroller.h": "c",
+        "raylib.h": "c",
+        "interface_t.h": "c",
+        "logicalcontroller.h": "c"
     }
 }

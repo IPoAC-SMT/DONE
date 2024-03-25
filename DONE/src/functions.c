@@ -13,10 +13,13 @@ void tempStop(settings_t*settings){
     stopSimulation();
 }
 
+void openShell(char *name){
+    openShellWrapper(name);
+}
+
 /*
  *     
     startSimulation();
-
     stopSimulation();
 
  * */

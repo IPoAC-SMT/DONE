@@ -1,5 +1,4 @@
 #include "../lib/netController.h"
-#include "../lib/netlib.h"
 
 int startSimulation()
 {

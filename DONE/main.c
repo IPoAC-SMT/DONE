@@ -16,8 +16,8 @@ char*completePath(char*name){ // took this from SO, not my responsibility
 int main()
 {
     interface_t *interface = init_interface((pulsante_t[NUMPULSANTI]){
-        {24, 129, 100, 100, "router.png", tempStart},
-        {24, 234, 100, 100, "router.png", tempStop},
+        {24, 129, 100, 100, "router.png", helloworld},
+        {24, 234, 100, 100, "router.png", helloworld},
         {24, 339, 100, 100, "router.png", helloworld},
         {24, 444, 100, 100, "router.png", helloworld},
         {24, 549, 100, 100, "router.png", helloworld},
