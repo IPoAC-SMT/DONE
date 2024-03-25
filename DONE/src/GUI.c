@@ -96,15 +96,15 @@ void DrawNode(node_t* node, settings_t* settings){
             // draw a circle
             break;
         case host_t:
-            DrawRectangle(nodex-20, nodey-20, 40, 40, PURPLE);   
+            //DrawRectangle(nodex-20, nodey-20, 40, 40, PURPLE);   
             // draw a something else
-            /* temporaneamente commentato in attesa di capire come si usi
-            Texture2D router = LoadTexture("../resources/icons/router.png");
-            BeginDrawing();
-            ClearBackground(RAYWHITE);
-            DrawTexture(router, 40, 40, WHITE);
-            EndDrawing();
-            */
+            // temporaneamente commentato in attesa di capire come si usi
+            Texture2D router = LoadTexture("/home/rebelnightmare/Documents/GitHub/DONE/DONE/resources/icons/elfuny.png");
+            Rectangle source_rec = { 0.0f, 0.0f, router.width, router.height};  // takes all the image 
+            Rectangle dest_rec = {nodex-20, nodey-20, 40,40};   // where the image should be placed and how big it will be
+            Vector2 origin = {0.0f,0.0f};   // the origin is the top right corner
+            DrawTexturePro(router, source_rec, dest_rec, origin, 0.0f, WHITE);  // draw a router and do not rotate it (0.0f)
+            
             break;
     }
     DrawText(node->nome,nodex-20,nodey+40,STD_FONT_SIZE,GRAY);
