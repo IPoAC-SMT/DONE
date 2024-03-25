@@ -1,4 +1,3 @@
-#include <string.h>
 #include "../lib/settings.h"
 
 

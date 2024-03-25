@@ -3,7 +3,6 @@
 #define WIDTH 1900
 #define HEIGHT 1000
 #define TITLE "Docker Orchestrator for Networks Emulation"
-#define STD_FONT_SIZE 19
 
 /*
 char*completePath(char*name){ // took this from SO, not my responsibility
@@ -16,7 +15,6 @@ char*completePath(char*name){ // took this from SO, not my responsibility
 
 int main()
 {
-
     interface_t *interface = init_interface((pulsante_t[NUMPULSANTI]){
                                                 {24, 129, 100, 100, "router.png", helloworld},
                                                 {24, 234, 100, 100, "router.png", helloworld},
@@ -34,13 +32,19 @@ int main()
                                                 {654, 24, 100, 100, "router.png", helloworld},
                                                 {759, 24, 100, 100, "router.png", helloworld},
                                                 {864, 24, 100, 100, "router.png", helloworld}},
-                                            NULL, NULL);
+                                            (node_t[NUMNODI]){
+                                                {"nodo1",host_t,500,500},
+                                                {"nodo2",host_t,1200,700}
+                                            },
+                                            (link_t[NUMLINK]){
+                                                {"nodo1","nodo2",0}
+                                            });
 
     InitWindow(WIDTH, HEIGHT, TITLE);
     SetTargetFPS(30);
 
     settings_t settings = {1};
-
+    
     while (!WindowShouldClose())
     {
         BeginDrawing();
