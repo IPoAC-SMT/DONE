@@ -84,6 +84,8 @@ void DrawNode(node_t* node, settings_t* settings){
     }
     // TODO draw text with name
     DrawText(node->nome,node->x-20,node->y+40,STD_FONT_SIZE,BLUE);
+    // se non sto al momento spostando niente e ci clicco con il tasto sinistro allora inizio a draggarlo
+    
 
 }
 
@@ -91,5 +93,7 @@ void DrawGUI(settings_t* settings, interface_t * interface){
     for (int i=0; i<NUMPULSANTI; i++) DrawButton(interface->pulsanti[i],settings);
     for (int i=0; i<NUMLINK;i++) DrawLink(interface->links[i],settings,interface->nodi);
     for (int i=0; i<NUMNODI;i++) DrawNode(&(interface->nodi[i]),settings);
+
+    // se dragging allora ci piazzo cose
 
 }

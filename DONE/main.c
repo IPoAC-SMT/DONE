@@ -43,7 +43,7 @@ int main()
     InitWindow(WIDTH, HEIGHT, TITLE);
     SetTargetFPS(30);
 
-    settings_t settings = {1};
+    settings_t settings = {0,0,0,""};
     
     while (!WindowShouldClose())
     {
