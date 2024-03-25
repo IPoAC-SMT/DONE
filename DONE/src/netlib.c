@@ -8,7 +8,7 @@
 // Initialize the environment by creating, if not already created, the netns folder
 int initEnv()
 {
-    return system("sudo mkdir -p /var/run/netns");
+    return system("sudo mkdir -p /var/run/netns 2>/dev/null");
 }
 
 // Get the PID of a container by passing its name
@@ -41,34 +41,24 @@ int addNode(char *name, char type)
     if (name != NULL && strlen(name) <= MAX_NAME_SIZE && (type == 'h' || type == 'r'))
     {
 
-        strcpy(command, "sudo docker run -id --name ");
-        strcat(command, name);
-        strcat(command, " --network none node:1.0.0 /bin/bash");
+        snprintf(command, MAX_COMMAND_SIZE, "sudo docker run -id --cap-add=NET_ADMIN --name %s --network none node:1.0.0 /bin/bash", name);
 
         if (!system(command))
         { // once the node is created, adding the node's namespace to the netns folder
 
             // retrieving the container's PID
-            strcpy(command, "sudo docker inspect -f '{{.State.Pid}}' ");
-            strcat(command, name);
+            snprintf(command, MAX_COMMAND_SIZE, "sudo docker inspect -f '{{.State.Pid}}' %s", name);
             char *pid = getContainerPID(name);
 
             if (pid != NULL)
             {
-
-                strcpy(command, "sudo ln -s /proc/");
-                strcat(command, pid);
-                strcat(command, "/ns/net /var/run/netns/");
-                strcat(command, pid);
+                snprintf(command, MAX_COMMAND_SIZE, "sudo ln -s /proc/%s/ns/net /var/run/netns/%s", pid, pid);
 
                 if (!system(command))
                 { // if the file creation was succesfull, eventually perfom the last step for routers, by enabling the IP forwarding
                     if (type == 'r')
                     {
-                        strcpy(command, "sudo ip netns exec ");
-                        strcat(command, pid);
-                        strcat(command, " sysctl net.ipv4.ip_forward=1");
-
+                        snprintf(command, MAX_COMMAND_SIZE, "sudo ip netns exec %s sysctl net.ipv4.ip_forward=1", pid);
                         free(pid);
 
                         if (!system(command))
@@ -91,16 +81,11 @@ int delNode(char *name)
 
     if (name != NULL && strlen(name) <= MAX_NAME_SIZE)
     {
-        strcpy(command, "sudo docker inspect -f '{{.State.Pid}}' ");
-        strcat(command, name);
-        strcat(command, " | xargs -I {} sudo rm /var/run/netns/{}");
+        snprintf(command, MAX_COMMAND_SIZE, "sudo docker inspect -f '{{.State.Pid}}' %s | xargs -I {} sudo rm /var/run/netns/{}", name);
 
         if (!system(command))
         {
-            strcpy(command, "sudo docker kill ");
-            strcat(command, name);
-            strcat(command, " && sudo docker rm ");
-            strcat(command, name);
+            snprintf(command, MAX_COMMAND_SIZE, "sudo docker kill %s && sudo docker rm %s", name, name);
 
             return system(command);
         }
@@ -115,8 +100,7 @@ int addSwitch(char *name)
 
     if (name != NULL && strlen(name) <= MAX_NAME_SIZE)
     {
-        strcpy(command, "sudo ovs-vsctl add-br ");
-        strcat(command, name);
+        snprintf(command, MAX_COMMAND_SIZE, "sudo ovs-vsctl add-br %s", name);
 
         return system(command);
     }
@@ -130,8 +114,7 @@ int delSwitch(char *name)
 
     if (name != NULL && strlen(name) <= MAX_NAME_SIZE)
     {
-        strcpy(command, "sudo ovs-vsctl del-br ");
-        strcat(command, name);
+        snprintf(command, MAX_COMMAND_SIZE, "sudo ovs-vsctl del-br %s", name);
 
         return system(command);
     }
@@ -145,34 +128,23 @@ int addExternalInterface(char *name, char *interface)
 
     if (name != NULL && strlen(name) <= MAX_NAME_SIZE && interface != NULL && strlen(interface) <= MAX_NAME_SIZE)
     {
-        strcpy(command, "sudo docker run -id --name ");
-        strcat(command, name);
-        strcat(command, " --network ");
-        strcat(command, interface);
-        strcat(command, " node:1.0.0 /bin/bash");
+        snprintf(command, MAX_COMMAND_SIZE, "sudo docker run -id --name %s --network %s node:1.0.0 /bin/bash", name, interface);
 
         if (!system(command))
         { // once the node is created, adding the node's namespace to the netns folder
 
             // retrieving the container's PID
-            strcpy(command, "sudo docker inspect -f '{{.State.Pid}}' ");
-            strcat(command, name);
+            snprintf(command, MAX_COMMAND_SIZE, "sudo docker inspect -f '{{.State.Pid}}' %s", name);
+
             char *pid = getContainerPID(name);
 
             if (pid != NULL)
             {
-
-                strcpy(command, "sudo ln -s /proc/");
-                strcat(command, pid);
-                strcat(command, "/ns/net /var/run/netns/");
-                strcat(command, pid);
+                snprintf(command, MAX_COMMAND_SIZE, "sudo ln -s /proc/%s/ns/net /var/run/netns/%s", pid, pid);
 
                 if (!system(command))
                 { // if the file creation was succesfull, eventually perfom the last step for routers, by enabling the IP forwarding
-                    strcpy(command, "sudo ip netns exec ");
-                    strcat(command, pid);
-                    strcat(command, " sysctl net.ipv4.ip_forward=1");
-
+                    snprintf(command, MAX_COMMAND_SIZE, "sudo ip netns exec %s sysctl net.ipv4.ip_forward=1", pid);
                     free(pid);
 
                     return system(command);
@@ -200,16 +172,11 @@ int addCableBetweenNodes(char *firstNode, char *secondNode)
     {
 
         // creating the connector's name
-        strcpy(endpoint1, "veth-");
-        strcat(endpoint1, firstNode);
+        snprintf(endpoint1, MAX_NAME_SIZE + 10, "veth-%s", firstNode);
+        
+        snprintf(endpoint2, MAX_NAME_SIZE + 10, "veth-%s", secondNode);
 
-        strcpy(endpoint2, "veth-");
-        strcat(endpoint2, secondNode);
-
-        strcpy(command, "sudo ip link add ");
-        strcat(command, endpoint1);
-        strcat(command, " type veth peer name ");
-        strcat(command, endpoint2);
+        snprintf(command, MAX_COMMAND_SIZE, "sudo ip link add %s type veth peer name %s", endpoint1, endpoint2);
 
         if (!system(command))
         { // if the cable connection was successful, connect the cable to the containers
@@ -218,33 +185,19 @@ int addCableBetweenNodes(char *firstNode, char *secondNode)
             char *pid2 = getContainerPID(secondNode);
 
             // connecting cable to the first container
-            strcpy(command, "sudo ip link set ");
-            strcat(command, endpoint1);
-            strcat(command, " netns ");
-            strcat(command, pid1);
+            snprintf(command, MAX_COMMAND_SIZE, "sudo ip link set %s netns %s", endpoint1, pid1);
             system(command);
 
             // connecting cable to the second container
-            strcpy(command, "sudo ip link set ");
-            strcat(command, endpoint2);
-            strcat(command, " netns ");
-            strcat(command, pid2);
+            snprintf(command, MAX_COMMAND_SIZE, "sudo ip link set %s netns %s", endpoint2, pid2);
             system(command);
 
             // turning on the first container interface
-            strcpy(command, "sudo ip netns exec ");
-            strcat(command, pid1);
-            strcat(command, " ip link set dev ");
-            strcat(command, endpoint1);
-            strcat(command, " up");
+            snprintf(command, MAX_COMMAND_SIZE, "sudo ip netns exec %s ip link set dev %s up", pid1, endpoint1);
             system(command);
 
             // turning on the second container interface
-            strcpy(command, "sudo ip netns exec ");
-            strcat(command, pid2);
-            strcat(command, " ip link set dev ");
-            strcat(command, endpoint2);
-            strcat(command, " up");
+            snprintf(command, MAX_COMMAND_SIZE, "sudo ip netns exec %s ip link set dev %s up", pid2, endpoint2);
 
             system(command);
             free(pid1);
@@ -266,17 +219,12 @@ int delCableBetweenNodes(char *firstNode, char *secondNode)
         char endpoint2[MAX_NAME_SIZE + 10];
 
         // creating the connector's name
-        strcpy(endpoint1, "veth-");
-        strcat(endpoint1, firstNode);
+        snprintf(endpoint1, MAX_NAME_SIZE + 10, "veth-%s", firstNode);
 
-        strcpy(endpoint2, "veth-");
-        strcat(endpoint2, secondNode);
+        snprintf(endpoint2, MAX_NAME_SIZE + 10, "veth-%s", secondNode);
 
         // deleting the cable from the first container
-        strcpy(command, "sudo ip netns exec ");
-        strcat(command, getContainerPID(firstNode));
-        strcat(command, " ip link del ");
-        strcat(command, endpoint1);
+        snprintf(command, MAX_COMMAND_SIZE, "sudo ip netns exec %s ip link del %s", getContainerPID(firstNode), endpoint1);
 
         return system(command);
     }
@@ -294,17 +242,11 @@ int addCableBetweenNodeAndSwitch(char *nodeName, char *switchName)
     {
 
         // creating the connector's name
-        strcpy(hostEndpoint, "veth-");
-        strcat(hostEndpoint, nodeName);
+        snprintf(hostEndpoint, MAX_NAME_SIZE + 10, "veth-%s", nodeName);
+        
+        snprintf(switchEndpoint, MAX_NAME_SIZE + 10, "veth-%s-%s", nodeName, switchName);
 
-        strcpy(switchEndpoint, hostEndpoint);
-        strcat(switchEndpoint, "-");
-        strcat(switchEndpoint, switchName);
-
-        strcpy(command, "sudo ip link add ");
-        strcat(command, hostEndpoint);
-        strcat(command, " type veth peer name ");
-        strcat(command, switchEndpoint);
+        snprintf(command, MAX_COMMAND_SIZE, "sudo ip link add %s type veth peer name %s", hostEndpoint, switchEndpoint);
 
         if (!system(command))
         { // if the cable connection was successful, connect the cable to the switch and to the container
@@ -312,32 +254,19 @@ int addCableBetweenNodeAndSwitch(char *nodeName, char *switchName)
             char *pid = getContainerPID(nodeName);
 
             // connecting cable to the container
-            strcpy(command, "sudo ip link set ");
-            strcat(command, hostEndpoint);
-            strcat(command, " netns ");
-            strcat(command, pid);
+            snprintf(command, MAX_COMMAND_SIZE, "sudo ip link set %s netns %s", hostEndpoint, pid);
             system(command);
 
             // connecting cable to the switch
-            strcpy(command, "sudo ovs-vsctl add-port ");
-            strcat(command, switchName);
-            strcat(command, " ");
-            strcat(command, switchEndpoint);
+            snprintf(command, MAX_COMMAND_SIZE, "sudo ovs-vsctl add-port %s %s", switchName, switchEndpoint);
             system(command);
 
             // turning on the switch interface
-            strcpy(command, "sudo ip link set dev ");
-            strcat(command, switchEndpoint);
-            strcat(command, " up");
+            snprintf(command, MAX_COMMAND_SIZE, "sudo ip link set dev %s up", switchEndpoint);
             system(command);
 
             // turning on the container interface
-            strcpy(command, "sudo ip netns exec ");
-            strcat(command, pid);
-            strcat(command, " ip link set dev ");
-            strcat(command, hostEndpoint);
-            strcat(command, " up");
-
+            snprintf(command, MAX_COMMAND_SIZE, "sudo ip netns exec %s ip link set dev %s up", pid, hostEndpoint);
             system(command);
             free(pid);
         }
@@ -357,18 +286,12 @@ int delCableBetweenNodeAndSwitch(char *nodeName, char *switchName)
         char switchEndpoint[MAX_NAME_SIZE + 10];
 
         // creating the connector's name
-        strcpy(hostEndpoint, "veth-");
-        strcat(hostEndpoint, nodeName);
-
-        strcpy(switchEndpoint, hostEndpoint);
-        strcat(switchEndpoint, "-");
-        strcat(switchEndpoint, switchName);
+        snprintf(hostEndpoint, MAX_NAME_SIZE + 10, "veth-%s", nodeName);
+        
+        snprintf(switchEndpoint, MAX_NAME_SIZE + 10, "veth-%s-%s", nodeName, switchName);
 
         // deleting the cable from the switch
-        strcpy(command, "sudo ovs-vsctl del-port ");
-        strcat(command, switchName);
-        strcat(command, " ");
-        strcat(command, switchEndpoint);
+        snprintf(command, MAX_COMMAND_SIZE, "sudo ovs-vsctl del-port %s %s", switchName, switchEndpoint);
 
         printf("%s\n", command);
 
@@ -378,10 +301,7 @@ int delCableBetweenNodeAndSwitch(char *nodeName, char *switchName)
             char *pid = getContainerPID(nodeName);
 
             // deleting the cable from the container, and so deleting the entire cable, now go home it's late
-            strcpy(command, "sudo ip netns exec ");
-            strcat(command, pid);
-            strcat(command, " ip link del ");
-            strcat(command, hostEndpoint);
+            snprintf(command, MAX_COMMAND_SIZE, "sudo ip netns exec %s ip link del %s", pid, hostEndpoint);
 
             printf("%s\n", command);
 
@@ -404,32 +324,22 @@ int addCableBetweenSwitches(char *firstSwitch, char *secondSwitch)
     {
 
         // creating the connector's name
-        strcpy(endpoint1, "veth-");
-        strcat(endpoint1, firstSwitch);
+        snprintf(endpoint1, MAX_NAME_SIZE + 10, "veth-%s", firstSwitch);
 
-        strcpy(endpoint2, "veth-");
-        strcat(endpoint2, secondSwitch);
 
-        strcpy(command, "sudo ip link add ");
-        strcat(command, endpoint1);
-        strcat(command, " type veth peer name ");
-        strcat(command, endpoint2);
+        snprintf(endpoint2, MAX_NAME_SIZE + 10, "veth-%s", secondSwitch);
+
+        snprintf(command, MAX_COMMAND_SIZE, "sudo ip link add %s type veth peer name %s", endpoint1, endpoint2);
 
         if (!system(command))
         { // if the cable connection was successful, connect the cable to the switches
 
             // connecting cable to the first switch
-            strcpy(command, "sudo ovs-vsctl add-port ");
-            strcat(command, firstSwitch);
-            strcat(command, " ");
-            strcat(command, endpoint1);
+            snprintf(command, MAX_COMMAND_SIZE, "sudo ovs-vsctl add-port %s %s", firstSwitch, endpoint1);
             system(command);
 
             // connecting cable to the second switch
-            strcpy(command, "sudo ovs-vsctl add-port ");
-            strcat(command, secondSwitch);
-            strcat(command, " ");
-            strcat(command, endpoint2);
+            snprintf(command, MAX_COMMAND_SIZE, "sudo ovs-vsctl add-port %s %s", secondSwitch, endpoint2);
 
             return system(command);
         }
@@ -449,25 +359,18 @@ int delCableBetweenSwitches(char *firstSwitch, char *secondSwitch)
         char endpoint2[MAX_NAME_SIZE + 10];
 
         // creating the connector's name
-        strcpy(endpoint1, "veth-");
-        strcat(endpoint1, firstSwitch);
+        snprintf(endpoint1, MAX_NAME_SIZE + 10, "veth-%s", firstSwitch);
 
-        strcpy(endpoint2, "veth-");
-        strcat(endpoint2, secondSwitch);
+
+        snprintf(endpoint2, MAX_NAME_SIZE + 10, "veth-%s", secondSwitch);
 
         // deleting the cable from the first switch
-        strcpy(command, "sudo ovs-vsctl del-port ");
-        strcat(command, firstSwitch);
-        strcat(command, " ");
-        strcat(command, endpoint1);
+        snprintf(command, MAX_COMMAND_SIZE, "sudo ovs-vsctl del-port %s %s", firstSwitch, endpoint1);
 
         if (!system(command))
         { // if the cable deletion was successful, delete the cable from the second switch
 
-            strcpy(command, "sudo ovs-vsctl del-port ");
-            strcat(command, secondSwitch);
-            strcat(command, " ");
-            strcat(command, endpoint2);
+            snprintf(command, MAX_COMMAND_SIZE, "sudo ovs-vsctl del-port %s %s", secondSwitch, endpoint2);
 
             return system(command);
         }
@@ -482,10 +385,7 @@ int sendNetworkSetupCommand(char *pid, char *command)
 
     if (pid != NULL && command != NULL && strlen(pid) <= MAX_PID_SIZE)
     {
-        strcpy(fullCommand, "sudo ip netns exec ");
-        strcat(fullCommand, pid);
-        strcat(fullCommand, " ");
-        strcat(fullCommand, command);
+        snprintf(fullCommand, MAX_COMMAND_SIZE, "sudo ip netns exec %s %s", pid, command);
 
         return system(fullCommand);
     }

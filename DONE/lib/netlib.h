@@ -5,7 +5,7 @@
 #include <unistd.h>
 
 #define MAX_COMMAND_SIZE 100
-#define MAX_NAME_SIZE 30
+#define MAX_NAME_SIZE 20
 #define MAX_PID_SIZE 10
 
 int initEnv();
