@@ -2,7 +2,7 @@
 
 #define WIDTH 1900
 #define HEIGHT 1000
-#define TITLE "Docker Orchestrator for Networks Emulation"
+#define TITLE "Docker Orchestrator for Network Emulation"
 
 /*
 char*completePath(char*name){ // took this from SO, not my responsibility

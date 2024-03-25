@@ -18,7 +18,7 @@ void DrawButton(pulsante_t pulsante, settings_t *settings)
     else
         hovering = false;
 
-    DrawRectangleLines(pulsante.x, pulsante.y, pulsante.width, pulsante.height, hovering ? YELLOW : BLACK); // lo creo con colore diverso se ci sto o meno hoverando
+    DrawRectangleLines(pulsante.x, pulsante.y, pulsante.width, pulsante.height, hovering ? YELLOW : GRAY); // lo creo con colore diverso se ci sto o meno hoverando
 }
 
 Vector2 getPos(node_t *nodi, char *nome)
