@@ -47,7 +47,7 @@ int main()
     while (!WindowShouldClose())
     {
         BeginDrawing();
-        ClearBackground(CLITERAL(Color){0, 0, 63,0}); // colore di sfondo, per crearne altri si deve usare CLITERAL(Color){R,G,B,A}, numeri interi da 0 a 255
+        ClearBackground(CLITERAL(Color){19, 31, 42,0}); // colore di sfondo, per crearne altri si deve usare CLITERAL(Color){R,G,B,A}, numeri interi da 0 a 255
 
         DrawGUI(&settings, interface);
 
