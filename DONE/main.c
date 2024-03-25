@@ -1,4 +1,5 @@
 #include "./lib/GUI.h"
+#include "./lib/logicalController.h"
 
 #define WIDTH 1900
 #define HEIGHT 1000
@@ -16,35 +17,33 @@ char*completePath(char*name){ // took this from SO, not my responsibility
 int main()
 {
     interface_t *interface = init_interface((pulsante_t[NUMPULSANTI]){
-                                                {24, 129, 100, 100, "router.png", helloworld},
-                                                {24, 234, 100, 100, "router.png", helloworld},
-                                                {24, 339, 100, 100, "router.png", helloworld},
-                                                {24, 444, 100, 100, "router.png", helloworld},
-                                                {24, 549, 100, 100, "router.png", helloworld},
-                                                {24, 654, 100, 100, "router.png", helloworld},
-                                                {24, 759, 100, 100, "router.png", helloworld},
-                                                {24, 864, 100, 100, "router.png", helloworld},
-                                                {129, 24, 100, 100, "router.png", helloworld},
-                                                {234, 24, 100, 100, "router.png", helloworld},
-                                                {339, 24, 100, 100, "router.png", helloworld},
-                                                {444, 24, 100, 100, "router.png", helloworld},
-                                                {549, 24, 100, 100, "router.png", helloworld},
-                                                {654, 24, 100, 100, "router.png", helloworld},
-                                                {759, 24, 100, 100, "router.png", helloworld},
-                                                {864, 24, 100, 100, "router.png", helloworld}},
-                                            (node_t[NUMNODI]){
-                                                {"nodo1",host_t,500,500},
-                                                {"nodo2",host_t,1200,700}
-                                            },
-                                            (link_t[NUMLINK]){
-                                                {"nodo1","nodo2",0}
-                                            });
+        {24, 129, 100, 100, "router.png", helloworld},
+        {24, 234, 100, 100, "router.png", helloworld},
+        {24, 339, 100, 100, "router.png", helloworld},
+        {24, 444, 100, 100, "router.png", helloworld},
+        {24, 549, 100, 100, "router.png", helloworld},
+        {24, 654, 100, 100, "router.png", helloworld},
+        {24, 759, 100, 100, "router.png", helloworld},
+        {24, 864, 100, 100, "router.png", helloworld},
+        {129, 24, 100, 100, "router.png", helloworld},
+        {234, 24, 100, 100, "router.png", helloworld},
+        {339, 24, 100, 100, "router.png", helloworld},
+        {444, 24, 100, 100, "router.png", helloworld},
+        {549, 24, 100, 100, "router.png", helloworld},
+        {654, 24, 100, 100, "router.png", helloworld},
+        {759, 24, 100, 100, "router.png", helloworld},
+        {864, 24, 100, 100, "router.png", helloworld}},
+    (node_t[NUMNODI]){{"nodo1", host_t, 500, 500}, {"nodo2", host_t, 1200, 700}}, (link_t[NUMLINK]){{"nodo1", "nodo2", 0}});
+
+    startSimulation();
 
     InitWindow(WIDTH, HEIGHT, TITLE);
     SetTargetFPS(30);
 
-    settings_t settings = {0,0,0,""};
-    
+    setSignalHandling(); // set up signal handling
+
+    settings_t settings = {0, 0, 0, ""};
+
     while (!WindowShouldClose())
     {
         BeginDrawing();
@@ -55,6 +54,8 @@ int main()
 
         EndDrawing();
     }
+
+    stopSimulation();
 
     return 0;
 }

@@ -97,7 +97,7 @@ int delNode(char *name)
 
         if (!system(command))
         {
-            strcpy(command, "sudo docker stop ");
+            strcpy(command, "sudo docker kill ");
             strcat(command, name);
             strcat(command, " && sudo docker rm ");
             strcat(command, name);
@@ -386,6 +386,88 @@ int delCableBetweenNodeAndSwitch(char *nodeName, char *switchName)
             printf("%s\n", command);
 
             free(pid);
+
+            return system(command);
+        }
+    }
+    return -1;
+}
+
+// Add a cable between two switches
+int addCableBetweenSwitches(char *firstSwitch, char *secondSwitch)
+{
+    char command[MAX_COMMAND_SIZE];
+    char endpoint1[MAX_NAME_SIZE + 10]; // used to build the connector's name
+    char endpoint2[MAX_NAME_SIZE + 10];
+
+    if (firstSwitch != NULL && strlen(firstSwitch) <= MAX_NAME_SIZE && secondSwitch != NULL && strlen(secondSwitch) <= MAX_NAME_SIZE)
+    {
+
+        // creating the connector's name
+        strcpy(endpoint1, "veth-");
+        strcat(endpoint1, firstSwitch);
+
+        strcpy(endpoint2, "veth-");
+        strcat(endpoint2, secondSwitch);
+
+        strcpy(command, "sudo ip link add ");
+        strcat(command, endpoint1);
+        strcat(command, " type veth peer name ");
+        strcat(command, endpoint2);
+
+        if (!system(command))
+        { // if the cable connection was successful, connect the cable to the switches
+
+            // connecting cable to the first switch
+            strcpy(command, "sudo ovs-vsctl add-port ");
+            strcat(command, firstSwitch);
+            strcat(command, " ");
+            strcat(command, endpoint1);
+            system(command);
+
+            // connecting cable to the second switch
+            strcpy(command, "sudo ovs-vsctl add-port ");
+            strcat(command, secondSwitch);
+            strcat(command, " ");
+            strcat(command, endpoint2);
+
+            return system(command);
+        }
+    }
+    return -1;
+}
+
+// Delete a cable between two switches
+int delCableBetweenSwitches(char *firstSwitch, char *secondSwitch)
+{
+    char command[MAX_COMMAND_SIZE];
+
+    if (firstSwitch != NULL && strlen(firstSwitch) <= MAX_NAME_SIZE && secondSwitch != NULL && strlen(secondSwitch) <= MAX_NAME_SIZE)
+    {
+
+        char endpoint1[MAX_NAME_SIZE + 10]; // used to build the connector's name
+        char endpoint2[MAX_NAME_SIZE + 10];
+
+        // creating the connector's name
+        strcpy(endpoint1, "veth-");
+        strcat(endpoint1, firstSwitch);
+
+        strcpy(endpoint2, "veth-");
+        strcat(endpoint2, secondSwitch);
+
+        // deleting the cable from the first switch
+        strcpy(command, "sudo ovs-vsctl del-port ");
+        strcat(command, firstSwitch);
+        strcat(command, " ");
+        strcat(command, endpoint1);
+
+        if (!system(command))
+        { // if the cable deletion was successful, delete the cable from the second switch
+
+            strcpy(command, "sudo ovs-vsctl del-port ");
+            strcat(command, secondSwitch);
+            strcat(command, " ");
+            strcat(command, endpoint2);
 
             return system(command);
         }

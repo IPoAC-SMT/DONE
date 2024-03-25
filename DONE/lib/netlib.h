@@ -22,4 +22,7 @@ int delCableBetweenNodes(char *firstNode, char *secondNode);
 int addCableBetweenNodeAndSwitch(char *nodeName, char *switchName);
 int delCableBetweenNodeAndSwitch(char *nodeName, char *switchName);
 
+int addCableBetweenSwitches(char *firstSwitch, char *secondSwitch);
+int delCableBetweenSwitches(char *firstSwitch, char *secondSwitch);
+
 int sendNetworkSetupCommand(char *pid, char *command);
