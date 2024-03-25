@@ -43,7 +43,7 @@ int addNode(char *name, char type)
 
         strcpy(command, "sudo docker run -id --name ");
         strcat(command, name);
-        strcat(command, " --network none node:1.0.0 /bin/ash");
+        strcat(command, " --network none node:1.0.0 /bin/bash");
 
         if (!system(command))
         { // once the node is created, adding the node's namespace to the netns folder
@@ -149,7 +149,7 @@ int addExternalInterface(char *name, char *interface)
         strcat(command, name);
         strcat(command, " --network ");
         strcat(command, interface);
-        strcat(command, " node:1.0.0 /bin/ash");
+        strcat(command, " node:1.0.0 /bin/bash");
 
         if (!system(command))
         { // once the node is created, adding the node's namespace to the netns folder
@@ -493,17 +493,21 @@ int sendNetworkSetupCommand(char *pid, char *command)
 }
 
 // open a shell in a device (host or switch)
-int openShell(char *name)
+int openNodeShell(char *name)
 {
     char command[MAX_COMMAND_SIZE];
 
     if (name != NULL && strlen(name) <= MAX_NAME_SIZE)
     {
-        strcpy(command, "sudo docker exec -it ");
+        strcpy(command, "konsole -e sudo docker exec -it ");
         strcat(command, name);
-        strcat(command, " /bin/ash");
-
-        return system(command);
+        strcat(command, " /bin/bash");
+        pid_t pid = fork(); 
+        if (pid == 0)
+        {
+            system(command);
+            exit(0);
+        }
     }
     return -1;
 }

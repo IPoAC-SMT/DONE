@@ -1,5 +1,5 @@
-# Alpine Linux as base image
-FROM alpine:latest
+FROM debian:latest
 
 # Required packages
-RUN apk add --no-cache net-tools iproute2 tcpdump iptables
+RUN apt update
+RUN apt install -y iproute2 iputils-ping net-tools

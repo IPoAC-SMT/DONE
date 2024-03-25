@@ -11,6 +11,7 @@ int startSimulation()
     addCableBetweenNodeAndSwitch("nodo1", "s1");
     addCableBetweenNodeAndSwitch("nodo2", "s2");
     addCableBetweenSwitches("s1", "s2");
+    openNodeShell("nodo1");
     return 0;
 }
 
