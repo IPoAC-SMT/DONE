@@ -1,14 +1,7 @@
 #include "../lib/GUI.h"
-#include "../lib/logicalController.h"
-
-<<<<<<< HEAD
-void DrawButton(pulsante_t pulsante,settings_t*settings){
-=======
-// const diocane = ;
 
 void DrawButton(pulsante_t pulsante, settings_t *settings)
 {
->>>>>>> refs/remotes/origin/main
     bool hovering;
     if (
         (GetMouseX() >= pulsante.x && GetMouseX() <= (pulsante.x + pulsante.width)) &&
@@ -45,18 +38,12 @@ int max(int a, int b)
     return (a > b ? a : b);
 }
 
-<<<<<<< HEAD
 void DrawLink(link_t link, settings_t* settings,node_t* nodi){
     Vector2 positions[2] = {getPos(nodi,link.nodo1),getPos(nodi,link.nodo2)};
     if (settings->moving_node){
         if (!strcmp(link.nodo1,settings->node_id)) positions[0]=(Vector2){GetMouseX(),GetMouseY()};
         else if (!strcmp(link.nodo2,settings->node_id)) positions[1]=(Vector2){GetMouseX(),GetMouseY()};
     }
-=======
-void DrawLink(link_t link, settings_t *settings, node_t *nodi)
-{
-    Vector2 positions[2] = {getPos(nodi, link.nodo1), getPos(nodi, link.nodo2)};
->>>>>>> refs/remotes/origin/main
     // breve digressione matematica: per verificare se sono su una linea verifico che la distanza del punto dalla linea sia minore di un qualcosa, diciamo 5 pixel.
     // ora, questo significa che posso rappresentare la mia linea con la seguente equazione:
     // y = mx + q, ossia y - mx - q = 0
@@ -67,21 +54,6 @@ void DrawLink(link_t link, settings_t *settings, node_t *nodi)
     // quindi q = y_0 - m x_0
     float q = positions[1].y - m * positions[1].x;
     // quindi la distanza punto-retta si calcola come \mod(y_mouse - (m x_mouse + y_0))/\sqrt(1+m^2)
-<<<<<<< HEAD
-    float d = (float)abs(GetMouseY() - (m*GetMouseX()+q))/(sqrt(1+m*m));
-    bool cond = (
-            (d<=5) &&
-            GetMouseX() >= min(positions[0].x,positions[1].x) &&
-            GetMouseX() <= max(positions[0].x,positions[1].x) &&
-            GetMouseY() >= min(positions[0].y,positions[1].y) &&
-            GetMouseY() <= max(positions[0].y,positions[1].y)
-            );
-    DrawLineEx(positions[0],positions[1], /*thick*/ cond?5:1 , /*Color color*/ RED);
-    
-    if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT)){
-        settings->moving_node = 0;
-        if (d) printf("HERE I should open the configs\n");
-=======
     float d = (float)abs(GetMouseY() - (m * GetMouseX() + q)) / (sqrt(1 + m * m));
     bool cond = ((d <= 5) &&
                  GetMouseX() >= min(positions[0].x, positions[1].x) &&
@@ -93,7 +65,6 @@ void DrawLink(link_t link, settings_t *settings, node_t *nodi)
     if (d && IsMouseButtonReleased(MOUSE_BUTTON_RIGHT))
     {
         printf("HERE I should open the configs\n");
->>>>>>> refs/remotes/origin/main
     }
     /* debug
     char toPrint[15];
@@ -102,7 +73,6 @@ void DrawLink(link_t link, settings_t *settings, node_t *nodi)
     */
 }
 
-<<<<<<< HEAD
 void DrawNode(node_t* node, settings_t* settings){
     int nodex, nodey;
     if (!strcmp(node->nome,settings->node_id)) {
@@ -191,46 +161,4 @@ void DrawGUI(settings_t* settings, interface_t * interface){
     for (int i=0; i<NUMLINK;i++) DrawLink(interface->links[i],settings,interface->nodi);
     for (int i=0; i<NUMNODI;i++) DrawNode(&(interface->nodi[i]),settings);
 
-=======
-void DrawNode(node_t *node, settings_t *settings)
-{
-    switch (node->tipo)
-    {
-    case switch_t:
-        // draw a rectangle
-        break;
-    case hub_t:
-        break;
-    case external_interface_t:
-        // draw a boh, something
-        break;
-    case router_t:
-        // draw a circle
-        break;
-    case host_t:
-        // DrawRectangle(node->x-20, node->y-20, 40, 40, PURPLE);
-        //  draw a something else
-        /*Texture2D router = LoadTexture("../resources/icons/router.png");
-        BeginDrawing();
-        ClearBackground(RAYWHITE);
-        DrawTexture(router, 40, 40, WHITE);
-        EndDrawing();*/
-        break;
-    }
-    // TODO draw text with name
-    DrawText(node->nome, node->x - 20, node->y + 40, STD_FONT_SIZE, BLUE);
-    // se non sto al momento spostando niente e ci clicco con il tasto sinistro allora inizio a draggarlo
-}
-
-void DrawGUI(settings_t *settings, interface_t *interface)
-{
-    for (int i = 0; i < NUMPULSANTI; i++)
-        DrawButton(interface->pulsanti[i], settings);
-    for (int i = 0; i < NUMLINK; i++)
-        DrawLink(interface->links[i], settings, interface->nodi);
-    for (int i = 0; i < NUMNODI; i++)
-        DrawNode(&(interface->nodi[i]), settings);
-
-    // se dragging allora ci piazzo cose
->>>>>>> refs/remotes/origin/main
 }

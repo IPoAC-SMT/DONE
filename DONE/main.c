@@ -1,9 +1,5 @@
 #include "./lib/GUI.h"
-<<<<<<< HEAD
-=======
-#include "./lib/logicalController.h"
 
->>>>>>> refs/remotes/origin/main
 #define WIDTH 1900
 #define HEIGHT 1000
 #define TITLE "Docker Orchestrator for Networks Emulation"
@@ -38,7 +34,6 @@ int main()
         {864, 24, 100, 100, "router.png", helloworld}},
     (node_t[NUMNODI]){{"nodo1", host_t, 500, 500}, {"nodo2", host_t, 1200, 700}}, (link_t[NUMLINK]){{"nodo1", "nodo2", 0}});
 
-    startSimulation();
 
     InitWindow(WIDTH, HEIGHT, TITLE);
     SetTargetFPS(30);
@@ -58,8 +53,6 @@ int main()
 
         EndDrawing();
     }
-
-    stopSimulation();
 
     return 0;
 }
