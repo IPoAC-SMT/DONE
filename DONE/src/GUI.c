@@ -1,5 +1,7 @@
 #include "../lib/GUI.h"
 
+//const diocane = ;
+
 void DrawButton(pulsante_t pulsante,settings_t*settings){
     bool hovering;
     if(
@@ -78,8 +80,13 @@ void DrawNode(node_t* node, settings_t* settings){
             // draw a circle
             break;
         case host_t:
-            DrawRectangle(node->x-20, node->y-20, 40, 40, PURPLE);   
+            //DrawRectangle(node->x-20, node->y-20, 40, 40, PURPLE);   
             // draw a something else
+            Texture2D router = LoadTexture("../resources/icons/router.png");
+            BeginDrawing();
+            ClearBackground(RAYWHITE);
+            DrawTexture(router, 40, 40, WHITE);
+            EndDrawing();
             break;
     }
     // TODO draw text with name
