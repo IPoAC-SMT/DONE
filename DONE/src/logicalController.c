@@ -12,7 +12,3 @@ void forcedCLIExit()
     stopSimulation();
     exit(0);
 }
-
-void openShellWrapper(char *name){
-    openNodeShell(name);
-}

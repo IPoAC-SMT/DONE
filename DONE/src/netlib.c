@@ -173,7 +173,7 @@ int addCableBetweenNodes(char *firstNode, char *secondNode)
 
         // creating the connector's name
         snprintf(endpoint1, MAX_NAME_SIZE + 10, "veth-%s", firstNode);
-        
+
         snprintf(endpoint2, MAX_NAME_SIZE + 10, "veth-%s", secondNode);
 
         snprintf(command, MAX_COMMAND_SIZE, "sudo ip link add %s type veth peer name %s", endpoint1, endpoint2);
@@ -243,7 +243,7 @@ int addCableBetweenNodeAndSwitch(char *nodeName, char *switchName)
 
         // creating the connector's name
         snprintf(hostEndpoint, MAX_NAME_SIZE + 10, "veth-%s", nodeName);
-        
+
         snprintf(switchEndpoint, MAX_NAME_SIZE + 10, "veth-%s-%s", nodeName, switchName);
 
         snprintf(command, MAX_COMMAND_SIZE, "sudo ip link add %s type veth peer name %s", hostEndpoint, switchEndpoint);
@@ -287,7 +287,7 @@ int delCableBetweenNodeAndSwitch(char *nodeName, char *switchName)
 
         // creating the connector's name
         snprintf(hostEndpoint, MAX_NAME_SIZE + 10, "veth-%s", nodeName);
-        
+
         snprintf(switchEndpoint, MAX_NAME_SIZE + 10, "veth-%s-%s", nodeName, switchName);
 
         // deleting the cable from the switch
@@ -324,22 +324,17 @@ int addCableBetweenSwitches(char *firstSwitch, char *secondSwitch)
     {
 
         // creating the connector's name
-        snprintf(endpoint1, MAX_NAME_SIZE + 10, "veth-%s", firstSwitch);
+        snprintf(endpoint1, MAX_NAME_SIZE + 10, "patch-%s", firstSwitch);
 
+        snprintf(endpoint2, MAX_NAME_SIZE + 10, "patch-%s", secondSwitch);
 
-        snprintf(endpoint2, MAX_NAME_SIZE + 10, "veth-%s", secondSwitch);
-
-        snprintf(command, MAX_COMMAND_SIZE, "sudo ip link add %s type veth peer name %s", endpoint1, endpoint2);
+        // snprintf(command, MAX_COMMAND_SIZE, "sudo ip link add %s type veth peer name %s", endpoint1, endpoint2);
+        snprintf(command, MAX_COMMAND_SIZE, "sudo ovs-vsctl add-port %s %s -- set interface %s type=patch options:peer=%s", firstSwitch, endpoint1, endpoint1, endpoint2);
 
         if (!system(command))
-        { // if the cable connection was successful, connect the cable to the switches
+        { // if the first cable connection was successful, connect the second one
 
-            // connecting cable to the first switch
-            snprintf(command, MAX_COMMAND_SIZE, "sudo ovs-vsctl add-port %s %s", firstSwitch, endpoint1);
-            system(command);
-
-            // connecting cable to the second switch
-            snprintf(command, MAX_COMMAND_SIZE, "sudo ovs-vsctl add-port %s %s", secondSwitch, endpoint2);
+            snprintf(command, MAX_COMMAND_SIZE, "sudo ovs-vsctl add-port %s %s -- set interface %s type=patch options:peer=%s", secondSwitch, endpoint2, endpoint2, endpoint1);
 
             return system(command);
         }
@@ -361,7 +356,6 @@ int delCableBetweenSwitches(char *firstSwitch, char *secondSwitch)
         // creating the connector's name
         snprintf(endpoint1, MAX_NAME_SIZE + 10, "veth-%s", firstSwitch);
 
-
         snprintf(endpoint2, MAX_NAME_SIZE + 10, "veth-%s", secondSwitch);
 
         // deleting the cable from the first switch
@@ -379,13 +373,13 @@ int delCableBetweenSwitches(char *firstSwitch, char *secondSwitch)
 }
 
 // Send a command to a container's network namespace
-int sendNetworkSetupCommand(char *pid, char *command)
+int sendNetworkSetupCommand(char *name, char *command)
 {
     char fullCommand[MAX_COMMAND_SIZE];
 
-    if (pid != NULL && command != NULL && strlen(pid) <= MAX_PID_SIZE)
+    if (name != NULL && command != NULL && strlen(name) <= MAX_PID_SIZE)
     {
-        snprintf(fullCommand, MAX_COMMAND_SIZE, "sudo ip netns exec %s %s", pid, command);
+        snprintf(fullCommand, MAX_COMMAND_SIZE, "docker exec -it %s %s", name, command);
 
         return system(fullCommand);
     }
@@ -400,7 +394,7 @@ int openNodeShell(char *name)
     if (name != NULL && strlen(name) <= MAX_NAME_SIZE)
     {
         snprintf(command, MAX_COMMAND_SIZE, "konsole -e sudo docker exec -it %s /bin/bash", name);
-        pid_t pid = fork(); 
+        pid_t pid = fork();
         if (pid == 0)
         {
             system(command);

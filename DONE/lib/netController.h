@@ -5,3 +5,4 @@
 
 int startSimulation();
 int stopSimulation();
+void openShellWrapper(char *name);

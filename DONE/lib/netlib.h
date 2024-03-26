@@ -4,7 +4,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#define MAX_COMMAND_SIZE 100
+#define MAX_COMMAND_SIZE 200
 #define MAX_NAME_SIZE 20
 #define MAX_PID_SIZE 10
 
@@ -27,5 +27,5 @@ int delCableBetweenNodeAndSwitch(char *nodeName, char *switchName);
 int addCableBetweenSwitches(char *firstSwitch, char *secondSwitch);
 int delCableBetweenSwitches(char *firstSwitch, char *secondSwitch);
 
-int sendNetworkSetupCommand(char *pid, char *command);
+int sendNetworkSetupCommand(char *name, char *command);
 int openNodeShell(char *name);
