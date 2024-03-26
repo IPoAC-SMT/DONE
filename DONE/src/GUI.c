@@ -9,7 +9,8 @@ void DrawButton(pulsante_t pulsante, settings_t *settings)
     {
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
         {
-            settings->moving_node=false;
+            settings->moving_node = false;
+            settings->placing_node = false;
             hovering = false;
             pulsante.pressed(settings);
         }
@@ -39,7 +40,7 @@ int max(int a, int b)
     return (a > b ? a : b);
 }
 
-void DrawLink(link_t link, settings_t* settings,node_t* nodi){
+void DrawLink(link_t link, settings_t* settings,node_t* nodi, bool true_node){
     Vector2 positions[2] = {getPos(nodi,link.nodo1),getPos(nodi,link.nodo2)};
     if (settings->moving_node){
         if (!strcmp(link.nodo1,settings->node_id)) positions[0]=(Vector2){GetMouseX(),GetMouseY()};
@@ -65,6 +66,8 @@ void DrawLink(link_t link, settings_t* settings,node_t* nodi){
 
     if (d && IsMouseButtonReleased(MOUSE_BUTTON_RIGHT))
     {
+        settings->moving_node = false;
+        settings->placing_node = false;
         printf("HERE I should open the configs\n");
     }
     /* debug
@@ -74,7 +77,7 @@ void DrawLink(link_t link, settings_t* settings,node_t* nodi){
     */
 }
 
-void DrawNode(node_t* node, settings_t* settings){
+void DrawNode(node_t* node, settings_t* settings, bool true_node){
     int nodex, nodey;
     if (!strcmp(node->nome,settings->node_id)) {
         nodex = GetMouseX();
@@ -241,28 +244,32 @@ void DrawNode(node_t* node, settings_t* settings){
     DrawText(node->nome,nodex-20,nodey+40,STD_FONT_SIZE,GRAY);
     // se non sto al momento spostando niente e ci clicco con il tasto sinistro allora inizio a draggarlo
     if (
+        true_node &&
         GetMouseX() <= node->x+20 &&
         GetMouseX() >= node->x-20 &&
         GetMouseY() <= node->y+20 &&
         GetMouseY() >= node->y-20 &&
         IsMouseButtonReleased(MOUSE_BUTTON_LEFT) &&
-        ! settings->moving_node
+        ! settings->dragging_deactivated
         )
     {
-        if (!strcmp(settings->node_id,node->nome)){
-            settings->node_id = (char*) calloc(NAMELENGTH,sizeof(char));
-        }
-        else {
-            settings->moving_node = 1;
-            settings->node_type = node->tipo;
-            settings->node_id = (char*) calloc(NAMELENGTH,sizeof(char));
-            snprintf(settings->node_id,NAMELENGTH,"%s",node->nome);
+        if(!settings->moving_node && !settings->placing_node){
+            if (!strcmp(settings->node_id,node->nome)){
+                settings->node_id = (char*) calloc(NAMELENGTH,sizeof(char));
+            }
+            else {
+                settings->placing_node = false;
+                settings->moving_node = 1;
+                settings->node_type = node->tipo;
+                settings->node_id = (char*) calloc(NAMELENGTH,sizeof(char));
+                snprintf(settings->node_id,NAMELENGTH,"%s",node->nome);
+            }
         }
     }
 }
 
-void setNode(char * name, node_t* nodi){
-    for (int i=0; i<NUMNODI; i++) {
+void setNode(char * name, node_t* nodi, settings_t * settings){
+    for (int i=0; i<settings->numnodi; i++) {
         if (!strcmp(name,nodi[i].nome)){
             nodi[i].x = GetMouseX();
             nodi[i].y = GetMouseY();
@@ -270,26 +277,128 @@ void setNode(char * name, node_t* nodi){
     }
 }
 
+char * identify(int num){
+    return (char[50][50]){"hub","switch","router","host","external_interface","external_natted_interface"}[num];
+}
 
-void DrawGUI(settings_t* settings, interface_t * interface){
+void appendNode(interface_t*interface,node_t newnode,settings_t*settings) {
+    if (settings->numnodi == 0){
+        interface->nodi = (node_t*)calloc(1,sizeof(node_t));
+    }
+    else interface->nodi = (node_t*)realloc(interface->nodi,(settings->numnodi+1)*sizeof(node_t));
+    interface->nodi[settings->numnodi].nome = (char*) calloc(NAMELENGTH,sizeof(char));
+    strncpy(interface->nodi[settings->numnodi].nome,newnode.nome,49);
+    interface->nodi[settings->numnodi].tipo = newnode.tipo;
+    interface->nodi[settings->numnodi].x = newnode.x;
+    interface->nodi[settings->numnodi].y = newnode.y;
+}
 
-    // se premo esc allora disattivo l'eventuale dragging
-    if(IsKeyReleased(KEY_ESCAPE)){
-        settings->moving_node = 0;
+void appendLink(interface_t*interface,settings_t*settings,link_t link) {
+    if (settings->numlink == 0){
+        interface->links = (link_t*)calloc(1,sizeof(link_t));
+    }
+    else interface->links = (link_t*)realloc(interface->links,(settings->numlink+1)*sizeof(link_t));
+    interface->links[settings->numlink].nodo1 = (char*) calloc(NAMELENGTH,sizeof(char));
+    interface->links[settings->numlink].nodo2 = (char*) calloc(NAMELENGTH,sizeof(char));
+    strncpy(interface->links[settings->numlink].nodo1,link.nodo1,49);
+    strncpy(interface->links[settings->numlink].nodo2,link.nodo2,49);
+}
+
+char * getInversePos(int x, int y, node_t * nodi, settings_t * settings) {
+    for (int i=0; i<settings->numnodi; i++) {
+        if (
+            x <= nodi[i].x + 20 &&
+            x >= nodi[i].x - 20 &&
+            y <= nodi[i].y + 20 &&
+            y >= nodi[i].y -20
+        ) {
+            return nodi[i].nome;
+        }
+    }
+}
+
+bool isSomethingUnder(int x,int y,node_t * nodi,settings_t*settings){
+    for (int i=0; i<settings->numnodi; i++) {
+        if (
+            x <= nodi[i].x + 20 &&
+            x >= nodi[i].x - 20 &&
+            y <= nodi[i].y + 20 &&
+            y >= nodi[i].y -20
+        ) {
+            return true;
+        }
+    }
+    return false;
+
+}
+
+void DrawGUI(settings_t* settings, interface_t * interface) {
+
+    // 1. piazzo i pulsanti
+    for (int i=0;i<NUMPULSANTI;i++) DrawButton(interface->pulsanti[i],settings);
+    
+    // 2. se premo esc disattivo dragging e placing TODO bugged
+    if(IsKeyReleased(KEY_ESCAPE)) {
+        settings->moving_node = false;
+        settings->placing_node = false;
+        settings->node_type = -1;
     }
 
-    // se dragging allora ci piazzo cose
+    // 3. se sto spostando cose
     if (settings->moving_node) {
-        DrawNode(&(node_t){settings->node_id,settings->node_type,GetMouseX(),GetMouseY()},settings);
-        if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
-            settings->moving_node = 0;
-            setNode(settings->node_id,interface->nodi);
+        // giusto per sicurezza, disattivo il placing se sto piazzando cose
+        settings->placing_node = false;
+        // disegno un nodo "fantasma" dove sto muovendo il mouse
+        DrawNode(&(node_t){settings->node_id,settings->node_type,GetMouseX(),GetMouseY()},settings,false);
+        // se sto premendo (rilasciando, tbh) il tasto sinistro del mouse
+        if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+            // smetto di spostare il nodo
+            settings->moving_node = false;
+            // ne imposto le posizioni
+            setNode(settings->node_id,interface->nodi,settings);
         }
     }
 
+    // 4. altrimenti, se sto posizionando qualcosa di nuovo
+    else if (settings->placing_node) {
+        // creo il nome del nuovo nodo
+        char nome[50];
+        snprintf(nome,50,"node-%d-%s",settings->numnodi,identify(settings->node_type));
+        // disegno un nodo "fantasma" dove sto muovendo il mouse
+        DrawNode(&(node_t){nome,settings->node_type,GetMouseX(),GetMouseY()},settings,false);
+        // se premo il mouse
+        if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+            // allora non lo sto più piazzando
+            settings->placing_node = false;
+            // aggiungo il nodo alla lista
+            appendNode(interface,(node_t){nome,settings->node_type,GetMouseX(),GetMouseY()},settings);
+            // e aumento il numero di nodi
+            settings->numnodi++;
+        }
+    }
+ 
+    // 5. altrimenti, se sto posizionando un link
+    else if (settings->placing_link) {
+        // se ho già selezionato il primo nodo
+        if (settings->placing_link==1 && IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && isSomethingUnder(GetMouseX(),GetMouseY(),interface->nodi,settings)) {
+            printf("%s\n",getInversePos(GetMouseX(),GetMouseY(),interface->nodi,settings));
+            strncpy(settings->first_place,getInversePos(GetMouseX(),GetMouseY(),interface->nodi,settings),50);
+            settings->dragging_deactivated = true;
+            settings->placing_link = 2;
+        }
+        // altrimenti
+        else if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)&&isSomethingUnder(GetMouseX(),GetMouseY(),interface->nodi,settings)){
+            printf("HERE2\n");
+            settings->placing_link = 0;
+            appendLink(interface,settings,(link_t){settings->first_place,getInversePos(GetMouseX(),GetMouseY(),interface->nodi,settings)});
+            //aumento il numero di link
+            settings->numlink++;
+            settings->dragging_deactivated = false;
+        }
+    }
 
-    for (int i=0; i<NUMPULSANTI; i++) DrawButton(interface->pulsanti[i],settings);
-    for (int i=0; i<NUMLINK;i++) DrawLink(interface->links[i],settings,interface->nodi);
-    for (int i=0; i<NUMNODI;i++) DrawNode(&(interface->nodi[i]),settings);
+    // ora posiziono tutto: nodi e link
+    for (int i=0; i<settings->numlink;i++) DrawLink(interface->links[i],settings,interface->nodi,true);
+    for (int i=0; i<settings->numnodi;i++) DrawNode(&(interface->nodi[i]),settings,true);
 
 }

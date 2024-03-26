@@ -16,13 +16,13 @@ char*completePath(char*name){ // took this from SO, not my responsibility
 int main()
 {
     interface_t *interface = init_interface((pulsante_t[NUMPULSANTI]){
-        {24, 129, 100, 100, router_t, placeRouter},
-        {24, 234, 100, 100, router_t, helloworld},
-        {24, 339, 100, 100, router_t, helloworld},
-        {24, 444, 100, 100, router_t, helloworld},
-        {24, 549, 100, 100, router_t, helloworld},
-        {24, 654, 100, 100, router_t, helloworld},
-        {24, 759, 100, 100, router_t, helloworld},
+        {24, 129, 100, 100, router_t, placehub},
+        {24, 234, 100, 100, router_t, placeswitch},
+        {24, 339, 100, 100, router_t, placerouter},
+        {24, 444, 100, 100, router_t, placehost},
+        {24, 549, 100, 100, router_t, placeexternalinterface},
+        {24, 654, 100, 100, router_t, placeexternalnattedinterface},
+        {24, 759, 100, 100, router_t, placelink},
         {24, 864, 100, 100, router_t, helloworld},
         {129, 24, 100, 100, router_t, helloworld},
         {234, 24, 100, 100, router_t, helloworld},
@@ -32,21 +32,7 @@ int main()
         {654, 24, 100, 100, router_t, helloworld},
         {759, 24, 100, 100, router_t, helloworld},
         {864, 24, 100, 100, router_t, helloworld}},
-    (node_t[NUMNODI]){
-        {"nodo1", host_t, 500, 500},
-        {"nodo2", switch_t, 1200, 700},
-        {"nodo4", external_natted_interface_t, 1200, 400},
-        {"nodo6", external_interface_t, 1200, 550},
-        {"nodo3", router_t, 600, 700},
-        {"nodo5",hub_t,600,1000}
-    },
-    (link_t[NUMLINK]){
-        {"nodo1", "nodo2", 0},
-        {"nodo2","nodo3", 0},
-        {"nodo3","nodo4", 0},
-        {"nodo2","nodo5",0},
-        {"nodo6","nodo3",0}
-    });
+    NULL,NULL);
 
 
     InitWindow(WIDTH, HEIGHT, TITLE);
@@ -56,7 +42,7 @@ int main()
 
     //setSignalHandling(); // set up signal handling
 
-    settings_t settings = {0, 0, 0, "",0};
+    settings_t settings = {0, 0, 0, "",0,0,0,0,"",0};
 
     while (!WindowShouldClose())
     {
