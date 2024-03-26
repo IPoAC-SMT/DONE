@@ -32,7 +32,21 @@ int main()
         {654, 24, 100, 100, "router.png", helloworld},
         {759, 24, 100, 100, "router.png", helloworld},
         {864, 24, 100, 100, "router.png", helloworld}},
-    (node_t[NUMNODI]){{"nodo1", host_t, 500, 500}, {"nodo2", host_t, 1200, 700}}, (link_t[NUMLINK]){{"nodo1", "nodo2", 0}});
+    (node_t[NUMNODI]){
+        {"nodo1", host_t, 500, 500},
+        {"nodo2", switch_t, 1200, 700},
+        {"nodo4", external_natted_interface_t, 1200, 400},
+        {"nodo6", external_interface_t, 1200, 550},
+        {"nodo3", router_t, 600, 700},
+        {"nodo5",hub_t,600,1000}
+    },
+    (link_t[NUMLINK]){
+        {"nodo1", "nodo2", 0},
+        {"nodo2","nodo3", 0},
+        {"nodo3","nodo4", 0},
+        {"nodo2","nodo5",0},
+        {"nodo6","nodo3",0}
+    });
 
 
     InitWindow(WIDTH, HEIGHT, TITLE);
@@ -40,14 +54,14 @@ int main()
  
     SetExitKey(KEY_NULL);
 
-    setSignalHandling(); // set up signal handling
+    //setSignalHandling(); // set up signal handling
 
     settings_t settings = {0, 0, 0, ""};
 
     while (!WindowShouldClose())
     {
         BeginDrawing();
-        ClearBackground(CLITERAL(Color){19, 31, 42,0}); // colore di sfondo, per crearne altri si deve usare CLITERAL(Color){R,G,B,A}, numeri interi da 0 a 255
+        ClearBackground(BACKGROUND_COLOR); // colore di sfondo, per crearne altri si deve usare CLITERAL(Color){R,G,B,A}, numeri interi da 0 a 255
 
         DrawGUI(&settings, interface);
 

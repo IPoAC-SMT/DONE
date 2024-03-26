@@ -85,18 +85,148 @@ void DrawNode(node_t* node, settings_t* settings){
     }
     switch(node->tipo){
         case switch_t:
-            // draw a rectangle
+            DrawRectangle(nodex-20, nodey-20, 40, 40, BACKGROUND_COLOR); // this should fix the compenetrations, but it doesn't. :-(
+            // external lines
+            DrawLineEx((Vector2){nodex-18,nodey-15},(Vector2){nodex+18,nodey-15},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-18,nodey+15},(Vector2){nodex+18,nodey+15},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-18,nodey-15},(Vector2){nodex-18,nodey+15},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+18,nodey-15},(Vector2){nodex+18,nodey+15},2,FIGURE_COLOR);
+            // frecce
+            DrawLineEx((Vector2){nodex+1,nodey-9},(Vector2){nodex+15,nodey-9},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+10,nodey-13},(Vector2){nodex+15,nodey-9},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+10,nodey-5},(Vector2){nodex+15,nodey-9},2,FIGURE_COLOR);
+            
+            DrawLineEx((Vector2){nodex-15,nodey-3},(Vector2){nodex-1,nodey-3},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-15,nodey-3},(Vector2){nodex-10,nodey-7},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-15,nodey-3},(Vector2){nodex-10,nodey+1},2,FIGURE_COLOR);
+            
+            DrawLineEx((Vector2){nodex+1,nodey+3},(Vector2){nodex+15,nodey+3},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+10,nodey+7},(Vector2){nodex+15,nodey+3},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+10,nodey-1},(Vector2){nodex+15,nodey+3},2,FIGURE_COLOR);
+            
+            DrawLineEx((Vector2){nodex-15,nodey+9},(Vector2){nodex-1,nodey+9},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-15,nodey+9},(Vector2){nodex-10,nodey+13},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-15,nodey+9},(Vector2){nodex-10,nodey+5},2,FIGURE_COLOR);
+            
             break;
         case hub_t:
+            // external lines
+            DrawLineEx((Vector2){nodex-18,nodey-12},(Vector2){nodex+18,nodey-12},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-18,nodey+12},(Vector2){nodex+18,nodey+12},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-18,nodey-12},(Vector2){nodex-18,nodey+12},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+18,nodey-12},(Vector2){nodex+18,nodey+12},2,FIGURE_COLOR);
+            // frecce
+            DrawLineEx((Vector2){nodex-15,nodey},(Vector2){nodex+15,nodey},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-15,nodey},(Vector2){nodex-10,nodey+4},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-15,nodey},(Vector2){nodex-10,nodey-4},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+15,nodey},(Vector2){nodex+10,nodey+4},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+15,nodey},(Vector2){nodex+10,nodey-4},2,FIGURE_COLOR);
+
             break;
         case external_interface_t:
+            DrawLineEx((Vector2){nodex-3,nodey+18},(Vector2){nodex-3,nodey+13},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+3,nodey+18},(Vector2){nodex+3,nodey+13},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-3,nodey+18},(Vector2){nodex+3,nodey+18},2,FIGURE_COLOR);
+            
+            DrawLineEx((Vector2){nodex-3,nodey+13},(Vector2){nodex-7,nodey+10},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+3,nodey+13},(Vector2){nodex+7,nodey+10},2,FIGURE_COLOR);
+
+            DrawLineEx((Vector2){nodex-7,nodey+10},(Vector2){nodex-10,nodey+9},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+7,nodey+10},(Vector2){nodex+10,nodey+9},2,FIGURE_COLOR);
+
+            DrawLineEx((Vector2){nodex-10,nodey+9},(Vector2){nodex-10,nodey-10},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+10,nodey+9},(Vector2){nodex+10,nodey-10},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-10,nodey-10},(Vector2){nodex+10,nodey-10},1,FIGURE_COLOR);
+
+            DrawLineEx((Vector2){nodex-7,nodey-10},(Vector2){nodex-7,nodey-15},1,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+7,nodey-10},(Vector2){nodex+7,nodey-15},1,FIGURE_COLOR);
+
+            DrawLineEx((Vector2){nodex-7,nodey-15},(Vector2){nodex-5,nodey-18},1,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+7,nodey-15},(Vector2){nodex+5,nodey-18},1,FIGURE_COLOR);
+            
+            DrawLineEx((Vector2){nodex+5,nodey-18},(Vector2){nodex-5,nodey-18},1,FIGURE_COLOR);
+            
+            DrawLineEx((Vector2){nodex-3,nodey-10},(Vector2){nodex-3,nodey-15},1,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-1,nodey-10},(Vector2){nodex-1,nodey-15},1,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+1,nodey-10},(Vector2){nodex+1,nodey-15},1,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+3,nodey-10},(Vector2){nodex+3,nodey-15},1,FIGURE_COLOR);
+            // draw a boh, something
+            break;
+        case external_natted_interface_t:
+            DrawLineEx((Vector2){nodex-3,nodey+18},(Vector2){nodex-3,nodey+13},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+3,nodey+18},(Vector2){nodex+3,nodey+13},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-3,nodey+18},(Vector2){nodex+3,nodey+18},2,FIGURE_COLOR);
+            
+            DrawLineEx((Vector2){nodex-3,nodey+13},(Vector2){nodex-7,nodey+10},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+3,nodey+13},(Vector2){nodex+7,nodey+10},2,FIGURE_COLOR);
+
+            DrawLineEx((Vector2){nodex-7,nodey+10},(Vector2){nodex-10,nodey+9},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+7,nodey+10},(Vector2){nodex+10,nodey+9},2,FIGURE_COLOR);
+
+            DrawLineEx((Vector2){nodex-10,nodey+9},(Vector2){nodex-10,nodey-10},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+10,nodey+9},(Vector2){nodex+10,nodey-10},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-10,nodey-10},(Vector2){nodex+10,nodey-10},1,FIGURE_COLOR);
+
+            DrawLineEx((Vector2){nodex-7,nodey-10},(Vector2){nodex-7,nodey-15},1,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+7,nodey-10},(Vector2){nodex+7,nodey-15},1,FIGURE_COLOR);
+
+            DrawLineEx((Vector2){nodex-7,nodey-15},(Vector2){nodex-5,nodey-18},1,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+7,nodey-15},(Vector2){nodex+5,nodey-18},1,FIGURE_COLOR);
+            
+            DrawLineEx((Vector2){nodex+5,nodey-18},(Vector2){nodex-5,nodey-18},1,FIGURE_COLOR);
+            
+            DrawLineEx((Vector2){nodex-3,nodey-10},(Vector2){nodex-3,nodey-15},1,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-1,nodey-10},(Vector2){nodex-1,nodey-15},1,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+1,nodey-10},(Vector2){nodex+1,nodey-15},1,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+3,nodey-10},(Vector2){nodex+3,nodey-15},1,FIGURE_COLOR);
+
+            //DrawText("NAT",nodex-9,nodey-3,0,FIGURE_COLOR);
+
+            DrawLineEx((Vector2){nodex-7,nodey-3},(Vector2){nodex-7,nodey+2},1,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-7,nodey-3},(Vector2){nodex-3,nodey+2},1,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-3,nodey-3},(Vector2){nodex-3,nodey+2},1,FIGURE_COLOR);
+
+            DrawLineEx((Vector2){nodex-1,nodey-3},(Vector2){nodex-1,nodey+2},1,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+3,nodey-3},(Vector2){nodex+3,nodey+2},1,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-1,nodey-1},(Vector2){nodex+3,nodey-1},1,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-1,nodey-3},(Vector2){nodex+3,nodey-3},1,FIGURE_COLOR);
+
+            DrawLineEx((Vector2){nodex+4,nodey-3},(Vector2){nodex+8,nodey-3},1,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+6,nodey-3},(Vector2){nodex+6,nodey+2},1,FIGURE_COLOR);
             // draw a boh, something
             break;
         case router_t:
             // draw a circle
+            DrawRectangle(nodex-20, nodey-20, 40, 40, BACKGROUND_COLOR); // this should fix the compenetrations, but it doesn't. :-(
+            DrawRing((Vector2){nodex,nodey}, 16, 18, 0, 360, 0, FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-3,nodey},(Vector2){nodex-14,nodey},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-3,nodey},(Vector2){nodex-8,nodey+4},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-3,nodey},(Vector2){nodex-8,nodey-4},2,FIGURE_COLOR);
+            
+            DrawLineEx((Vector2){nodex+3,nodey},(Vector2){nodex+14,nodey},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+3,nodey},(Vector2){nodex+8,nodey+4},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+3,nodey},(Vector2){nodex+8,nodey-4},2,FIGURE_COLOR);
+            
+            DrawLineEx((Vector2){nodex,nodey-3},(Vector2){nodex,nodey-14},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+4,nodey-10},(Vector2){nodex,nodey-14},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-4,nodey-10},(Vector2){nodex,nodey-14},2,FIGURE_COLOR);
+            
+            DrawLineEx((Vector2){nodex,nodey+3},(Vector2){nodex,nodey+14},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+4,nodey+10},(Vector2){nodex,nodey+14},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-4,nodey+10},(Vector2){nodex,nodey+14},2,FIGURE_COLOR);
             break;
         case host_t:
-            DrawRectangle(nodex-20, nodey-20, 40, 40, PURPLE);   
+            DrawRectangle(nodex-20, nodey-20, 40, 40, BACKGROUND_COLOR); // this should fix the compenetrations, but it doesn't. :-(
+            DrawLineEx((Vector2){nodex-18,nodey-18},(Vector2){nodex+18,nodey-18},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-18,nodey-18},(Vector2){nodex-18,nodey+5},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+18,nodey-18},(Vector2){nodex+18,nodey+5},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-18,nodey+5},(Vector2){nodex+18,nodey+5},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-3,nodey+5},(Vector2){nodex-3,nodey+15},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+3,nodey+5},(Vector2){nodex+3,nodey+15},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-15,nodey+15},(Vector2){nodex+15,nodey+15},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-15,nodey+18},(Vector2){nodex+15,nodey+18},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex-15,nodey+15},(Vector2){nodex-15,nodey+18},2,FIGURE_COLOR);
+            DrawLineEx((Vector2){nodex+15,nodey+15},(Vector2){nodex+15,nodey+18},2,FIGURE_COLOR);
             // draw a something else
             // temporaneamente commentato in attesa di capire come si usi
             /*Texture2D router = LoadTexture("./resources/icons/elfuny.png");
