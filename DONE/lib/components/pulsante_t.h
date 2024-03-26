@@ -5,6 +5,6 @@ typedef struct
     int y;                         // y to start drawing
     int width;                     // width of the rectangle
     int height;                    // height of the rectangle
-    char *iconName;                // name of the icon
+    int iconType;                  // type of the icon
     void (*pressed)(settings_t *); // function to be called when pressed
 } pulsante_t;

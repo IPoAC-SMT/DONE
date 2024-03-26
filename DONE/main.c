@@ -16,22 +16,22 @@ char*completePath(char*name){ // took this from SO, not my responsibility
 int main()
 {
     interface_t *interface = init_interface((pulsante_t[NUMPULSANTI]){
-        {24, 129, 100, 100, "router.png", helloworld},
-        {24, 234, 100, 100, "router.png", helloworld},
-        {24, 339, 100, 100, "router.png", helloworld},
-        {24, 444, 100, 100, "router.png", helloworld},
-        {24, 549, 100, 100, "router.png", helloworld},
-        {24, 654, 100, 100, "router.png", helloworld},
-        {24, 759, 100, 100, "router.png", helloworld},
-        {24, 864, 100, 100, "router.png", helloworld},
-        {129, 24, 100, 100, "router.png", helloworld},
-        {234, 24, 100, 100, "router.png", helloworld},
-        {339, 24, 100, 100, "router.png", helloworld},
-        {444, 24, 100, 100, "router.png", helloworld},
-        {549, 24, 100, 100, "router.png", helloworld},
-        {654, 24, 100, 100, "router.png", helloworld},
-        {759, 24, 100, 100, "router.png", helloworld},
-        {864, 24, 100, 100, "router.png", helloworld}},
+        {24, 129, 100, 100, router_t, placeRouter},
+        {24, 234, 100, 100, router_t, helloworld},
+        {24, 339, 100, 100, router_t, helloworld},
+        {24, 444, 100, 100, router_t, helloworld},
+        {24, 549, 100, 100, router_t, helloworld},
+        {24, 654, 100, 100, router_t, helloworld},
+        {24, 759, 100, 100, router_t, helloworld},
+        {24, 864, 100, 100, router_t, helloworld},
+        {129, 24, 100, 100, router_t, helloworld},
+        {234, 24, 100, 100, router_t, helloworld},
+        {339, 24, 100, 100, router_t, helloworld},
+        {444, 24, 100, 100, router_t, helloworld},
+        {549, 24, 100, 100, router_t, helloworld},
+        {654, 24, 100, 100, router_t, helloworld},
+        {759, 24, 100, 100, router_t, helloworld},
+        {864, 24, 100, 100, router_t, helloworld}},
     (node_t[NUMNODI]){
         {"nodo1", host_t, 500, 500},
         {"nodo2", switch_t, 1200, 700},
@@ -56,7 +56,7 @@ int main()
 
     //setSignalHandling(); // set up signal handling
 
-    settings_t settings = {0, 0, 0, ""};
+    settings_t settings = {0, 0, 0, "",0};
 
     while (!WindowShouldClose())
     {
