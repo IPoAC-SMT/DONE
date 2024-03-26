@@ -1,0 +1,13 @@
+\section{Analisi}
+Di seguito si analizzeranno in maniera più dettagliata le singole componenti, descrivendo come si intende realizzarle. 
+\paragraph*{Tecnologie utilizzate} Complessivamente, il progetto sarà realizzato utilizzando le seguenti tecnologie: linguaggio \textbf{C}, con l'uso della libreria \texttt{raylib} per la realizzazione dell'interfaccia grafica; \textbf{Docker}, per la virtualizzazione dei nodi e dei router; \textbf{OpenVSwitch} per la virtualizzazione di switch. L'assenza di ulteriori dipendenze assicura un'elevata portabilità dell'applicazione, basando tutte le configurazioni di rete necessarie su strumenti già presenti in un ambiente Linux, come ad esempio i namespaces e la segregazione dello stack di rete tramite questi. 
+\newline\newline
+Come introdotto nella sezione precedente, il progetto si compone di cinque componenti principali:
+\paragraph*{Networking} La componente di networking è interamente gestita attraverso l'uso di \texttt{openvswitch-switch}, docker e l'interazione con i namespace dei container creati. La topologia viene realizzata concretamente creando i nodi richiesti, gli switch necessari e realizzando i collegamenti desiderati attraverso la creazione di interfacce virtuali collegate tra di loro mediante cavi virtuali. Alla creazione di un container, per creare dei collegamenti con altri apparati si creano delle interfacce virtuali lavorando direttamente sul namespace del container. Il livello di networking viene gestito direttamente da un network controller, attraverso l'uso di una libreria appositamente realizzata. 
+\paragraph*{Network controller} Si occupa di inviare i comandi necessari per la creazione della rete, in base alla topologia precedentemente realizzata dall'utente. Le informazioni relative ad apparati, relativo tipo e collegamenti sono comunicati al network controller dalla logica soprastante. 
+\paragraph*{Logical controller} Rappresenta il fulcro della logica di controllo. Riceve informazioni sulla topologia creata dal livello di GUI, le invia al controller di rete all'avvio della simulazione, gestisce il salvataggio dei progetti (topologia ed eventuali configurazioni dei nodi) e l'apertura di progetti salvati in precedenza, comunicando alla GUI quali nodi devono essere visualizzati. 
+\paragraph*{GUI} Realizza la componente grafica con cui l'utente può interagire con l'applicazione
+\paragraph*{CLI} Realizza la componente di interfaccia a riga di comando, con cui l'utente può interagire con i singoli nodi della rete, inserendo configurazioni e comandi. Questi comandi si distinguono da quelli che l'utente può specificare per i singoli apparati antecedentemente all'avvio della simulazione. 
+
+
+\newpage

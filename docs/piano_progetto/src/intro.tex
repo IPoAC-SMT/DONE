@@ -1,6 +1,14 @@
 Alla luce delle funzionalità che gli emulatori di rete oggi esistenti offrono, desideriamo, con l'obiettivo di approfondire le nostre conoscenze in ambito di reti e di sviluppo software, proporre una soluzione alternativa che offra feature extra ed un miglioramento generale della qualità di utilizzo.
-\newline\newline
-L'architettura della piattaforma proposta è stata ideata come segue:
+\subsection{Funzionalità}
+Le funzionalità che desideriamo offrire attraverso l'utilizzo di \texttt{DONE} sono le seguenti: 
+\begin{itemize}
+    \item L'utente può creare, aprire, modificare progetti di topologie di rete, aggiungendo apparati, definendo collegamenti tra questi, nonché fare uso di apparati specifici volti al collegamento della topologia definita a reti esterne alla simulazione. 
+    \item Una volta realizzata la topologia desiderata, l'utente può salvare su file il progetto, con lo scopo di poter riprendere il lavoro in un secondo momento
+    \item L'utente può assegnare per ogni singolo device delle configurazioni, che verranno applicate all'avvio della simulazione
+    \item L'utente può avviare la simulazione, con la possibilità in seguito di accedere tramite terminale ai singoli nodi per aggiungere ulteriori configurazioni, per testare la connettività e/o effettuare troubleshooting. Il tutto, esclusivamente tramite linea di comando
+\end{itemize}
+\subsection{Architettura}
+Alla luce delle funzionalità desiderate, l'architettura che abbiamo ideato per raggiungere gli obiettivi preposti è così organizzata: 
 \begin{center}
     \begin{tikzpicture}
         \draw (12,0) rectangle (15, 1.5);
@@ -8,19 +16,25 @@ L'architettura della piattaforma proposta è stata ideata come segue:
         \draw (11,0) rectangle (9,4);
         \draw (8,0) rectangle (6,4);
         \draw (3,0) rectangle (5,4);
-        \node[] at (4,2) {Networking};
+        \node[] at (4,2) {Networking}; 
         \node[] at (7,2) {Network};
         \node[] at (7,1.5) {Controller};
         \node[] at (10,2) {Logical};
         \node[] at (10,1.5) {Controller};
-        \node[] at (13,1) {CLI};
-        \node[] at (13,3.5) {GUI};
+        \node[] at (13.4,0.7) {CLI};
+        \node[] at (13.4,3) {GUI};
         \node[] at (5.5,2) {$\Leftrightarrow$};
         \node[] at (8.5,2) {$\Leftrightarrow$};
         \node[] at (11.5,0.5) {$\Leftrightarrow$};
         \node[] at (11.5,3) {$\Leftrightarrow$};
     \end{tikzpicture}
 \end{center}
+%\begin{center}
+%    \begin{tikzpicture}
+%        \node[rectangle,draw,minimum height=4cm,minimum width=2.5cm] at (5,4) {Networking};
+%        \node[rectangle,draw,minimum height=4cm,minimum width=2.5cm] at (2,4) {Network Controller};
+%    \end{tikzpicture}
+%\end{center}
 
 Per tanto, le componenti da realizzare sono:
 \begin{itemize}
@@ -41,8 +55,8 @@ Gli obiettivi che desideriamo perseguire attraverso questo progetto sono:
     \item \textbf{Ridurre le dipendenze} al minimo necessario, in modo da rendere il programma il più portabile possibile
     \item Fornire la \textbf{capacità di salvare} non solo la topologia fisica ma anche tutte le configurazioni, senza bisogno di script ulteriori
     \item \textbf{Maggiore pulizia dell'ambiente}, evitando che Docker rimanga in uno stato intermedio (ossia con i vecchi container ancora presenti) in caso di chiusura della applicazione senza arresto della simulazione, nonché pulizia dalle altre interfacce e apparati virtuali creati
+    \item Offrire una soluzione open-source che possa essere \textbf{estesa} e \textbf{modificata}
 \end{itemize}
-
 
 
 \newpage
