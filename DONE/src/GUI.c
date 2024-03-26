@@ -9,6 +9,7 @@ void DrawButton(pulsante_t pulsante, settings_t *settings)
     {
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
         {
+            settings->moving_node=false;
             hovering = false;
             pulsante.pressed(settings);
         }
