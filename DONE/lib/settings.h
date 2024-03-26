@@ -12,6 +12,7 @@ typedef struct
     char placing_link;
     char first_place[50];
     char dragging_deactivated;
+    void * GUIdata;
 } settings_t;
 
 void toggleInterface(settings_t *settings);

@@ -6,6 +6,7 @@ void placerouter(settings_t *settings);
 void placehost(settings_t *settings);
 void placeexternalinterface(settings_t *settings);
 void placeexternalnattedinterface(settings_t *settings);
+void funzione_per_melissa(settings_t *settings);
 void tempStart(settings_t *settings);
 void tempStop(settings_t *settings);
 void openShell(char *name); // TODO: fix

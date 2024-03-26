@@ -47,6 +47,10 @@ void placelink(settings_t*settings){
     settings->placing_link = 1;
 }
 
+void funzione_per_melissa(settings_t*settings) {
+    printf("hello @RebelNightmare, here's the struct: %p\n",settings->GUIdata);
+}
+
 void tempStart(settings_t*settings){
     startSimulation();
 }
