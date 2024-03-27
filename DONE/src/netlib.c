@@ -11,27 +11,6 @@ int initEnv()
     return system("sudo mkdir -p /var/run/netns 2>/dev/null");
 }
 
-// Get the PID of a container by passing its name
-char *getContainerPID(char *name)
-{
-
-    char command[MAX_COMMAND_SIZE];
-
-    strcpy(command, "sudo docker inspect -f '{{.State.Pid}}' ");
-    strcat(command, name);
-    char *pid = (char *)calloc(MAX_PID_SIZE, sizeof(char));
-    FILE *fp = popen(command, "r");
-    if (fp != NULL)
-    {
-        fgets(pid, MAX_PID_SIZE, fp);
-        pclose(fp);
-
-        pid[strlen(pid) - 1] = '\0'; // removing the newline character
-        return pid;
-    }
-    return NULL;
-}
-
 // Create a new node
 // A node can be a host (h) or a router (r)
 int addNode(char *name, char type)
