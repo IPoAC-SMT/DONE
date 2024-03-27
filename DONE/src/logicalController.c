@@ -28,24 +28,32 @@ void sendDataToDocker(interface_t *simulation, int nodes_num, int links_num)
 
     // actually sending data to docker
 
-    for(int i = 0; i < nodes_num;i i++){
+    for(int i = 0; i < nodes_num;i i++){    // handling nodes
         node_t *current_node = simdata.nodes[i];
         
-        switch(current_node->tipo){     // handling every node type differently
+        switch(current_node->tipo){     // handling every node type differently depending on node type
             case host_t:
                 addNode(current_node->nome,'h');
                 break;
-            case hub_t:
+            case hub_t:     // TODO: wait for hub code 
                 break;
             case switch_t:
+                addNode(current_node->nome);
                 break;
             case router_t:
+                addNode(current_node->nome,'r');
                 break;
             case external_interface_t:
+                addExternalInterface(current_node->nome, "");   // TODO: @tiz314 - handling strings
                 break;
             case external_natted_interface_t:
+                addExternalInterface(current_node->nome, "");   // TODO: @tiz314 - handling strings
                 break;
         }
+    }
+
+    for(int i = 0; i < links_num; i++){
+        
     }
 
 }
@@ -56,5 +64,5 @@ void openSwitchShell(char* roba){
 }
 
 void openHostShell(char * roba){
-    
+
 }
