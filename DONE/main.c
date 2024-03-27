@@ -23,7 +23,7 @@ int main()
         {24, 549, 100, 100, router_t, placeexternalinterface},
         {24, 654, 100, 100, router_t, placeexternalnattedinterface},
         {24, 759, 100, 100, router_t, placelink},
-        {24, 864, 100, 100, router_t, funzione_per_melissa},
+        {24, 864, 100, 100, router_t, sendDataToLogicalController},
         {129, 24, 100, 100, router_t, helloworld},
         {234, 24, 100, 100, router_t, helloworld},
         {339, 24, 100, 100, router_t, helloworld},

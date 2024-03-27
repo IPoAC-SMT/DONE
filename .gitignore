@@ -25,4 +25,4 @@ docs/piano_progetto/indent.log
 
 *.sty
 
-*.vscode
+.vscode/

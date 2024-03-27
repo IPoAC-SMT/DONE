@@ -1,5 +1,5 @@
-#include "../lib/settings.h"
-
+//#include "../lib/settings.h"
+#include "../lib/logicalController.h"
 
 void helloworld(settings_t*settings){
     printf("hello world\n");
@@ -47,8 +47,9 @@ void placelink(settings_t*settings){
     settings->placing_link = 1;
 }
 
-void funzione_per_melissa(settings_t*settings) {
-    printf("hello @RebelNightmare, here's the struct: %p\n",settings->GUIdata);
+void sendDataToLogicalController(settings_t*settings) {    // sending data to logical controller
+    //printf("hello @RebelNightmare, here's the struct: %p\n",settings->GUIdata)
+    sendDataToDocker((interface_t *)settings->GUIdata,settings->numnodi,settings->numlink);
 }
 
 void tempStart(settings_t*settings){
@@ -59,6 +60,6 @@ void tempStop(settings_t*settings){
     stopSimulation();
 }
 
-void openShell(char *name){
-    openShellWrapper(name);
+void openShell(settings_t*settings){
+    settings->node_type == switch_t ? openSwitchShell(settings->node_id) : openHostShell(settings->node_id);
 }
