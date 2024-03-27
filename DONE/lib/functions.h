@@ -11,4 +11,4 @@ void tempStart(settings_t *settings);
 void tempStop(settings_t *settings);
 
 
-void openShell(settings_t*settings)
+void openShell(settings_t*settings);

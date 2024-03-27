@@ -15,3 +15,5 @@ void forcedCLIExit();
 void sendDataToDocker(interface_t *simulation, int nodes_num, int links_num);
 void openSwitchShell(char* roba);
 void openHostShell(char * roba);
+void startSimulation();
+void stopSimulation();
