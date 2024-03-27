@@ -1,5 +1,4 @@
 #include "../lib/logicalController.h"
-#include "../lib/netController.h"
 #include "../lib/netlib.h"
 
 
@@ -65,4 +64,12 @@ void openSwitchShell(char* roba){
 
 void openHostShell(char * roba){
 
+}
+
+void startSimulation(){
+    // starting simulation
+}
+
+void stopSimulation(){
+    // stopping simulation
 }
