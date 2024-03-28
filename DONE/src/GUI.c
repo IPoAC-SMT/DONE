@@ -297,14 +297,17 @@ void appendLink(interface_t*interface,settings_t*settings,link_t link) {
     if (settings->numlink == 0){
         interface->links = (link_t*)calloc(1,sizeof(link_t));
     }
-    else interface->links = (link_t*)realloc(interface->links,(settings->numlink+1)*sizeof(link_t));
-    interface->links[settings->numlink].nodo1 = (char*) calloc(NAMELENGTH,sizeof(char));
+    else interface->links = (link_t*)realloc(interface->links,(settings->numlink+1)*sizeof(link_t)); // reallocating if not first link
+    interface->links[settings->numlink].nodo1 = (char*) calloc(NAMELENGTH,sizeof(char));    // allocating memory for interface names
     interface->links[settings->numlink].nodo2 = (char*) calloc(NAMELENGTH,sizeof(char));
-    strncpy(interface->links[settings->numlink].nodo1,link.nodo1,49);
+    strncpy(interface->links[settings->numlink].nodo1,link.nodo1,49);   // setting interface names
     strncpy(interface->links[settings->numlink].nodo2,link.nodo2,49);
+    interface->links[settings->numlink].node1_type = link.node1_type;
+    interface->links[settings->numlink].node2_type = link.node2_type;
+    printf("allocated %s that is a %d and %s that is a %d\n", interface->links[settings->numlink].nodo1, interface->links[settings->numlink].node1_type, interface->links[settings->numlink].nodo2, interface->links[settings->numlink].node2_type);
 }
 
-char * getInversePos(int x, int y, node_t * nodi, settings_t * settings) {
+node_t * getInversePos(int x, int y, node_t * nodi, settings_t * settings) { // now returns entire struct node (node type is needed to handle different types of links in logical controller)
     for (int i=0; i<settings->numnodi; i++) {
         if (
             x <= nodi[i].x + 20 &&
@@ -312,7 +315,7 @@ char * getInversePos(int x, int y, node_t * nodi, settings_t * settings) {
             y <= nodi[i].y + 20 &&
             y >= nodi[i].y -20
         ) {
-            return nodi[i].nome;
+            return &nodi[i];
         }
     }
 }
@@ -381,8 +384,9 @@ void DrawGUI(settings_t* settings, interface_t * interface) {
     else if (settings->placing_link) {
         // se ho già selezionato il primo nodo
         if (settings->placing_link==1 && IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && isSomethingUnder(GetMouseX(),GetMouseY(),interface->nodi,settings)) {
-            printf("%s\n",getInversePos(GetMouseX(),GetMouseY(),interface->nodi,settings));
-            strncpy(settings->first_place,getInversePos(GetMouseX(),GetMouseY(),interface->nodi,settings),50);
+            //printf("%s\n",getInversePos(GetMouseX(),GetMouseY(),interface->nodi,settings));
+            strncpy(settings->first_place,getInversePos(GetMouseX(),GetMouseY(),interface->nodi,settings)->nome,50);    // adding name of first selected node to settings 
+            settings->first_place_nodetype = (void *)getInversePos(GetMouseX(),GetMouseY(),interface->nodi,settings)->tipo;     // adding type of first selected node to settings
             settings->dragging_deactivated = true;
             settings->placing_link = 2;
         }
@@ -390,7 +394,8 @@ void DrawGUI(settings_t* settings, interface_t * interface) {
         else if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)&&isSomethingUnder(GetMouseX(),GetMouseY(),interface->nodi,settings)){
             printf("HERE2\n");
             settings->placing_link = 0;
-            appendLink(interface,settings,(link_t){settings->first_place,getInversePos(GetMouseX(),GetMouseY(),interface->nodi,settings)});
+            // funny modified function that now returns link_t with the extra needed info too
+            appendLink(interface,settings,(link_t){settings->first_place,getInversePos(GetMouseX(),GetMouseY(),interface->nodi,settings)->nome,(tipo_componente_t)settings->first_place_nodetype,getInversePos(GetMouseX(),GetMouseY(),interface->nodi,settings)->tipo});
             //aumento il numero di link
             settings->numlink++;
             settings->dragging_deactivated = false;

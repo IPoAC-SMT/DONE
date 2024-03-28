@@ -42,7 +42,7 @@ int main()
 
     //setSignalHandling(); // set up signal handling
 
-    settings_t settings = {0, 0, 0, "",0,0,0,0,"",0,(void*)interface};
+    settings_t settings = {0, 0, 0, "",0,0,0,0,"",0,0,(void*)interface};
 
     while (!WindowShouldClose())
     {
