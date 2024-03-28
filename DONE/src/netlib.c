@@ -1,6 +1,10 @@
 // Docker orchestration commands library
-
 #include "../lib/netlib.h"
+
+#include <sys/socket.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 // This functions exclusively include the interactions with the Linux system and docker API
 // All the logical controls about already existing nodes, switches and cables must be added outside of this library
@@ -123,12 +127,12 @@ int delSwitch(char *name)
 
 int addExternalInterface(char *name, char *interface)
 {
-
+    // interface will be used further to connect the container to the external interface, by firstly creating a bridged network and then choosing it while creating the container
     char command[MAX_COMMAND_SIZE];
 
     if (name != NULL && strlen(name) <= MAX_NAME_SIZE && interface != NULL && strlen(interface) <= MAX_NAME_SIZE)
     {
-        snprintf(command, MAX_COMMAND_SIZE, "sudo docker run -id --name %s --network %s node:1.0.0 /bin/bash", name, interface);
+        snprintf(command, MAX_COMMAND_SIZE, "sudo docker run -id --cap-add=NET_ADMIN --name %s --network bridge node:1.0.0 /bin/bash", name);
 
         if (!system(command))
         { // once the node is created, adding the node's namespace to the netns folder
@@ -164,6 +168,7 @@ int addExternalInterface(char *name, char *interface)
 // - a host and an external NATted interface
 int addCableBetweenNodes(char *firstNode, char *secondNode)
 {
+    
     char command[MAX_COMMAND_SIZE];
     char endpoint1[MAX_NAME_SIZE + 10]; // used to build the connector's name
     char endpoint2[MAX_NAME_SIZE + 10];
@@ -172,14 +177,11 @@ int addCableBetweenNodes(char *firstNode, char *secondNode)
     {
 
         // creating the connector's name
-        snprintf(endpoint1, MAX_NAME_SIZE + 10, "veth-%s", firstNode);
+        snprintf(endpoint1, MAX_NAME_SIZE + 10, "veth-%s-%s", firstNode, secondNode);
 
-        snprintf(endpoint2, MAX_NAME_SIZE + 10, "veth-%s", secondNode);
-
+        snprintf(endpoint2, MAX_NAME_SIZE + 10, "veth-%s-%s", secondNode, secondNode);
 
         snprintf(command, MAX_COMMAND_SIZE, "sudo ip link add %s type veth peer name %s", endpoint1, endpoint2);
-
-        printf("%s\n", command);
 
         if (!system(command))
         { // if the cable connection was successful, connect the cable to the containers
@@ -222,9 +224,9 @@ int delCableBetweenNodes(char *firstNode, char *secondNode)
         char endpoint2[MAX_NAME_SIZE + 10];
 
         // creating the connector's name
-        snprintf(endpoint1, MAX_NAME_SIZE + 10, "veth-%s", firstNode);
+        snprintf(endpoint1, MAX_NAME_SIZE + 10, "veth-%s-%s", firstNode, secondNode);
 
-        snprintf(endpoint2, MAX_NAME_SIZE + 10, "veth-%s", secondNode);
+        snprintf(endpoint2, MAX_NAME_SIZE + 10, "veth-%s-%s", secondNode, secondNode);
 
         // deleting the cable from the first container
         snprintf(command, MAX_COMMAND_SIZE, "sudo ip netns exec %s ip link del %s", getContainerPID(firstNode), endpoint1);
@@ -245,13 +247,11 @@ int addCableBetweenNodeAndSwitch(char *nodeName, char *switchName)
     {
 
         // creating the connector's name
-        snprintf(hostEndpoint, MAX_NAME_SIZE + 10, "veth-%s", nodeName);
+        snprintf(hostEndpoint, MAX_NAME_SIZE + 10, "sveth-%s-%s", nodeName, switchName);
 
         snprintf(switchEndpoint, MAX_NAME_SIZE + 10, "veth-%s-%s", nodeName, switchName);
 
         snprintf(command, MAX_COMMAND_SIZE, "sudo ip link add %s type veth peer name %s", hostEndpoint, switchEndpoint);
-
-        printf("%s\n", command);
 
         if (!system(command))
         { // if the cable connection was successful, connect the cable to the switch and to the container
@@ -291,7 +291,7 @@ int delCableBetweenNodeAndSwitch(char *nodeName, char *switchName)
         char switchEndpoint[MAX_NAME_SIZE + 10];
 
         // creating the connector's name
-        snprintf(hostEndpoint, MAX_NAME_SIZE + 10, "veth-%s", nodeName);
+        snprintf(hostEndpoint, MAX_NAME_SIZE + 10, "sveth-%s-%s", nodeName, switchName);
 
         snprintf(switchEndpoint, MAX_NAME_SIZE + 10, "veth-%s-%s", nodeName, switchName);
 
@@ -329,9 +329,9 @@ int addCableBetweenSwitches(char *firstSwitch, char *secondSwitch)
     {
 
         // creating the connector's name
-        snprintf(endpoint1, MAX_NAME_SIZE + 10, "patch-%s", firstSwitch);
+        snprintf(endpoint1, MAX_NAME_SIZE + 10, "patch-%s-%s", firstSwitch, secondSwitch);
 
-        snprintf(endpoint2, MAX_NAME_SIZE + 10, "patch-%s", secondSwitch);
+        snprintf(endpoint2, MAX_NAME_SIZE + 10, "patch-%s-%s", secondSwitch, secondSwitch);
 
         // snprintf(command, MAX_COMMAND_SIZE, "sudo ip link add %s type veth peer name %s", endpoint1, endpoint2);
         snprintf(command, MAX_COMMAND_SIZE, "sudo ovs-vsctl add-port %s %s -- set interface %s type=patch options:peer=%s", firstSwitch, endpoint1, endpoint1, endpoint2);
@@ -359,9 +359,9 @@ int delCableBetweenSwitches(char *firstSwitch, char *secondSwitch)
         char endpoint2[MAX_NAME_SIZE + 10];
 
         // creating the connector's name
-        snprintf(endpoint1, MAX_NAME_SIZE + 10, "veth-%s", firstSwitch);
+        snprintf(endpoint1, MAX_NAME_SIZE + 10, "veth-%s-%s", firstSwitch, secondSwitch);
 
-        snprintf(endpoint2, MAX_NAME_SIZE + 10, "veth-%s", secondSwitch);
+        snprintf(endpoint2, MAX_NAME_SIZE + 10, "veth-%s-%s", secondSwitch, secondSwitch);
 
         // deleting the cable from the first switch
         snprintf(command, MAX_COMMAND_SIZE, "sudo ovs-vsctl del-port %s %s", firstSwitch, endpoint1);
@@ -407,4 +407,80 @@ int openNodeShell(char *name)
         }
     }
     return -1;
+}
+
+// open a shell for the switch
+int openSwitchShell()
+{
+    char command[MAX_COMMAND_SIZE];
+
+    snprintf(command, MAX_COMMAND_SIZE, "konsole -e sudo ovs-vsctl show");
+    pid_t pid = fork();
+    if (pid == 0)
+    {
+        system(command);
+        exit(0);
+    }
+    return -1;
+}
+
+interfaces *getNetInterfaces()
+{
+    struct ifaddrs *ifap, *ifa;
+    interfaces *res = (interfaces *)calloc(1, sizeof(interfaces));
+
+    if (getifaddrs(&ifap) == -1)
+    {
+        perror("getifaddrs");
+        return NULL;
+    }
+
+    for (ifa = ifap; ifa != NULL; ifa = ifa->ifa_next)
+    {
+        if (ifa->ifa_addr == NULL)
+        {
+            continue;
+        }
+        res->interfaces++; // counting the available interfaces
+    }
+
+    res->interfaces_name = (char **)calloc(res->interfaces, sizeof(char *)); // the last element is NULL
+    for (int i = 0; i < res->interfaces; i++)
+    {
+        res->interfaces_name[i] = (char *)calloc(MAX_INTERFACE_SIZE, sizeof(char));
+    }
+
+    int i = 0; 
+    for (ifa = ifap; ifa != NULL; ifa = ifa->ifa_next)
+    {
+        if (ifa->ifa_addr == NULL)
+        {
+            continue;
+        }
+
+        int family = ifa->ifa_addr->sa_family;
+        if (family == AF_INET || family == AF_INET6)
+        {
+            strcpy(res->interfaces_name[i++], ifa->ifa_name);
+        }
+    }
+
+    freeifaddrs(ifap);
+    return res;
+}
+
+void printNetInterfaces(interfaces *interfaces)
+{
+    for (int i = 0; i < interfaces->interfaces; i++)
+    {
+        printf("%s\n", interfaces->interfaces_name[i]);
+    }
+}
+
+void freeInterfaces(interfaces *interfaces){
+    for(int i = 0; i < interfaces->interfaces; i++){
+        free(interfaces->interfaces_name[i]);
+    }
+    free(interfaces->interfaces_name);
+    free(interfaces);
 }
