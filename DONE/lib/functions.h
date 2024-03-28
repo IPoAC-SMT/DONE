@@ -6,9 +6,8 @@ void placerouter(settings_t *settings);
 void placehost(settings_t *settings);
 void placeexternalinterface(settings_t *settings);
 void placeexternalnattedinterface(settings_t *settings);
-void sendDataToLogicalController(settings_t *settings);
-void tempStart(settings_t *settings);
-void tempStop(settings_t *settings);
+void start(settings_t *settings);
+void stop(settings_t*settings);
 
 
 void openShell(settings_t*settings);

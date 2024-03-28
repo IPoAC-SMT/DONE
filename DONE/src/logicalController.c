@@ -1,11 +1,13 @@
 #include "../lib/logicalController.h"
 #include "../lib/netlib.h"
 
+/*      TODO for the future -> deleting containers if forced exit
 
 void setSignalHandling()
 {
     signal(SIGINT, forcedCLIExit);
 }
+
 
 void forcedCLIExit()
 {
@@ -13,9 +15,11 @@ void forcedCLIExit()
     exit(0);
 }
 
+*/
+
 // functions that interact with data collected by the GUI and pass it to the lower level (docker)
 
-void sendDataToDocker(interface_t *simulation, int nodes_num, int links_num)
+void startSimulation(interface_t *simulation, int nodes_num, int links_num)
 {
     simdata_t simdata;      // filling simulation struct
     simdata.nodes = simulation->nodes;
@@ -25,10 +29,14 @@ void sendDataToDocker(interface_t *simulation, int nodes_num, int links_num)
 
     initEnv();
 
+    printf("starting...\n");
+
     // actually sending data to docker
 
     for(int i = 0; i < nodes_num; i++){    // handling nodes
         node_t *current_node = &simdata.nodes[i];
+
+        printf("current node type: %d\n", current_node->tipo);
         
         switch(current_node->tipo){     // handling every node type differently depending on node type
             case host_t:
@@ -51,8 +59,23 @@ void sendDataToDocker(interface_t *simulation, int nodes_num, int links_num)
         }
     }
 
-    for(int i = 0; i < links_num; i++){
-        
+    for(int i = 0; i < links_num; i++){     // handling links
+        link_t *current_link = &simdata.links[i];
+
+        // differentiating between different kinds of connections
+        if(current_link->node1_type == switch_t && current_link->node2_type == switch_t){
+            // 1. switch-switch
+            addCableBetweenSwitches(current_link->node1, current_link->node2);
+        } else if(current_link->node1_type == switch_t){    
+            // 2. switch-node
+            addCableBetweenNodeAndSwitch(current_link->node2, current_link->node1);
+        } else if(current_link->node2_type == switch_t){    
+            // 3. node-switch
+            addCableBetweenNodeAndSwitch(current_link->node1, current_link->node2);
+        } else {
+            // 4. every other case is node-node
+            addCableBetweenNodes(current_link->node1, current_link->node2);
+        }
     }
 
 }
@@ -66,10 +89,24 @@ void openHostShell(char * roba){
 
 }
 
-void startSimulation(){
-    // starting simulation
-}
+void stopSimulation(interface_t *simulation, int nodes_num, int links_num){
+    simdata_t simdata;      // filling simulation struct
+    simdata.nodes = simulation->nodes;
+    simdata.links = simulation->links;
+    simdata.nodes_num = nodes_num;
+    simdata.links_num = links_num;
 
-void stopSimulation(){
-    // stopping simulation
+    printf("stopping...\n");
+
+    for(int i = 0; i < nodes_num; i++){    // handling nodes is enough, all links between them will be deleted automatically
+        node_t *current_node = &simdata.nodes[i];
+
+        printf("current node type: %d\n", current_node->tipo);
+        
+        if(current_node->tipo == switch_t){
+            delSwitch(current_node->nome);
+        } else {
+            delNode(current_node->nome);
+        }
+    }
 }

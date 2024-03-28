@@ -46,16 +46,12 @@ void placelink(settings_t*settings){
     settings->placing_link = 1;
 }
 
-void sendDataToLogicalController(settings_t*settings) {    // sending data to logical controller
-    sendDataToDocker((interface_t *)settings->GUIdata,settings->numnodes,settings->numlink);
+void start(settings_t*settings) {    // sending data to logical controller, that starts the simulation
+    startSimulation((interface_t *)settings->GUIdata,settings->numnodes,settings->numlink);
 }
 
-void tempStart(settings_t*settings){
-    startSimulation();
-}
-
-void tempStop(settings_t*settings){
-    stopSimulation();
+void stop(settings_t*settings){    // sending data, again, to logical controller, that stops the simulation
+    stopSimulation((interface_t *)settings->GUIdata,settings->numnodes,settings->numlink);
 }
 
 void openShell(settings_t*settings){

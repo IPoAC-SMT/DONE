@@ -176,7 +176,10 @@ int addCableBetweenNodes(char *firstNode, char *secondNode)
 
         snprintf(endpoint2, MAX_NAME_SIZE + 10, "veth-%s", secondNode);
 
+
         snprintf(command, MAX_COMMAND_SIZE, "sudo ip link add %s type veth peer name %s", endpoint1, endpoint2);
+
+        printf("%s\n", command);
 
         if (!system(command))
         { // if the cable connection was successful, connect the cable to the containers
@@ -247,6 +250,8 @@ int addCableBetweenNodeAndSwitch(char *nodeName, char *switchName)
         snprintf(switchEndpoint, MAX_NAME_SIZE + 10, "veth-%s-%s", nodeName, switchName);
 
         snprintf(command, MAX_COMMAND_SIZE, "sudo ip link add %s type veth peer name %s", hostEndpoint, switchEndpoint);
+
+        printf("%s\n", command);
 
         if (!system(command))
         { // if the cable connection was successful, connect the cable to the switch and to the container

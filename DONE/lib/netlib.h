@@ -4,8 +4,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#define MAX_COMMAND_SIZE 200
-#define MAX_NAME_SIZE 20
+#define MAX_COMMAND_SIZE 300
+#define MAX_NAME_SIZE 50
 #define MAX_PID_SIZE 10
 
 int initEnv();

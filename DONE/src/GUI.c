@@ -318,6 +318,7 @@ node_t * getInversePos(int x, int y, node_t * nodes, settings_t * settings) { //
             return &nodes[i];
         }
     }
+    return NULL;
 }
 
 bool isSomethingUnder(int x,int y,node_t * nodes,settings_t*settings){

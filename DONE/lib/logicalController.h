@@ -10,10 +10,9 @@ typedef struct{
     int links_num;
 } simdata_t;
 
-void setSignalHandling();
-void forcedCLIExit();
-void sendDataToDocker(interface_t *simulation, int nodes_num, int links_num);
+//void setSignalHandling();
+//void forcedCLIExit();
+void startSimulation(interface_t *simulation, int nodes_num, int links_num);
 void openSwitchShell(char* roba);
 void openHostShell(char * roba);
-void startSimulation();
-void stopSimulation();
+void stopSimulation(interface_t *simulation, int nodes_num, int links_num);
