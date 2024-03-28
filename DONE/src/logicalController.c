@@ -36,25 +36,25 @@ void startSimulation(interface_t *simulation, int nodes_num, int links_num)
     for(int i = 0; i < nodes_num; i++){    // handling nodes
         node_t *current_node = &simdata.nodes[i];
 
-        printf("current node type: %d\n", current_node->tipo);
+        printf("current node type: %d\n", current_node->type);
         
-        switch(current_node->tipo){     // handling every node type differently depending on node type
+        switch(current_node->type){     // handling every node type differently depending on node type
             case host_t:
-                addNode(current_node->nome,'h');
+                addNode(current_node->name,'h');
                 break;
             case hub_t:     // TODO: wait for hub code 
                 break;
             case switch_t:
-                addSwitch(current_node->nome);
+                addSwitch(current_node->name);
                 break;
             case router_t:
-                addNode(current_node->nome,'r');
+                addNode(current_node->name,'r');
                 break;
             case external_interface_t:
-                addExternalInterface(current_node->nome, "");   // TODO: @tiz314 - handling strings
+                addExternalInterface(current_node->name, "");   // TODO: @tiz314 - handling strings
                 break;
             case external_natted_interface_t:
-                addExternalInterface(current_node->nome, "");   // TODO: @tiz314 - handling strings
+                addExternalInterface(current_node->name, "");   // TODO: @tiz314 - handling strings
                 break;
         }
     }
@@ -101,12 +101,12 @@ void stopSimulation(interface_t *simulation, int nodes_num, int links_num){
     for(int i = 0; i < nodes_num; i++){    // handling nodes is enough, all links between them will be deleted automatically
         node_t *current_node = &simdata.nodes[i];
 
-        printf("current node type: %d\n", current_node->tipo);
+        printf("current node type: %d\n", current_node->type);
         
-        if(current_node->tipo == switch_t){
-            delSwitch(current_node->nome);
+        if(current_node->type == switch_t){
+            delSwitch(current_node->name);
         } else {
-            delNode(current_node->nome);
+            delNode(current_node->name);
         }
     }
 }
