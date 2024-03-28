@@ -1,6 +1,6 @@
 #include "../lib/GUI.h"
 
-void DrawButton(pulsante_t pulsante, settings_t *settings)
+void DrawButton(button_t pulsante, settings_t *settings)
 {
     bool hovering;
     if (
@@ -23,12 +23,12 @@ void DrawButton(pulsante_t pulsante, settings_t *settings)
     DrawRectangleLines(pulsante.x, pulsante.y, pulsante.width, pulsante.height, hovering ? YELLOW : GRAY); // lo creo con colore diverso se ci sto o meno hoverando
 }
 
-Vector2 getPos(node_t *nodi, char *nome)
+Vector2 getPos(node_t *nodes, char *nome)
 {
     int i = 0;
-    while (strcmp(nodi[i].nome, nome))
+    while (strcmp(nodes[i].nome, nome))
         i++;
-    return (Vector2){nodi[i].x, nodi[i].y};
+    return (Vector2){nodes[i].x, nodes[i].y};
 }
 
 int min(int a, int b)
@@ -40,11 +40,11 @@ int max(int a, int b)
     return (a > b ? a : b);
 }
 
-void DrawLink(link_t link, settings_t* settings,node_t* nodi, bool true_node){
-    Vector2 positions[2] = {getPos(nodi,link.nodo1),getPos(nodi,link.nodo2)};
+void DrawLink(link_t link, settings_t* settings,node_t* nodes, bool true_node){
+    Vector2 positions[2] = {getPos(nodes,link.node1),getPos(nodes,link.node2)};
     if (settings->moving_node){
-        if (!strcmp(link.nodo1,settings->node_id)) positions[0]=(Vector2){GetMouseX(),GetMouseY()};
-        else if (!strcmp(link.nodo2,settings->node_id)) positions[1]=(Vector2){GetMouseX(),GetMouseY()};
+        if (!strcmp(link.node1,settings->node_id)) positions[0]=(Vector2){GetMouseX(),GetMouseY()};
+        else if (!strcmp(link.node2,settings->node_id)) positions[1]=(Vector2){GetMouseX(),GetMouseY()};
     }
     // breve digressione matematica: per verificare se sono su una linea verifico che la distanza del punto dalla linea sia minore di un qualcosa, diciamo 5 pixel.
     // ora, questo significa che posso rappresentare la mia linea con la seguente equazione:
@@ -268,11 +268,11 @@ void DrawNode(node_t* node, settings_t* settings, bool true_node){
     }
 }
 
-void setNode(char * name, node_t* nodi, settings_t * settings){
-    for (int i=0; i<settings->numnodi; i++) {
-        if (!strcmp(name,nodi[i].nome)){
-            nodi[i].x = GetMouseX();
-            nodi[i].y = GetMouseY();
+void setNode(char * name, node_t* nodes, settings_t * settings){
+    for (int i=0; i<settings->numnodes; i++) {
+        if (!strcmp(name,nodes[i].nome)){
+            nodes[i].x = GetMouseX();
+            nodes[i].y = GetMouseY();
         }
     }
 }
@@ -282,15 +282,15 @@ char * identify(int num){
 }
 
 void appendNode(interface_t*interface,node_t newnode,settings_t*settings) {
-    if (settings->numnodi == 0){
-        interface->nodi = (node_t*)calloc(1,sizeof(node_t));
+    if (settings->numnodes == 0){
+        interface->nodes = (node_t*)calloc(1,sizeof(node_t));
     }
-    else interface->nodi = (node_t*)realloc(interface->nodi,(settings->numnodi+1)*sizeof(node_t));
-    interface->nodi[settings->numnodi].nome = (char*) calloc(NAMELENGTH,sizeof(char));
-    strncpy(interface->nodi[settings->numnodi].nome,newnode.nome,49);
-    interface->nodi[settings->numnodi].tipo = newnode.tipo;
-    interface->nodi[settings->numnodi].x = newnode.x;
-    interface->nodi[settings->numnodi].y = newnode.y;
+    else interface->nodes = (node_t*)realloc(interface->nodes,(settings->numnodes+1)*sizeof(node_t));
+    interface->nodes[settings->numnodes].nome = (char*) calloc(NAMELENGTH,sizeof(char));
+    strncpy(interface->nodes[settings->numnodes].nome,newnode.nome,49);
+    interface->nodes[settings->numnodes].tipo = newnode.tipo;
+    interface->nodes[settings->numnodes].x = newnode.x;
+    interface->nodes[settings->numnodes].y = newnode.y;
 }
 
 void appendLink(interface_t*interface,settings_t*settings,link_t link) {
@@ -298,35 +298,35 @@ void appendLink(interface_t*interface,settings_t*settings,link_t link) {
         interface->links = (link_t*)calloc(1,sizeof(link_t));
     }
     else interface->links = (link_t*)realloc(interface->links,(settings->numlink+1)*sizeof(link_t)); // reallocating if not first link
-    interface->links[settings->numlink].nodo1 = (char*) calloc(NAMELENGTH,sizeof(char));    // allocating memory for interface names
-    interface->links[settings->numlink].nodo2 = (char*) calloc(NAMELENGTH,sizeof(char));
-    strncpy(interface->links[settings->numlink].nodo1,link.nodo1,49);   // setting interface names
-    strncpy(interface->links[settings->numlink].nodo2,link.nodo2,49);
+    interface->links[settings->numlink].node1 = (char*) calloc(NAMELENGTH,sizeof(char));    // allocating memory for interface names
+    interface->links[settings->numlink].node2 = (char*) calloc(NAMELENGTH,sizeof(char));
+    strncpy(interface->links[settings->numlink].node1,link.node1,49);   // setting interface names
+    strncpy(interface->links[settings->numlink].node2,link.node2,49);
     interface->links[settings->numlink].node1_type = link.node1_type;
     interface->links[settings->numlink].node2_type = link.node2_type;
-    printf("allocated %s that is a %d and %s that is a %d\n", interface->links[settings->numlink].nodo1, interface->links[settings->numlink].node1_type, interface->links[settings->numlink].nodo2, interface->links[settings->numlink].node2_type);
+    //printf("allocated %s that is a %d and %s that is a %d\n", interface->links[settings->numlink].node1, interface->links[settings->numlink].node1_type, interface->links[settings->numlink].node2, interface->links[settings->numlink].node2_type);
 }
 
-node_t * getInversePos(int x, int y, node_t * nodi, settings_t * settings) { // now returns entire struct node (node type is needed to handle different types of links in logical controller)
-    for (int i=0; i<settings->numnodi; i++) {
+node_t * getInversePos(int x, int y, node_t * nodes, settings_t * settings) { // now returns entire struct node (node type is needed to handle different types of links in logical controller)
+    for (int i=0; i<settings->numnodes; i++) {
         if (
-            x <= nodi[i].x + 20 &&
-            x >= nodi[i].x - 20 &&
-            y <= nodi[i].y + 20 &&
-            y >= nodi[i].y -20
+            x <= nodes[i].x + 20 &&
+            x >= nodes[i].x - 20 &&
+            y <= nodes[i].y + 20 &&
+            y >= nodes[i].y -20
         ) {
-            return &nodi[i];
+            return &nodes[i];
         }
     }
 }
 
-bool isSomethingUnder(int x,int y,node_t * nodi,settings_t*settings){
-    for (int i=0; i<settings->numnodi; i++) {
+bool isSomethingUnder(int x,int y,node_t * nodes,settings_t*settings){
+    for (int i=0; i<settings->numnodes; i++) {
         if (
-            x <= nodi[i].x + 20 &&
-            x >= nodi[i].x - 20 &&
-            y <= nodi[i].y + 20 &&
-            y >= nodi[i].y -20
+            x <= nodes[i].x + 20 &&
+            x >= nodes[i].x - 20 &&
+            y <= nodes[i].y + 20 &&
+            y >= nodes[i].y -20
         ) {
             return true;
         }
@@ -337,8 +337,8 @@ bool isSomethingUnder(int x,int y,node_t * nodi,settings_t*settings){
 
 void DrawGUI(settings_t* settings, interface_t * interface) {
 
-    // 1. piazzo i pulsanti
-    for (int i=0;i<NUMPULSANTI;i++) DrawButton(interface->pulsanti[i],settings);
+    // 1. piazzo i buttons
+    for (int i=0;i<NUMbuttons;i++) DrawButton(interface->buttons[i],settings);
     
     // 2. se premo esc disattivo dragging e placing TODO bugged
     if(IsKeyReleased(KEY_ESCAPE)) {
@@ -358,7 +358,7 @@ void DrawGUI(settings_t* settings, interface_t * interface) {
             // smetto di spostare il nodo
             settings->moving_node = false;
             // ne imposto le posizioni
-            setNode(settings->node_id,interface->nodi,settings);
+            setNode(settings->node_id,interface->nodes,settings);
         }
     }
 
@@ -366,7 +366,7 @@ void DrawGUI(settings_t* settings, interface_t * interface) {
     else if (settings->placing_node) {
         // creo il nome del nuovo nodo
         char nome[50];
-        snprintf(nome,50,"node-%d-%s",settings->numnodi,identify(settings->node_type));
+        snprintf(nome,50,"node-%d-%s",settings->numnodes,identify(settings->node_type));
         // disegno un nodo "fantasma" dove sto muovendo il mouse
         DrawNode(&(node_t){nome,settings->node_type,GetMouseX(),GetMouseY()},settings,false);
         // se premo il mouse
@@ -375,35 +375,35 @@ void DrawGUI(settings_t* settings, interface_t * interface) {
             settings->placing_node = false;
             // aggiungo il nodo alla lista
             appendNode(interface,(node_t){nome,settings->node_type,GetMouseX(),GetMouseY()},settings);
-            // e aumento il numero di nodi
-            settings->numnodi++;
+            // e aumento il numero di nodes
+            settings->numnodes++;
         }
     }
  
     // 5. altrimenti, se sto posizionando un link
     else if (settings->placing_link) {
         // se ho già selezionato il primo nodo
-        if (settings->placing_link==1 && IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && isSomethingUnder(GetMouseX(),GetMouseY(),interface->nodi,settings)) {
-            //printf("%s\n",getInversePos(GetMouseX(),GetMouseY(),interface->nodi,settings));
-            strncpy(settings->first_place,getInversePos(GetMouseX(),GetMouseY(),interface->nodi,settings)->nome,50);    // adding name of first selected node to settings 
-            settings->first_place_nodetype = (void *)getInversePos(GetMouseX(),GetMouseY(),interface->nodi,settings)->tipo;     // adding type of first selected node to settings
+        if (settings->placing_link==1 && IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && isSomethingUnder(GetMouseX(),GetMouseY(),interface->nodes,settings)) {
+            //printf("%s\n",getInversePos(GetMouseX(),GetMouseY(),interface->nodes,settings));
+            strncpy(settings->first_place,getInversePos(GetMouseX(),GetMouseY(),interface->nodes,settings)->nome,50);    // adding name of first selected node to settings 
+            settings->first_place_nodetype = (void *)getInversePos(GetMouseX(),GetMouseY(),interface->nodes,settings)->tipo;     // adding type of first selected node to settings
             settings->dragging_deactivated = true;
             settings->placing_link = 2;
         }
         // altrimenti
-        else if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)&&isSomethingUnder(GetMouseX(),GetMouseY(),interface->nodi,settings)){
+        else if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)&&isSomethingUnder(GetMouseX(),GetMouseY(),interface->nodes,settings)){
             printf("HERE2\n");
             settings->placing_link = 0;
             // funny modified function that now returns link_t with the extra needed info too
-            appendLink(interface,settings,(link_t){settings->first_place,getInversePos(GetMouseX(),GetMouseY(),interface->nodi,settings)->nome,(tipo_componente_t)settings->first_place_nodetype,getInversePos(GetMouseX(),GetMouseY(),interface->nodi,settings)->tipo});
+            appendLink(interface,settings,(link_t){settings->first_place,getInversePos(GetMouseX(),GetMouseY(),interface->nodes,settings)->nome,(component_type_t)settings->first_place_nodetype,getInversePos(GetMouseX(),GetMouseY(),interface->nodes,settings)->tipo});
             //aumento il numero di link
             settings->numlink++;
             settings->dragging_deactivated = false;
         }
     }
 
-    // ora posiziono tutto: nodi e link
-    for (int i=0; i<settings->numlink;i++) DrawLink(interface->links[i],settings,interface->nodi,true);
-    for (int i=0; i<settings->numnodi;i++) DrawNode(&(interface->nodi[i]),settings,true);
+    // ora posiziono tutto: nodes e link
+    for (int i=0; i<settings->numlink;i++) DrawLink(interface->links[i],settings,interface->nodes,true);
+    for (int i=0; i<settings->numnodes;i++) DrawNode(&(interface->nodes[i]),settings,true);
 
 }

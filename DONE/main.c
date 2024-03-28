@@ -15,7 +15,7 @@ char*completePath(char*name){ // took this from SO, not my responsibility
 
 int main()
 {
-    interface_t *interface = init_interface((pulsante_t[NUMPULSANTI]){
+    interface_t *interface = init_interface((button_t[NUMbuttons]){
         {24, 129, 100, 100, router_t, placehub},
         {24, 234, 100, 100, router_t, placeswitch},
         {24, 339, 100, 100, router_t, placerouter},

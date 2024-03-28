@@ -7,4 +7,4 @@ typedef struct
     int height;                    // height of the rectangle
     int iconType;                  // type of the icon
     void (*pressed)(settings_t *); // function to be called when pressed
-} pulsante_t;
+} button_t;

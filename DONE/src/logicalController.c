@@ -18,7 +18,7 @@ void forcedCLIExit()
 void sendDataToDocker(interface_t *simulation, int nodes_num, int links_num)
 {
     simdata_t simdata;      // filling simulation struct
-    simdata.nodes = simulation->nodi;
+    simdata.nodes = simulation->nodes;
     simdata.links = simulation->links;
     simdata.nodes_num = nodes_num;
     simdata.links_num = links_num;

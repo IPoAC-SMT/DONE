@@ -47,8 +47,7 @@ void placelink(settings_t*settings){
 }
 
 void sendDataToLogicalController(settings_t*settings) {    // sending data to logical controller
-    //printf("hello @RebelNightmare, here's the struct: %p\n",settings->GUIdata)
-    sendDataToDocker((interface_t *)settings->GUIdata,settings->numnodi,settings->numlink);
+    sendDataToDocker((interface_t *)settings->GUIdata,settings->numnodes,settings->numlink);
 }
 
 void tempStart(settings_t*settings){
