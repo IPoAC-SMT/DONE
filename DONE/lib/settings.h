@@ -5,7 +5,7 @@ typedef struct
     char interfaceHidden;
     char moving_node;
     char node_type;
-    char * node_id;
+    char * node_name;
     char placing_node;
     int numnodes;
     int numlink;

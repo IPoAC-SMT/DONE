@@ -13,6 +13,6 @@ typedef struct{
 //void setSignalHandling();
 //void forcedCLIExit();
 void startSimulation(interface_t *simulation, int nodes_num, int links_num);
-void openSwitchShell(char* roba);
-void openHostShell(char * roba);
+void openSwitchShellWrapper();
+void openNodeShellWrapper(char * node_name);
 void stopSimulation(interface_t *simulation, int nodes_num, int links_num);

@@ -21,6 +21,8 @@ void forcedCLIExit()
 
 void startSimulation(interface_t *simulation, int nodes_num, int links_num)
 {
+    interfaces *availableInterfaces = getNetInterfaces();
+
     simdata_t simdata;      // filling simulation struct
     simdata.nodes = simulation->nodes;
     simdata.links = simulation->links;
@@ -35,8 +37,6 @@ void startSimulation(interface_t *simulation, int nodes_num, int links_num)
 
     for(int i = 0; i < nodes_num; i++){    // handling nodes
         node_t *current_node = &simdata.nodes[i];
-
-        printf("current node type: %d\n", current_node->type);
         
         switch(current_node->type){     // handling every node type differently depending on node type
             case host_t:
@@ -51,10 +51,10 @@ void startSimulation(interface_t *simulation, int nodes_num, int links_num)
                 addNode(current_node->name,'r');
                 break;
             case external_interface_t:
-                addExternalInterface(current_node->name, "");   // TODO: @tiz314 - handling strings
+                addExternalInterface(current_node->name, availableInterfaces->interfaces_name[1]); 
                 break;
             case external_natted_interface_t:
-                addExternalInterface(current_node->name, "");   // TODO: @tiz314 - handling strings
+                addExternalInterface(current_node->name, availableInterfaces->interfaces_name[1]); 
                 break;
         }
     }
@@ -81,12 +81,12 @@ void startSimulation(interface_t *simulation, int nodes_num, int links_num)
 }
 
 
-void openSwitchShell(char* roba){
-
+void openNodeShellWrapper(char* node_name){
+    openNodeShell(node_name);
 }
 
-void openHostShell(char * roba){
-
+void openSwitchShellWrapper(){
+    openSwitchShell();
 }
 
 void stopSimulation(interface_t *simulation, int nodes_num, int links_num){
@@ -101,7 +101,6 @@ void stopSimulation(interface_t *simulation, int nodes_num, int links_num){
     for(int i = 0; i < nodes_num; i++){    // handling nodes is enough, all links between them will be deleted automatically
         node_t *current_node = &simdata.nodes[i];
 
-        printf("current node type: %d\n", current_node->type);
         
         if(current_node->type == switch_t){
             delSwitch(current_node->name);

@@ -1,7 +1,7 @@
 #include "../lib/logicalController.h"
 
 void helloworld(settings_t*settings){
-    printf("hello world\n");
+    printf("%d\n", settings->numlink);
 }
 
 void placehub(settings_t*settings){
@@ -55,5 +55,5 @@ void stop(settings_t*settings){    // sending data, again, to logical controller
 }
 
 void openShell(settings_t*settings){
-    settings->node_type == switch_t ? openSwitchShell(settings->node_id) : openHostShell(settings->node_id);
+    settings->node_type == switch_t ? openSwitchShellWrapper() : openNodeShellWrapper(settings->node_name);
 }

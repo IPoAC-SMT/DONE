@@ -43,8 +43,8 @@ int max(int a, int b)
 void DrawLink(link_t link, settings_t* settings,node_t* nodes, bool true_node){
     Vector2 positions[2] = {getPos(nodes,link.node1),getPos(nodes,link.node2)};
     if (settings->moving_node){
-        if (!strcmp(link.node1,settings->node_id)) positions[0]=(Vector2){GetMouseX(),GetMouseY()};
-        else if (!strcmp(link.node2,settings->node_id)) positions[1]=(Vector2){GetMouseX(),GetMouseY()};
+        if (!strcmp(link.node1,settings->node_name)) positions[0]=(Vector2){GetMouseX(),GetMouseY()};
+        else if (!strcmp(link.node2,settings->node_name)) positions[1]=(Vector2){GetMouseX(),GetMouseY()};
     }
     // breve digressione matematica: per verificare se sono su una linea verifico che la distanza del punto dalla linea sia minore di un qualcosa, diciamo 5 pixel.
     // ora, questo significa che posso rappresentare la mia linea con la seguente equazione:
@@ -79,7 +79,7 @@ void DrawLink(link_t link, settings_t* settings,node_t* nodes, bool true_node){
 
 void DrawNode(node_t* node, settings_t* settings, bool true_node){
     int nodex, nodey;
-    if (!strcmp(node->name,settings->node_id)) {
+    if (!strcmp(node->name,settings->node_name)) {
         nodex = GetMouseX();
         nodey = GetMouseY();
     }
@@ -254,15 +254,15 @@ void DrawNode(node_t* node, settings_t* settings, bool true_node){
         )
     {
         if(!settings->moving_node && !settings->placing_node){
-            if (!strcmp(settings->node_id,node->name)){
-                settings->node_id = (char*) calloc(NAMELENGTH,sizeof(char));
+            if (!strcmp(settings->node_name,node->name)){
+                settings->node_name = (char*) calloc(NAMELENGTH,sizeof(char));
             }
             else {
                 settings->placing_node = false;
                 settings->moving_node = 1;
                 settings->node_type = node->type;
-                settings->node_id = (char*) calloc(NAMELENGTH,sizeof(char));
-                snprintf(settings->node_id,NAMELENGTH,"%s",node->name);
+                settings->node_name = (char*) calloc(NAMELENGTH,sizeof(char));
+                snprintf(settings->node_name,NAMELENGTH,"%s",node->name);
             }
         }
     }
@@ -278,7 +278,7 @@ void setNode(char * name, node_t* nodes, settings_t * settings){
 }
 
 char * identify(int num){
-    return (char[50][50]){"hub","switch","router","host","external_interface","external_natted_interface"}[num];
+    return (char[50][50]){"hu","s","r","h","e","en"}[num]; // hub, switch, router, host, external interface, external natted interface
 }
 
 void appendNode(interface_t*interface,node_t newnode,settings_t*settings) {
@@ -353,13 +353,13 @@ void DrawGUI(settings_t* settings, interface_t * interface) {
         // giusto per sicurezza, disattivo il placing se sto piazzando cose
         settings->placing_node = false;
         // disegno un nodo "fantasma" dove sto muovendo il mouse
-        DrawNode(&(node_t){settings->node_id,settings->node_type,GetMouseX(),GetMouseY()},settings,false);
+        DrawNode(&(node_t){settings->node_name,settings->node_type,GetMouseX(),GetMouseY()},settings,false);
         // se sto premendo (rilasciando, tbh) il tasto sinistro del mouse
         if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
             // smetto di spostare il nodo
             settings->moving_node = false;
             // ne imposto le posizioni
-            setNode(settings->node_id,interface->nodes,settings);
+            setNode(settings->node_name,interface->nodes,settings);
         }
     }
 
@@ -367,7 +367,7 @@ void DrawGUI(settings_t* settings, interface_t * interface) {
     else if (settings->placing_node) {
         // creo il name del nuovo nodo
         char name[50];
-        snprintf(name,50,"node-%d-%s",settings->numnodes,identify(settings->node_type));
+        snprintf(name,50,"%s-%d",identify(settings->node_type), settings->numnodes);
         // disegno un nodo "fantasma" dove sto muovendo il mouse
         DrawNode(&(node_t){name,settings->node_type,GetMouseX(),GetMouseY()},settings,false);
         // se premo il mouse
