@@ -2,61 +2,45 @@ Alla luce delle funzionalità che gli emulatori di rete oggi esistenti offrono, 
 \subsection{Funzionalità}
 Le funzionalità che desideriamo offrire attraverso l'utilizzo di \texttt{DONE} sono le seguenti: 
 \begin{itemize}
-    \item L'utente può creare, aprire, modificare progetti di topologie di rete, aggiungendo apparati, definendo collegamenti tra questi, nonché fare uso di device specifici volti al collegamento della topologia definita a reti esterne alla simulazione. I dispositivi utilizzabili sono hub, switch, nodi, router, connessioni a interfacce esterne, con NAT o meno.
-    \item Una volta realizzata la topologia desiderata, l'utente può salvare su file il progetto, con lo scopo di poter riprendere il lavoro in un secondo momento
-    \item L'utente può assegnare per ogni singolo device delle configurazioni, che verranno applicate all'avvio della simulazione
-    \item L'utente può avviare la simulazione, con la possibilità in seguito di accedere tramite terminale ai singoli nodi per aggiungere ulteriori configurazioni, per testare la connettività e/o effettuare troubleshooting. Il tutto esclusivamente tramite linea di comando. I nodi possono ospitare vari servizi, come ad esempio server ssh, ftp e web, anch'essi configurabili attraverso linea di comando. 
+    \item L'utente può creare, aprire, modificare \textbf{progetti di topologie di rete}, aggiungendo apparati, definendo collegamenti tra questi, nonché fare uso di device specifici volti al collegamento della topologia definita a reti esterne alla simulazione. I dispositivi utilizzabili sono hub, switch, nodi, router, connessioni a interfacce esterne, con NAT o meno.
+    \item Una volta realizzata la topologia desiderata, l'utente può \textbf{salvare su file il progetto}, con lo scopo di poter riprendere il lavoro in un secondo momento.
+    \item L'utente può assegnare per ogni singolo device delle \textbf{configurazioni} che verranno applicate all'avvio della simulazione.
+    \item L'utente può avviare la simulazione, con la possibilità in seguito di \textbf{accedere tramite terminale ai singoli nodi} per aggiungere ulteriori configurazioni, per testare la connettività e/o effettuare troubleshooting. Il tutto esclusivamente tramite linea di comando. I nodi possono ospitare vari servizi, come ad esempio server ssh, ftp e web, anch'essi configurabili da linea di comando. 
 \end{itemize}
-Gli obiettivi che desideriamo perseguire attraverso questo progetto sono:
+Gli obiettivi che desideriamo perseguire con questo progetto sono:
 \begin{itemize}
-    \item \textbf{Ridurre le dipendenze} al minimo necessario, in modo da rendere il programma il più portabile possibile
-    \item Fornire la \textbf{capacità di salvare} non solo la topologia fisica ma anche tutte le configurazioni, senza bisogno di script ulteriori
-    \item \textbf{Maggiore pulizia dell'ambiente}, evitando che Docker rimanga in uno stato intermedio (ossia con i vecchi container ancora presenti) in caso di chiusura della applicazione senza arresto della simulazione, nonché pulizia dalle altre interfacce e apparati virtuali creati
-    \item Offrire una soluzione open-source che possa essere \textbf{estesa} e \textbf{modificata}
+    \item \textbf{Ridurre le dipendenze} al minimo necessario, in modo da rendere il programma il più portabile possibile.
+    \item Fornire la \textbf{capacità di salvare} non solo la topologia fisica, ma anche tutte le configurazioni, senza bisogno di script ulteriori.
+    \item \textbf{Maggiore pulizia dell'ambiente}, evitando che Docker rimanga in uno stato intermedio (ossia con i vecchi container ancora presenti) in caso di chiusura della applicazione senza arresto della simulazione, nonché pulizia dalle altre interfacce e apparati virtuali creati.
+    \item Offrire una soluzione open-source che possa essere \textbf{estesa} e \textbf{modificata}.
 \end{itemize}
 \subsection{Architettura}
 Alla luce delle funzionalità desiderate, l'architettura che abbiamo ideato per raggiungere gli obiettivi preposti è così organizzata: 
 \begin{center}
     \begin{tikzpicture}
-        \draw (12,0) rectangle (15, 1.5);
-        \draw (12,2.5) rectangle (15,4);
-        \draw (11,0) rectangle (9,4);
-        \draw (8,0) rectangle (6,4);
-        \draw (3,0) rectangle (5,4);
-        \node[] at (4,2) {Networking}; 
-        \node[] at (7,2) {Network};
-        \node[] at (7,1.5) {Controller};
-        \node[] at (10,2) {Logical};
-        \node[] at (10,1.5) {Controller};
-        \node[] at (13.4,0.7) {CLI};
-        \node[] at (13.4,3) {GUI};
-        \node[] at (5.5,2) {$\Leftrightarrow$};
-        \node[] at (8.5,2) {$\Leftrightarrow$};
-        \node[] at (11.5,0.5) {$\Leftrightarrow$};
-        \node[] at (11.5,3) {$\Leftrightarrow$};
+        \node[rectangle,draw,minimum height=4cm,minimum width=2.5cm,fill=gray!50] (net) at (-5,0) {Networking};
+        \node[rectangle,draw,minimum height=4cm,minimum width=2.5cm,align=center,fill=gray!35] (log) at (-1,0) {Logical\\Controller};
+        \node[rectangle,draw,minimum height=1.5cm, minimum width=2.5cm,fill=gray!15] (gui) at (3,1.25) {GUI};
+        \node[rectangle,draw,minimum height=1.5cm, minimum width=2.5cm,fill=gray!15] (cli) at (3,-1.25) {CLI};
+        \draw[<->, shorten >= 5pt, shorten <= 5pt] (net) -- (log);
+        \draw[<->, shorten >= 5pt, shorten <= 5pt] (log) -- (gui);
+        \draw[<->, shorten >= 5pt, shorten <= 5pt] (log) -- (cli);
     \end{tikzpicture}
 \end{center}
-%\begin{center}
-%    \begin{tikzpicture}
-%        \node[rectangle,draw,minimum height=4cm,minimum width=2.5cm] at (5,4) {Networking};
-%        \node[rectangle,draw,minimum height=4cm,minimum width=2.5cm] at (2,4) {Network Controller};
-%    \end{tikzpicture}
-%\end{center}
-
 Pertanto, le componenti da realizzare sono:
 \begin{itemize}
-    \item \textbf{Networking}: Utilizzo di container e apparati virtualizzati. Si tratta del modo in cui vengono realizzati, come in IMUNES, i componenti veri e propri. Essi sono poi connessi tra di loro mediante gli appositi comandi e possono simulare una rete. Sarà gestito dal relativo controller attraverso utilizzo di librerie apposite sviluppate ad hoc.
-    \item \textbf{Network Controller}: Automatizzazione, a fronte di una topologia creata, della creazione della configurazione di rete
-    \item \textbf{Logical Controller}: Logica di controllo, a più alto livello, che possa gestire:
+    \item \textbf{Networking}: Utilizzo di container e apparati virtualizzati. Si tratta del modo in cui vengono realizzati, come in IMUNES, i componenti veri e propri. Essi sono poi connessi tra di loro mediante gli appositi comandi e possono simulare una rete. Sarà gestito dal relativo controller attraverso librerie apposite sviluppate ad hoc.
+    \item \textbf{Logical Controller}: Automatizzazione, a fronte di una topologia creata, della creazione della configurazione di rete e realizzazione di logica di controllo, a più alto livello, che possa gestire:
           \begin{itemize}
-              \item Strutture per gestire la topologia creata
-              \item Salvataggio della topologia
-              \item Gestione e salvataggio delle configurazioni
-              \item Invio delle informazioni necessarie al network controller per realizzare la topologia creata
+              \item Strutture relative alla topologia creata;
+              \item Salvataggio della topologia;
+              \item Gestione e salvataggio delle configurazioni;
+              \item Invio delle informazioni necessarie al livello di Networking per generare la topologia creata.
           \end{itemize}
-    \item \textbf{GUI}: si tratta dell'interfaccia su cui l'utente può disegnare la topologia logica della rete, posizionando quindi nodi e link tra nodi, trascinandoli, modificandoli e interagendoci in genere
-    \item \textbf{CLI}: da qui si possono lanciare i comandi di configurazione dei vari componenti. Essa aprirà un editor di testo sui file di configurazione, permettendo quindi di modificarli, salvarli e caricare le modifiche anche nella visualizzazione GUI. Permetterà di accedere a CLI dedicate ai singoli nodi per inserire configurazioni
+    \item \textbf{GUI}: si tratta dell'interfaccia su cui l'utente può disegnare la topologia logica della rete, posizionando quindi nodi e link tra nodi, trascinandoli, modificandoli e interagendoci.
+    \item \textbf{CLI}: da qui si possono lanciare i comandi di configurazione dei vari componenti. Essa aprirà un editor di testo sui file di configurazione, permettendo quindi di modificarli, salvarli e caricare le modifiche anche nella visualizzazione GUI. Permetterà di accedere a CLI dedicate ai singoli nodi per inserire configurazioni.
 \end{itemize}
+
 
 
 \newpage

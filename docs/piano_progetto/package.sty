@@ -1,0 +1,500 @@
+\ProvidesPackage{package}
+
+%! packages required
+
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[english]{babel}
+\RequirePackage[a4paper, portrait, margin=2cm]{geometry}
+\RequirePackage[table]{xcolor}                                              % colors, loaded here because of option clash, DO NOT MOVE
+\RequirePackage{dirtytalk}                                                  % " "
+\RequirePackage{forest}                                                     % trees
+%\RequirePackage{faktor}                                                     % set quotients
+\RequirePackage{alphalph}                                                   % numberings
+\RequirePackage{makeidx}                                                    % analytical index
+\RequirePackage{tikz}                                                       % graphs
+\RequirePackage{fancyhdr}                                                   % header
+\RequirePackage{url}                                                        % links
+\RequirePackage{hyperref}                                                   % links
+\RequirePackage{array}                                                      % tables
+\RequirePackage{longtable}                                                  % tables
+\RequirePackage{multirow}                                                   % tables
+\RequirePackage{graphicx}                                                   % figure
+\RequirePackage{wrapfig}                                                 % figure
+\RequirePackage{subcaption}                                                 % figure
+\RequirePackage{fontawesome5}                                               % symbols
+\RequirePackage{amsthm}                                                     % math
+\RequirePackage{amsmath}                                                    % math
+\RequirePackage{amssymb}                                                    % math
+\RequirePackage{csquotes}                                                   % bibliography
+\RequirePackage[backend=bibtex,style=numeric]{biblatex}                     % bibliography
+\RequirePackage{etoolbox}                                                   % bibliography
+\RequirePackage{epigraph}                                                   % inspiring quotes at the beginning of the document
+\RequirePackage{kantlipsum}                                                 % I don't have to explain this to you. I'll keep my secrets
+\RequirePackage{environ}                                                    % for the timelines, but I don't know why, I just wrote this a lot of time ago
+\RequirePackage{utfsym}                                                     % chess pieces
+\RequirePackage{pdfpages}                                                   % import pdfs
+\RequirePackage{listings}                                                   % for code listings
+\RequirePackage{color}                                                      % for code listings
+\RequirePackage{cprotect}                                                   % for examples
+\RequirePackage{enumitem}                                                   % for choices
+\RequirePackage{tasks}                                                      % also for choices
+\RequirePackage{mathabx}                                                    % I don't know
+\RequirePackage{verbatim}
+
+
+%! packages of packages ;-)
+
+\usetikzlibrary{positioning,automata,arrows,calc,matrix,er,shapes,decorations.pathmorphing,decorations.pathreplacing,calligraphy}          %drawings
+
+%! configurations
+
+\pagestyle{fancy}
+\pagenumbering{arabic}
+\addbibresource{bibliography.bib}                                           % bibliography
+\BiblatexSplitbibDefernumbersWarningOff                                     % bibliography
+\setlength\epigraphwidth{8cm}                                               % inspiring quotes
+\setlength\epigraphrule{0pt}                                                % inspiring quotes
+
+%! definitions
+
+\def\ojoin{\setbox0=\hbox{$\Join$}%
+\rule[-.02ex]{.25em}{.4pt}\llap{\rule[1.10ex]{.25em}{.4pt}}}                % join
+\def\leftouterjoin{\mathbin{\ojoin\mkern-8.5mu\Join}}                       % join
+\def\rightouterjoin{\mathbin{\Join\mkern-8.5mu\ojoin}}                      % join
+\def\fullouterjoin{\mathbin{\ojoin\mkern-8.5mu\Join\mkern-8.5mu\ojoin}}     % join
+
+
+
+%! commands
+
+%? patches
+
+\patchcmd{\thebibliography}{\section*{\refname}}{}{}{}                      % bibliography
+\makeatletter                                                               % epigraph
+\patchcmd{\epigraph}{\@epitext{#1}}{\itshape\@epitext{#1}}{}{}              % epigraph
+\makeatother                                                                % epigraph
+\makeatletter                                                               % timeline
+    \let\matamp=&                                                           % timeline
+    \catcode`\&=13                                                          % timeline
+    \def&{%                                                                 % timeline
+        \iftikz@is@matrix%                                                  % timeline
+            \pgfmatrixnextcell%                                             % timeline
+        \else%                                                              % timeline
+            \matamp%                                                        % timeline
+        \fi%                                                                % timeline
+    }                                                                       % timeline
+\makeatother                                                                % timeline
+\newcounter{lines}                                                          % timeline
+\def\endlr{\stepcounter{lines}\\}                                           % timeline
+\newcounter{vtml}                                                           % timeline
+\setcounter{vtml}{0}                                                        % timeline
+\newif\ifvtimelinetitle                                                     % timeline
+\newif\ifvtimebottomline                                                    % timeline
+
+
+%? new commands
+
+%%% entity-relationship
+\newcommand{\attributeof}[5]{
+    \draw (#4,#5) circle (2pt) edge (#1) node[anchor=#3](#2){#2};
+}
+\newcommand{\keyof}[5]{
+    \filldraw[black] (#4,#5) circle (2pt) edge (#1) node[anchor=#3](#2){#2};
+}
+\newcommand{\connect}[4]{
+    \draw (#1) -- (#2) node[midway,#4] {$(#3)$};
+}
+\newcommand{\attrconnect}[7]{
+    \draw (#4,#5) circle (2pt) node[anchor=#3](#2){#2};
+    \connect{#1}{#2}{#6}{#7}
+}
+\newcommand{\keyconnect}[7]{
+    \filldraw[black] (#4,#5) circle (2pt) node[anchor=#3](#2){#2};
+    \connect{#1}{#2}{#6}{#7}
+}
+\newcommand{\multikey}[2]{
+    \filldraw (#2) circle (2pt);
+    \draw (#1) -- (#2);
+}
+
+%%% not straight paths:
+\newcommand{\fuzzypath}[2]{
+    \pgfmathsetseed{42}
+    \draw[decorate,decoration={random steps,segment length=12pt,amplitude=2pt}] (#1) -- (#2);
+}
+
+%%% binary logic
+\newcommand{\Vero}{\textit{Vero} (1)}
+\newcommand{\Falso}{\textit{Falso} (0)}
+
+
+
+
+
+
+\tikzset{
+    description/.style={column 2/.append style={#1}},
+    timeline color/.store in=\vtmlcolor,
+    timeline color=red!80!black,
+    timeline color st/.style={fill=\vtmlcolor,draw=\vtmlcolor},
+    use timeline header/.is if=vtimelinetitle,
+    use timeline header=false,
+    add bottom line/.is if=vtimebottomline,
+    add bottom line=false,
+    timeline title/.store in=\vtimelinetitle,
+    timeline title={},
+    line offset/.store in=\lineoffset,
+    line offset=4pt,
+}
+
+\NewEnviron{vtimeline}[1][]{%
+    \setcounter{lines}{1}%
+    \stepcounter{vtml}%
+    \begin{tikzpicture}[column 1/.style={anchor=east},
+        column 2/.style={anchor=west},
+        text depth=0pt,text height=1ex,
+        row sep=1ex,
+        column sep=1em,
+        #1
+    ]
+        \matrix(vtimeline\thevtml)[matrix of nodes]{\BODY};
+        \pgfmathtruncatemacro\endmtx{\thelines-1}
+
+        \path[timeline color st]
+            ($(vtimeline\thevtml-1-1.north east)!0.5!(vtimeline\thevtml-1-2.north west)$)--
+            ($(vtimeline\thevtml-\endmtx-1.south east)!0.5!(vtimeline\thevtml-\endmtx-2.south west)$);
+
+        \foreach \x in {1,...,\endmtx}{
+            \node[circle,timeline color st, inner sep=0.15pt, draw=white, thick]
+            (vtimeline\thevtml-c-\x) at
+            ($(vtimeline\thevtml-\x-1.east)!0.5!(vtimeline\thevtml-\x-2.west)$){};
+                \draw[timeline color st](vtimeline\thevtml-c-\x.west)--++(-3pt,0);
+        }
+
+        \ifvtimelinetitle%
+            \draw[timeline color st]([yshift=\lineoffset]vtimeline\thevtml.north west)--
+                ([yshift=\lineoffset]vtimeline\thevtml.north east);
+
+            \node[anchor=west,yshift=16pt,font=\large]
+                at (vtimeline\thevtml-1-1.north west)
+                {\textsc{Timeline \thevtml}: \textit{\vtimelinetitle}};
+        \else%
+            \relax%
+        \fi%
+
+        \ifvtimebottomline%
+            \draw[timeline color st]([yshift=-\lineoffset]vtimeline\thevtml.south west)--
+            ([yshift=-\lineoffset]vtimeline\thevtml.south east);
+        \else%
+            \relax%
+        \fi%
+    \end{tikzpicture}
+}
+
+
+
+%for code
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\definecolor{deepblue}{rgb}{0,0,0.5}
+\definecolor{deepred}{rgb}{0.6,0,0}
+\definecolor{deepgreen}{rgb}{0,0.5,0}
+
+\lstdefinelanguage{JavaScript}{
+  keywords={async, break, case, catch, continue, debugger, default, delete, do, else, false, finally, for, function, if, in, instanceof, new, null, return, switch, this, throw, true, try, typeof, var, void, while, with},
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]",
+  morestring=[b]`,
+  ndkeywords={class, export, boolean, throw, implements, import, this},
+  ndkeywordstyle=\color{darkgray}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=true
+}
+\lstdefinelanguage{pseudocode}{
+  keywords={for, to, do, while, and, or, if, then, else, returns, downto, error},
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]",
+  morestring=[b]`,
+  sensitive=false,
+  mathescape=true
+}
+
+\lstdefinelanguage{transaction}[]{SQL}{
+    morekeywords={{begin transaction}, {end transaction}, commit, work, rollback, if, then, else}
+}
+\lstdefinelanguage{FLWOR}{
+  keywords={for, let, where, order, return, in, and, or, ascending, descending, count},
+  ndkeywords={document,doc},
+  ndkeywordstyle=\color{darkgray}\bfseries,
+  sensitive=false
+}
+\lstdefinelanguage{XML}
+{
+  morestring=[b]",
+  morestring=[s]{>}{<},
+  morecomment=[s]{<?}{?>},
+  morecomment=[s]{<!--}{-->},
+  stringstyle=\color{black},
+  identifierstyle=\color{mauve},
+  %keywordstyle=\color{cyan},
+  %morekeywords={xmlns,version,type}% list your attributes here
+}
+
+\lstdefinelanguage{CUDA}{
+	language=C++,
+	morekeywords=[1]{__device__, __global__, __shared__, __constant__, __managed__, __restrict__},
+	morekeywords=[2]{uchar, uchar2, uchar3, uchar4,
+		char2, char3, char4,
+		ushort, ushort2, ushort3, ushort4,
+		short2, short3, short4,
+		uint, uint2, uint3, uint4,
+		int2, int3, int4,
+		ulong, ulong2, ulong3, ulong4,
+		long2, long3, long4,
+		float2, float3, float4,
+		double2, double3, double4,
+		dim3, cudaError_t, cudaMemcpyKind},
+	keywordstyle=[1]\color{blue},
+	keywordstyle=[2]\color{purple},
+	morecomment=[l]{//}, 
+	commentstyle=\color{deepgreen}
+}
+
+\lstset{frame=tlrb,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=left,
+  stepnumber=1,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=4
+}
+
+\lstnewenvironment{code}[2][]{%
+  \lstset{%
+    numbers = left,
+    title   = #2,
+    #1,
+  }%
+}{}
+
+%funny quotes
+\newcommand{\funnyquote}[2]{
+    \vspace{5mm}
+    \hrule
+    \vspace{2mm}
+    \textit{\say{#1}}\\\vspace{-5mm}\begin{flushright}#2\end{flushright}
+    \hrule
+    \vspace{5mm}
+}
+
+%idea
+\newcommand{\nota}[1]{
+    \vspace{5mm}
+    \hrule
+    \vspace{2mm}
+    \textbf{\noindent \faInfoCircle Nota: }#1
+    \vspace{1mm}
+    \hrule
+    \vspace{5mm}
+}
+
+\newcommand{\details}[1]{
+    \vspace{5mm}
+    \hrule
+    \vspace{2mm}
+    \textbf{\noindent \faCog Technical thoughts: }#1
+    \vspace{1mm}
+    \hrule
+    \vspace{5mm}
+}
+
+\newcommand{\idea}[1]{
+    \vspace{5mm}
+    \hrule
+    \vspace{2mm}
+    \textbf{\noindent \faLightbulb[regular] Idea: }#1
+    \vspace{1mm}
+    \hrule
+    \vspace{5mm}
+}
+
+\newcommand{\knowledge}[1]{
+    \vspace{5mm}
+    \hrule
+    \vspace{2mm}
+    \textbf{\noindent \faBook: }#1
+    \vspace{1mm}
+    \hrule
+    \vspace{5mm}
+}
+
+\newcommand{\definition}[1]{
+    \vspace{5mm}
+    \hrule
+    \vspace{2mm}
+    \textbf{\noindent \faBook Def: }#1
+    \vspace{1mm}
+    \hrule
+    \vspace{5mm}
+}
+
+\newcommand{\definitionname}[2]{
+    \vspace{5mm}
+    \hrule
+    \vspace{2mm}
+    \textbf{\noindent \faBook Def (#1): }#2
+    \vspace{1mm}
+    \hrule
+    \vspace{5mm}
+}
+
+\newcommand{\theorem}[1]{
+    \vspace{5mm}
+    \hrule
+    \vspace{2mm}
+    \textbf{\noindent \faBook Thm: }#1
+    \vspace{1mm}
+    \hrule
+    \vspace{5mm}
+}
+
+\newcommand{\corollario}[1]{
+    \vspace{5mm}
+    \hrule
+    \vspace{2mm}
+    \textbf{\noindent \faBook Corollario: }#1
+    \vspace{1mm}
+    \hrule
+    \vspace{5mm}
+}
+
+\newcommand{\theoremname}[2]{
+    \vspace{5mm}
+    \hrule
+    \vspace{2mm}
+    \textbf{\noindent \faBook Thm (#1): }#2
+    \vspace{1mm}
+    \hrule
+    \vspace{5mm}
+}
+
+\newcommand{\alert}[1]{
+    \vspace{5mm}
+    \hrule
+    \vspace{2mm}
+    \textbf{\noindent \faExclamationTriangle: }#1
+    \vspace{1mm}
+    \hrule
+    \vspace{5mm}
+}
+
+
+
+\newcommand{\example}[1]{
+    \vspace{5mm}
+    \hrule
+    \vspace{2mm}
+    \textbf{\noindent \faPencil*: }
+    #1
+    \vspace{1mm}
+    \hrule
+    \vspace{5mm}
+}
+\newcommand{\examplename}[2]{
+    \vspace{5mm}
+    \hrule
+    \vspace{2mm}
+    \textbf{\noindent \faPencil*\textbf{#1}: }
+    #2
+    \vspace{1mm}
+    \hrule
+    \vspace{5mm}
+}
+
+%centered images with no overflow
+\newcommand{\includecenter}[1]{
+    \begin{center}\includegraphics[scale=0.5]{#1}\end{center}
+}
+\newcommand{\includescale}[2]{
+    \begin{center}\includegraphics[scale=#2]{#1}\end{center}
+}
+\newcommand{\includescaleplus}[4]{
+    \begin{minipage}{#1\linewidth}
+        \begin{center}\includegraphics[scale=#3]{#2}\end{center}
+        \captionof{figure}{#4}
+    \end{minipage}
+}
+
+% choice
+\newlist{choices}{enumerate}{1}
+\setlist[choices]{label*=(\Alph*)}
+\newcommand{\choice}{\item}
+\newcommand{\truefalse}{
+    \begin{tasks}(3)
+        \task Vero
+        \task Falso
+        \task Non è possibile determinarlo
+    \end{tasks}
+}
+\newcommand{\invisiblesection}[1]{
+    \addcontentsline{toc}{section}{#1}
+    \section*{#1}
+}
+\newcommand{\invisiblesubsection}[1]{
+    \addcontentsline{toc}{subsection}{#1}
+    \subsection*{#1}
+}
+\newcommand{\invisiblesubsubsection}[1]{
+    \addcontentsline{toc}{subsubsection}{#1}
+    \subsubsection*{#1}
+}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Q}{\mathbb{Q}}
+
+\newcommand{\system}[1]{
+    $\begin{cases} 
+        #1
+    \end{cases}$
+}
+
+
+\newcommand{\inputC}[1]{
+    \lstinputlisting[language=C]{./code/#1.c}    
+}
+\newcommand{\inputCfolder}[2]{
+    \lstinputlisting[language=C]{./code/#1/#2.c}    
+}
+\newcommand{\inputCfolderx}[3]{
+    \begin{center}./code/#1/#2.#3\end{center}
+    \lstinputlisting[language=C]{./code/#1/#2.#3}    
+}
+\newcommand{\inputCUDA}[1]{
+    \lstinputlisting[language=CUDA]{./code/#1.cu}    
+}
+\newcommand{\inputAsm}[1]{
+    \lstinputlisting[]{./code/#1.asm}    
+}
+
+\newcommand{\inputCLimit}[3]{
+    \lstinputlisting[language=C,firstline=#2,lastline=#3]{./code/#1.c}    
+}
+
+\newcommand{\describedistribution}[2]{
+    \textbf{#1} (#2)
+}

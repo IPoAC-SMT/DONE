@@ -1,13 +1,28 @@
 \section{Analisi}
+\subsection{Componenti}
 Di seguito si analizzeranno in maniera più dettagliata le singole componenti, descrivendo come si intende realizzarle. 
-\paragraph*{Tecnologie utilizzate} Complessivamente, il progetto sarà realizzato utilizzando le seguenti tecnologie: linguaggio \textbf{C}, con l'uso della libreria \texttt{raylib} per la realizzazione dell'interfaccia grafica; \textbf{Docker}, per la virtualizzazione dei nodi e dei router; \textbf{OpenVSwitch} per la virtualizzazione di switch. L'assenza di ulteriori dipendenze assicura un'elevata portabilità dell'applicazione, basando tutte le configurazioni di rete necessarie su strumenti già presenti in un ambiente Linux, come ad esempio i namespaces e la segregazione dello stack di rete tramite questi. 
+\paragraph*{Tecnologie utilizzate} Complessivamente, il progetto sarà realizzato utilizzando le seguenti tecnologie: 
+\begin{itemize}
+    \item Linguaggio \textbf{C}, con l'ausilio della libreria \href{https://github.com/raysan5/raylib}{\texttt{raylib}} per quanto concerne l'interfaccia grafica;
+    \item \textbf{Docker}, per la virtualizzazione di nodi e router;
+    \item \textbf{OpenVSwitch} per la virtualizzazione di switch. 
+\end{itemize}
+L'assenza di ulteriori dipendenze assicura un'\textbf{elevata portabilità} dell'applicazione, basando tutte le configurazioni di rete necessarie su strumenti già presenti in un ambiente Linux, come ad esempio i namespaces e la segregazione dello stack di rete tramite questi ultimi. 
 \newline\newline
-Come introdotto nella sezione precedente, il progetto è strutturato in cinque layer distinti:
-\paragraph*{Networking} La componente di networking è interamente gestita attraverso l'uso di \texttt{openvswitch-switch}, docker e l'interazione con i namespace dei container creati. La topologia viene realizzata concretamente creando i nodi richiesti, gli switch necessari e realizzando i collegamenti desiderati attraverso la creazione di interfacce virtuali collegate tra di loro mediante cavi virtuali. Alla creazione di un container, per creare dei collegamenti con altri apparati si creano delle interfacce virtuali lavorando direttamente sul namespace del container. Il livello di networking viene gestito direttamente da un network controller, attraverso l'uso di una libreria appositamente realizzata. 
-\paragraph*{Network controller} Si occupa di inviare i comandi necessari per la creazione della rete, in base alla topologia precedentemente realizzata dall'utente. Le informazioni relative ad apparati, relativo type e collegamenti sono comunicati al network controller dalla logica soprastante. 
-\paragraph*{Logical controller} Rappresenta il fulcro della logica di controllo. Riceve informazioni sulla topologia creata dal livello di GUI, le invia al controller di rete all'avvio della simulazione, gestisce il salvataggio dei progetti (topologia ed eventuali configurazioni dei nodi) e l'apertura di progetti salvati in precedenza, comunicando alla GUI quali nodi devono essere visualizzati. 
-\paragraph*{GUI} Realizza la componente grafica con cui l'utente può interagire con l'applicazione
-\paragraph*{CLI} Realizza la componente di interfaccia a riga di comando, con cui l'utente può interagire con i singoli nodi della rete, inserendo configurazioni e comandi. Questi comandi si distinguono da quelli che l'utente può specificare per i singoli apparati antecedentemente all'avvio della simulazione, perché a differenza di questi non faranno parte della configurazione che verrà caricata all'avvio della simulazione e dunque non saranno salvati nel progetto.
+Come introdotto nella sezione precedente, il progetto è strutturato in \textbf{quattro layer distinti}:
+\paragraph*{Networking} La componente di networking è interamente gestita tramite \texttt{openvswitch-switch}, docker e l'interazione con i namespace dei container. La \textbf{realizzazione concreta della topologia} prevede la generazione dei nodi/switch richiesti, linkati grazie ad interfacce virtuali collegate da cavi virtuali, lavorando direttamente sul namespace del container. 
+\paragraph*{Logical controller} Rappresenta il fulcro della logica di controllo. Riceve informazioni sulla topologia creata (dunque nome, tipo e collegamenti di ciascun apparato) dal livello di GUI, le formatta, parsa ed invia al livello di Networking all'\textbf{avvio della simulazione}. Gestisce inoltre il salvataggio dei progetti (topologia ed eventuali configurazioni dei nodi) e l'apertura di quelli salvati in precedenza, comunicando alla GUI quali nodi devono essere visualizzati e come. 
+\paragraph*{GUI} Realizza la componente grafica con cui l'utente può interagire tramite l'applicazione, e \textbf{raccoglie i dati} generati dall'utente. Questi ultimi verranno adeguatamente incapsulati e trasmessi al Logical Controller.
+
+\paragraph*{CLI} Realizza la componente di interfaccia a riga di comando, trmite cui l'utente può \textbf{interagire con i singoli nodi della rete}, inserendo configurazioni e comandi. Tali comandi si distinguono da quelli che l'utente può specificare per i singoli apparati prima dell'avvio della simulazione, in quanto, a differenza di questi ultimi, non faranno parte della configurazione che verrà caricata all'avvio della simulazione e dunque \textit{non} saranno salvati nel progetto.
+\subsection{Suddivisione del lavoro}
+Di seguito come intendiamo suddividere il lavoro:
+\begin{itemize}
+    \item L'\textbf{interfaccia grafica} e la \textbf{raccolta dei dati} forniti dall'utente (dove e quali nodi collocare, e come questi vengono collegati tra di loro) viene gestita da Samuele Manclossi tramite la realizzazione di una GUI che si appoggi a strutture dati e funzioni ad hoc. Questo permette di tener traccia in tempo reale dei cambiamenti apportati alla topologia, grazie a struct dinamicamente aggiornate che raccolgono efficacemente i dati richiesti dai livelli sottostanti.
+    \item La riformulazione e \textbf{trasmissione} di tali dati alla libreria di rete, la gestione dello \textbf{start/stop} della simulazione (anche in caso di uscita forzata, in modo da evitare di lasciare sulla macchina ospitante container \textsl{pendenti}), oltre che il \textbf{salvataggio e parsing} delle configurazioni passate su file (così da poterle agevolmente caricare in futuro) è compito del Logical Controller implementato da Melissa Moioli.
+    \item Infine, la realizzazione della \textbf{libreria di rete} (\texttt{netlib}) che comunica direttamente con Docker ed OpenVSwitch consentendo la rappresentazione tramite container di ogni dispositivo, nonché il collegamento diretto a ciascuno di essi tramite \textbf{shell}, è compito di Tiziano Radicchi.
+\end{itemize}
+Nonostante la seguente suddivisione in macroaree, le scelte architetturali ed implementative sono state prese all'unanimità ed il codice prodotto è frutto della \textbf{collaborazione di tutti i membri}, talvolta portati a contribuire anche ad aree altre rispetto alla propria.
 
 
 \newpage
