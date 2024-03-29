@@ -7,6 +7,7 @@ int lastNodesNum, lastLinksNum;
 
 void initEnv()
 {
+
     signal(SIGINT, forcedCLIExit);
     signal(SIGTERM, forcedCLIExit);
     signal(SIGQUIT, forcedCLIExit);

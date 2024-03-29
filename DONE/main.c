@@ -27,7 +27,7 @@ int main(int argc, char** argv)
             return 0;
         }
         else {
-            printf("tried to spawn the CLI but failed. so sad.\n");
+            printf("tried to spawn the CLI but failed. so sad :(\n");
             return -1;
         }
     }

@@ -2,9 +2,9 @@ import ctypes
 # importo la libreria shared object
 C_library = ctypes.CDLL("./obj/netlib.so")
 # signatures delle funzioni
-initEnv = C_library.initEnv
-initEnv.argtypes = []
-initEnv.restype = ctypes.c_int
+createNetnsDir = C_library.createNetnsDir
+createNetnsDir.argtypes = []
+createNetnsDir.restype = ctypes.c_int
 addNode = C_library.addNode
 addNode.argtypes = [ctypes.c_char_p, ctypes.c_char]
 addNode.restype = ctypes.c_int
@@ -72,5 +72,5 @@ sendNetworkSetupCommand(name:bytes, command:bytes) -> int
 openNodeShell(name:bytes) -> int
 
 """)
-initEnv()
+createNetnsDir()
 help()
