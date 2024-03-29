@@ -15,8 +15,25 @@ char*completePath(char*name){ // took this from SO, not my responsibility
     return result;
 }*/
 
-int main()
+int main(int argc, char** argv)
 {
+    if(argc>1 && !strcmp(argv[1],"--no-gui")) {
+        int a = 0;
+        if (((a = fork()) == 0)) {
+            char * args[]={"konsole","-e","python3","-i","./cli/netlib.py",NULL};
+            execvp(args[0],args);
+        }
+        else if(a>0) {
+            printf("CLI running in other window\n");
+            waitpid(a,NULL,0);
+            return 0;
+        }
+        else {
+            printf("tried to spawn the CLI but failed. so sad.\n");
+            return -1;
+        }
+    }
+
     interface_t *interface = init_interface((button_t[NUMbuttons]){
         {24, 129, 100, 100, router_t, placehub},
         {24, 234, 100, 100, router_t, placeswitch},

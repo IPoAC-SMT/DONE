@@ -1,6 +1,9 @@
 #include <raylib.h>
 #include <string.h>
 #include <math.h>
+#include<unistd.h>
+#include<sys/types.h>
+#include<sys/wait.h>
 
 #include "./interface_t.h"
 

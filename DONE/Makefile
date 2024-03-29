@@ -1,8 +1,11 @@
-all: main.o  ./obj/functions.o ./obj/GUI.o ./obj/interface.o ./obj/settings.o ./obj/netlib.o ./obj/logicalController.o
-	gcc main.o ./obj/* -lm -lraylib -o ./bin/executable
+all: main.o  ./obj/functions.o ./obj/GUI.o ./obj/interface.o ./obj/settings.o ./obj/netlib.o ./obj/logicalController.o ./obj/netlib.so
+	gcc main.o ./obj/*.o -lm -lraylib -o ./bin/executable
 
 ./obj/%.o: src/%.c
 	gcc -Wall -Wextra -c $< -o $@
+
+./obj/netlib.so: src/netlib.c
+	gcc -shared -Wall -Wextra src/netlib.c -o ./obj/netlib.so
 
 main.o:
 	gcc -Wall -Wextra -c main.c
@@ -14,3 +17,7 @@ clean:
 .PHONY: exec
 exec:
 	./bin/executable
+
+.PHONY: cli
+cli:
+	./bin/executable --no-gui
