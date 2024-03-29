@@ -1,21 +1,31 @@
 #include "../lib/logicalController.h"
 #include "../lib/netlib.h"
 
-/*      TODO for the future -> deleting containers if forced exit
 
-void setSignalHandling()
+interface_t *lastSimulation = NULL;
+int lastNodesNum, lastLinksNum;
+
+void initEnv()
 {
     signal(SIGINT, forcedCLIExit);
+    signal(SIGTERM, forcedCLIExit);
+    signal(SIGQUIT, forcedCLIExit);
+    signal(SIGKILL, forcedCLIExit);
+    signal(SIGSTOP, forcedCLIExit);
+    signal(SIGTSTP, forcedCLIExit);
+    signal(SIGABRT, forcedCLIExit);
+    signal(SIGSEGV, forcedCLIExit);
+
+    createNetnsDir();
 }
 
 
 void forcedCLIExit()
 {
-    stopSimulation();
+    stopSimulation(lastSimulation, lastNodesNum, lastLinksNum);
     exit(0);
 }
 
-*/
 
 // functions that interact with data collected by the GUI and pass it to the lower level (docker)
 
@@ -29,7 +39,9 @@ void startSimulation(interface_t *simulation, int nodes_num, int links_num)
     simdata.nodes_num = nodes_num;
     simdata.links_num = links_num;
 
-    initEnv();
+    lastSimulation = simulation;
+    lastNodesNum = nodes_num;
+    lastLinksNum = links_num;
 
     printf("starting...\n");
 

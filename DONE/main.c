@@ -4,8 +4,6 @@
 #define HEIGHT 1000
 #define TITLE "Docker Orchestrator for Network Emulation"
 
-#include "./lib/netlib.h" // temp
-
 /*
 char*completePath(char*name){ // took this from SO, not my responsibility
     char *result = malloc(strlen("./resources/icons/") + strlen(name) + 1); // +1 for the null-terminator
@@ -58,8 +56,7 @@ int main(int argc, char** argv)
     SetTargetFPS(30);
  
     SetExitKey(KEY_NULL);
-
-    //setSignalHandling(); // set up signal handling
+    initEnvironment(); // set up signal handling, create netns dir if not present
 
     settings_t settings = {0, 0, 0, "",0,0,0,0,"",0,0,(void*)interface,0};
 

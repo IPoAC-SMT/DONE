@@ -10,8 +10,8 @@ typedef struct{
     int links_num;
 } simdata_t;
 
-//void setSignalHandling();
-//void forcedCLIExit();
+void initEnv();
+void forcedCLIExit();
 void startSimulation(interface_t *simulation, int nodes_num, int links_num);
 void openSwitchShellWrapper();
 void openNodeShellWrapper(char * node_name);

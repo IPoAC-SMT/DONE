@@ -53,6 +53,10 @@ void placelink(settings_t*settings){
     settings->placing_link = 1;
 }
 
+void initEnvironment(){
+    initEnv();
+}
+
 void start(settings_t*settings) {    // sending data to logical controller, that starts the simulation
     settings->isSimulating = 42;
     startSimulation((interface_t *)settings->GUIdata,settings->numnodes,settings->numlink);

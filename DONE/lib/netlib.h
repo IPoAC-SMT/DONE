@@ -15,7 +15,7 @@ typedef struct
     u_int16_t interfaces;
 } interfaces;
 
-int initEnv();
+int createNetnsDir();
 
 int addNode(char *name, char type);
 int delNode(char *name);

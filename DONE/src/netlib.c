@@ -10,7 +10,7 @@
 // All the logical controls about already existing nodes, switches and cables must be added outside of this library
 
 // Initialize the environment by creating, if not already created, the netns folder
-int initEnv()
+int createNetnsDir()
 {
     return system("sudo mkdir -p /var/run/netns 2>/dev/null");
 }
