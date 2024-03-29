@@ -14,6 +14,7 @@ typedef struct
     void * first_place_nodetype;    // needs to be cast in the future -> into component_type_t
     char dragging_deactivated;
     void * GUIdata;
+    char isSimulating;
 } settings_t;
 
 void toggleInterface(settings_t *settings);
