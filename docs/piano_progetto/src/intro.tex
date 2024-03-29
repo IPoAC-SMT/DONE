@@ -18,13 +18,13 @@ Gli obiettivi che desideriamo perseguire con questo progetto sono:
 Alla luce delle funzionalità desiderate, l'architettura che abbiamo ideato per raggiungere gli obiettivi preposti è così organizzata: 
 \begin{center}
     \begin{tikzpicture}
-        \node[rectangle,draw,minimum height=4cm,minimum width=2.5cm,fill=gray!50] (net) at (-5,0) {Networking};
-        \node[rectangle,draw,minimum height=4cm,minimum width=2.5cm,align=center,fill=gray!35] (log) at (-1,0) {Logical\\Controller};
-        \node[rectangle,draw,minimum height=1.5cm, minimum width=2.5cm,fill=gray!15] (gui) at (3,1.25) {GUI};
-        \node[rectangle,draw,minimum height=1.5cm, minimum width=2.5cm,fill=gray!15] (cli) at (3,-1.25) {CLI};
+        \node[rectangle,draw,minimum height=4cm,minimum width=2.5cm,align=center,fill=gray!55] (net) at (-2.5,0) {Networking};
+        \node[rectangle,draw,minimum height=4cm,minimum width=2.5cm,fill=gray!35,align=center] (log) at (1,0) {Logical\\Controller};
+        \node[rectangle,draw,minimum height=1.5cm, minimum width=2.5cm,fill=gray!15] (gui) at (4.5,0) {GUI};
+        \node[rectangle,draw,minimum height=1.5cm, minimum width=2.5cm,fill=gray!15] (cli) at (-6,0) {CLI};
         \draw[<->, shorten >= 5pt, shorten <= 5pt] (net) -- (log);
         \draw[<->, shorten >= 5pt, shorten <= 5pt] (log) -- (gui);
-        \draw[<->, shorten >= 5pt, shorten <= 5pt] (log) -- (cli);
+        \draw[<->, shorten >= 5pt, shorten <= 5pt] (net) to (cli);
     \end{tikzpicture}
 \end{center}
 Pertanto, le componenti da realizzare sono:
@@ -37,9 +37,11 @@ Pertanto, le componenti da realizzare sono:
               \item Gestione e salvataggio delle configurazioni;
               \item Invio delle informazioni necessarie al livello di Networking per generare la topologia creata.
           \end{itemize}
-    \item \textbf{GUI}: si tratta dell'interfaccia su cui l'utente può disegnare la topologia logica della rete, posizionando quindi nodi e link tra nodi, trascinandoli, modificandoli e interagendoci.
-    \item \textbf{CLI}: da qui si possono lanciare i comandi di configurazione dei vari componenti. Essa aprirà un editor di testo sui file di configurazione, permettendo quindi di modificarli, salvarli e caricare le modifiche anche nella visualizzazione GUI. Permetterà di accedere a CLI dedicate ai singoli nodi per inserire configurazioni.
+    \item \textbf{GUI}: si tratta dell'interfaccia su cui l'utente può disegnare la topologia logica della rete, posizionando quindi nodi e link tra nodi, rilocandoli, modificandoli e interagendoci.
+    Permetterà di accedere a CLI dedicate ai singoli nodi per inserire configurazioni.
+    \item \textbf{CLI}: offre un'alternativa all'utilizzo combinato di GUI e logical controller, permettendo di interagire direttamente col livello di networking\footnote{I due approcci sono mutualmente esclusivi: scegliere di utilizzare la CLI in fase di progettazione significa rinunciare alla possibilità di salvare la configurazione e la disposizione dei nodi che sono invece parte integrante dell'approccio predefinito GUI - Logical Controller.}. Essa consiste in un'istanza interattiva di Python arricchita da funzioni ad hoc che consentono di modificare il sistema live fin dalla fase di progettazione.
 \end{itemize}
+È inoltre prevista la possibilità, durante la simulazione, indipendentemente dalla scelta della modalità di utilizzo (sia essa GUI o CLI), di connettersi tramite \textbf{shell} ai singoli nodi.
 
 
 
