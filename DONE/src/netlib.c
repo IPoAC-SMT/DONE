@@ -298,8 +298,6 @@ int delCableBetweenNodeAndSwitch(char *nodeName, char *switchName)
         // deleting the cable from the switch
         snprintf(command, MAX_COMMAND_SIZE, "sudo ovs-vsctl del-port %s %s", switchName, switchEndpoint);
 
-        printf("%s\n", command);
-
         if (!system(command))
         { // if the cable deletion was successful, delete the cable from the container
 
@@ -307,8 +305,6 @@ int delCableBetweenNodeAndSwitch(char *nodeName, char *switchName)
 
             // deleting the cable from the container, and so deleting the entire cable, now go home it's late
             snprintf(command, MAX_COMMAND_SIZE, "sudo ip netns exec %s ip link del %s", pid, hostEndpoint);
-
-            printf("%s\n", command);
 
             free(pid);
 
