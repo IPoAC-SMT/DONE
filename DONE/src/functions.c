@@ -122,10 +122,13 @@ void saveProject(settings_t *settings)
 
 void clearCanvas(settings_t *settings)
 {
-    settings->numnodes = 0;
-    settings->numlink = 0;
-    interface_t *interface = (interface_t *)settings->GUIdata;
-    interface->links = NULL;
-    interface->nodes = NULL;
-    interface->rectangles = NULL;
+    if (settings->numlink > 0 || settings->numnodes > 0)
+    {
+        settings->numnodes = 0;
+        settings->numlink = 0;
+        interface_t *interface = (interface_t *)settings->GUIdata;
+        free(interface->links);
+        free(interface->nodes);
+        free(interface->rectangles);
+    }
 }
