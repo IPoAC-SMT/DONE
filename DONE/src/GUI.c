@@ -11,11 +11,15 @@ void DrawButton(button_t pulsante, settings_t *settings)
         {
             settings->moving_node = false;
             settings->placing_node = false;
+            settings->placing_link = false;
+            settings->drawing_rectangle = false;
             hovering = false;
             pulsante.pressed(settings);
         }
-        else
+        else {
             hovering = true;
+            DrawText(pulsante.alt_text,GetMouseX()+20,GetMouseY()+20,STD_FONT_SIZE,GRAY);
+        }
     }
     else
         hovering = false;
@@ -40,7 +44,7 @@ int max(int a, int b)
     return (a > b ? a : b);
 }
 
-void DrawLink(link_t link, settings_t* settings,node_t* nodes, bool true_node){
+void DrawLink(link_t link, settings_t* settings,node_t* nodes){
     Vector2 positions[2] = {getPos(nodes,link.node1),getPos(nodes,link.node2)};
     if (settings->moving_node){
         if (!strcmp(link.node1,settings->node_name)) positions[0]=(Vector2){GetMouseX(),GetMouseY()};
@@ -68,6 +72,7 @@ void DrawLink(link_t link, settings_t* settings,node_t* nodes, bool true_node){
     {
         settings->moving_node = false;
         settings->placing_node = false;
+        settings->drawing_rectangle = false;
         printf("HERE I should open the configs\n");
     }
     /* debug
@@ -75,6 +80,10 @@ void DrawLink(link_t link, settings_t* settings,node_t* nodes, bool true_node){
     snprintf(toPrint,10,"%f",d);
     DrawText(toPrint, 420, 420, 42, BLUE);
     */
+}
+
+void DrawFakeLink(settings_t*settings,node_t*nodes){
+    DrawLineEx(getPos(nodes,settings->first_place),(Vector2){GetMouseX(),GetMouseY()},5,PURPLE);
 }
 
 void DrawNode(node_t* node, settings_t* settings, bool true_node){
@@ -248,21 +257,48 @@ void DrawNode(node_t* node, settings_t* settings, bool true_node){
         GetMouseX() <= node->x+20 &&
         GetMouseX() >= node->x-20 &&
         GetMouseY() <= node->y+20 &&
-        GetMouseY() >= node->y-20 &&
-        IsMouseButtonReleased(MOUSE_BUTTON_LEFT) &&
-        ! settings->dragging_deactivated
-        )
+        GetMouseY() >= node->y-20)
     {
-        if(!settings->moving_node && !settings->placing_node){
-            if (!strcmp(settings->node_name,node->name)){
-                settings->node_name = (char*) calloc(NAMELENGTH,sizeof(char));
+        if (
+            IsMouseButtonReleased(MOUSE_BUTTON_LEFT) &&
+            ! settings->dragging_deactivated
+            )
+        {
+            if(!settings->moving_node && !settings->placing_node){
+                if (!strcmp(settings->node_name,node->name)){
+                    settings->node_name = (char*) calloc(NAMELENGTH,sizeof(char));
+                }
+                else {
+                    if (settings->placing_link == 3) {
+                        settings->placing_link = 0;
+                    }
+                    else {
+                        settings->placing_node = false;
+                        settings->drawing_rectangle = false;
+                        settings->moving_node = 1;
+                        settings->node_type = node->type;
+                        settings->node_name = (char*) calloc(NAMELENGTH,sizeof(char));
+                        snprintf(settings->node_name,NAMELENGTH,"%s",node->name);
+                    }
+                }
             }
-            else {
+        }
+        else if (
+            IsMouseButtonReleased(MOUSE_BUTTON_RIGHT)
+            )
+        {
+            if(settings->isSimulating) {
+                // TODO open shell on node NOT TESTED
                 settings->placing_node = false;
-                settings->moving_node = 1;
+                settings->placing_link = false;
+                settings->drawing_rectangle = false;
+                settings->moving_node = false;
                 settings->node_type = node->type;
                 settings->node_name = (char*) calloc(NAMELENGTH,sizeof(char));
                 snprintf(settings->node_name,NAMELENGTH,"%s",node->name);
+            }
+            else {
+                // TODO open node configs
             }
         }
     }
@@ -336,6 +372,10 @@ bool isSomethingUnder(int x,int y,node_t * nodes,settings_t*settings){
 
 }
 
+void DrawMessageAtAngle(char*message) {
+    DrawText(message,1900-STD_FONT_SIZE/2*strlen(message),970,STD_FONT_SIZE,GRAY);
+}
+
 void DrawGUI(settings_t* settings, interface_t * interface) {
 
     // 1. piazzo i buttons
@@ -345,6 +385,8 @@ void DrawGUI(settings_t* settings, interface_t * interface) {
     if(IsKeyReleased(KEY_ESCAPE)) {
         settings->moving_node = false;
         settings->placing_node = false;
+        settings->drawing_rectangle = false;
+        settings->placing_link = false;
         settings->node_type = -1;
     }
 
@@ -361,6 +403,7 @@ void DrawGUI(settings_t* settings, interface_t * interface) {
             // ne imposto le posizioni
             setNode(settings->node_name,interface->nodes,settings);
         }
+        else DrawMessageAtAngle("Select a new position for the node");
     }
 
     // 4. altrimenti, se sto posizionando qualcosa di nuovo
@@ -379,6 +422,7 @@ void DrawGUI(settings_t* settings, interface_t * interface) {
             // e aumento il numero di nodes
             settings->numnodes++;
         }
+        else DrawMessageAtAngle("Choose the position for this new node");
     }
  
     // 5. altrimenti, se sto posizionando un link
@@ -391,20 +435,59 @@ void DrawGUI(settings_t* settings, interface_t * interface) {
             settings->dragging_deactivated = true;
             settings->placing_link = 2;
         }
+        else if (settings->placing_link == 1) {
+            DrawCircle(GetMouseX(), GetMouseY(), 5, PURPLE);
+            DrawMessageAtAngle("Select the first node to link");
+        }
         // altrimenti
-        else if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)&&isSomethingUnder(GetMouseX(),GetMouseY(),interface->nodes,settings)){
-            printf("HERE2\n");
-            settings->placing_link = 0;
+        else if(settings->placing_link == 2 && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)&&isSomethingUnder(GetMouseX(),GetMouseY(),interface->nodes,settings)){
+            settings->placing_link = 3;
             // funny modified function that now returns link_t with the extra needed info too
             appendLink(interface,settings,(link_t){settings->first_place,getInversePos(GetMouseX(),GetMouseY(),interface->nodes,settings)->name,(component_type_t)settings->first_place_nodetype,getInversePos(GetMouseX(),GetMouseY(),interface->nodes,settings)->type});
             //aumento il numero di link
             settings->numlink++;
             settings->dragging_deactivated = false;
         }
+        else if(settings->placing_link == 2) {
+            DrawFakeLink(settings,interface->nodes);
+            DrawMessageAtAngle("Select the second node to link");
+        }
+    }
+
+    else if (settings->drawing_rectangle) {
+        // TODO draw rectangle with all the cases and prompting for the color
+        if (settings->drawing_rectangle == 1) {
+            settings->dragging_deactivated = true;
+            if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+                settings->posX = GetMouseX();
+                settings->posY = GetMouseY();
+                settings->drawing_rectangle = 2;
+            }
+            else {
+                DrawRectangle(GetMouseX(),GetMouseY(),5,5,PURPLE);
+                DrawMessageAtAngle("Select the first angle");
+            }
+        }
+        else if (settings->drawing_rectangle == 2) {
+            settings->dragging_deactivated = true;
+            if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+                settings->dragging_deactivated = false;
+                // TODO add rectangle to interface
+                settings->drawing_rectangle = 0;
+            }
+            else {
+                DrawMessageAtAngle("Select the second angle");
+                DrawRectangleLines(min(settings->posX,GetMouseX()),min(settings->posY,GetMouseY()),abs(GetMouseX()-settings->posX),abs(GetMouseY()-settings->posY),PURPLE);
+                // TODO draw partial rectangle
+            }
+        }
+        else {
+            settings->drawing_rectangle = 1;
+        }
     }
 
     // ora posiziono tutto: nodes e link
-    for (int i=0; i<settings->numlink;i++) DrawLink(interface->links[i],settings,interface->nodes,true);
+    for (int i=0; i<settings->numlink;i++) DrawLink(interface->links[i],settings,interface->nodes);
     for (int i=0; i<settings->numnodes;i++) DrawNode(&(interface->nodes[i]),settings,true);
 
 }

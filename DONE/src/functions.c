@@ -7,12 +7,16 @@ void helloworld(settings_t*settings){
 void placehub(settings_t*settings){
     if(settings->isSimulating) return;
     settings->moving_node = 0;
+    settings->placing_link = 0;
+    settings->drawing_rectangle = 0;
     settings->placing_node = 1;
     settings->node_type = 0;
 }
 
 void placeswitch(settings_t*settings){
     if(settings->isSimulating) return;
+    settings->placing_link = 0;
+    settings->drawing_rectangle = 0;
     settings->moving_node = 0;
     settings->placing_node = 1;
     settings->node_type = 1;
@@ -20,6 +24,8 @@ void placeswitch(settings_t*settings){
 
 void placerouter(settings_t*settings){
     if(settings->isSimulating) return;
+    settings->placing_link = 0;
+    settings->drawing_rectangle = 0;
     settings->moving_node = 0;
     settings->placing_node = 1;
     settings->node_type = 2;
@@ -27,6 +33,8 @@ void placerouter(settings_t*settings){
 
 void placehost(settings_t*settings){
     if(settings->isSimulating) return;
+    settings->placing_link = 0;
+    settings->drawing_rectangle = 0;
     settings->moving_node = 0;
     settings->placing_node = 1;
     settings->node_type = 3;
@@ -34,6 +42,8 @@ void placehost(settings_t*settings){
 
 void placeexternalinterface(settings_t*settings){
     if(settings->isSimulating) return;
+    settings->placing_link = 0;
+    settings->drawing_rectangle = 0;
     settings->moving_node = 0;
     settings->placing_node = 1;
     settings->node_type = 4;
@@ -41,6 +51,8 @@ void placeexternalinterface(settings_t*settings){
 
 void placeexternalnattedinterface(settings_t*settings){
     if(settings->isSimulating) return;
+    settings->placing_link = 0;
+    settings->drawing_rectangle = 0;
     settings->moving_node = 0;
     settings->placing_node = 1;
     settings->node_type = 5;
@@ -48,11 +60,19 @@ void placeexternalnattedinterface(settings_t*settings){
 
 void placelink(settings_t*settings){
     if(settings->isSimulating) return;
+    settings->drawing_rectangle = 0;
     settings->moving_node = 0;
     settings->placing_node = 0;
     settings->placing_link = 1;
 }
 
+void placeRectangle(settings_t*settings){
+    if(settings->isSimulating) return;
+    settings->drawing_rectangle = -1;
+    settings->moving_node = 0;
+    settings->placing_node = 0;
+    settings->placing_link = 0;
+}
 void initEnvironment(){
     initEnv();
 }

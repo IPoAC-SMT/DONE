@@ -15,6 +15,12 @@ typedef struct
     char dragging_deactivated;
     void * GUIdata;
     char isSimulating;
+    char drawing_rectangle;
+    /* begin things for rectangles */
+    int posX;
+    int posY;
+    // TODO there was something else
+    /* end things for rectangles */
 } settings_t;
 
 void toggleInterface(settings_t *settings);
