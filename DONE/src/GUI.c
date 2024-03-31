@@ -512,5 +512,5 @@ void DrawGUI(settings_t* settings, interface_t * interface) {
     // ora posiziono tutto: nodes e link
     for (int i=0; i<settings->numlink;i++) DrawLink(interface->links[i],settings,interface->nodes);
     for (int i=0; i<settings->numnodes;i++) DrawNode(&(interface->nodes[i]),settings,true);
-
+    
 }
