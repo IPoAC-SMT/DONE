@@ -374,13 +374,28 @@ int delCableBetweenSwitches(char *firstSwitch, char *secondSwitch)
 }
 
 // Send a command to a container's network namespace
-int sendNetworkSetupCommand(char *name, char *command)
+int sendNodeSetupCommand(char *name, char *command)
 {
     char fullCommand[MAX_COMMAND_SIZE];
 
     if (name != NULL && command != NULL && strlen(name) <= MAX_PID_SIZE)
     {
-        snprintf(fullCommand, MAX_COMMAND_SIZE, "docker exec -it %s %s", name, command);
+        snprintf(fullCommand, MAX_COMMAND_SIZE, "docker exec -it %s '%s'", name, command);
+        printf("%s\n", fullCommand);    
+
+        return system(fullCommand);
+    }
+    return -1;
+}
+
+// Send a command to a switch
+int sendSwitchSetupCommand(char *command)
+{
+    char fullCommand[MAX_COMMAND_SIZE];
+
+    if (command != NULL)
+    {
+        snprintf(fullCommand, MAX_COMMAND_SIZE, "%s", command);
 
         return system(fullCommand);
     }

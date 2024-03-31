@@ -3,7 +3,8 @@
 
 #include "./interface_t.h"
 
-typedef struct{
+typedef struct
+{
     node_t *nodes;
     link_t *links;
     int nodes_num;
@@ -14,5 +15,8 @@ void initEnv();
 void forcedCLIExit();
 void startSimulation(interface_t *simulation, int nodes_num, int links_num);
 void openSwitchShellWrapper();
-void openNodeShellWrapper(char * node_name);
+void openNodeShellWrapper(char *node_name);
+void sendNodeCommand(char *name, char *command);
+void sendSwitchCommand(char *command);
+
 void stopSimulation(interface_t *simulation, int nodes_num, int links_num);

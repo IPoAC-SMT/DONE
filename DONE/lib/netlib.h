@@ -34,7 +34,9 @@ int delCableBetweenNodeAndSwitch(char *nodeName, char *switchName);
 int addCableBetweenSwitches(char *firstSwitch, char *secondSwitch);
 int delCableBetweenSwitches(char *firstSwitch, char *secondSwitch);
 
-int sendNetworkSetupCommand(char *name, char *command);
+int sendNodeSetupCommand(char *name, char *command);
+int sendSwitchSetupCommand(char *command);
+
 int openNodeShell(char *node_name);
 int openSwitchShell();
 

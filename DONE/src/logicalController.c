@@ -58,6 +58,8 @@ void startSimulation(interface_t *simulation, int nodes_num, int links_num)
             addNode(current_node->name, 'h');
             break;
         case hub_t: // TODO: wait for hub code
+            printf("antani");
+            addSwitch(current_node->name); // Wondering if someone will ever use this
             break;
         case switch_t:
             addSwitch(current_node->name);
@@ -110,6 +112,16 @@ void openNodeShellWrapper(char *node_name)
 void openSwitchShellWrapper()
 {
     openSwitchShell();
+}
+
+void sendNodeCommand(char *name, char *command)
+{
+    sendNodeSetupCommand(name, command);
+}
+
+void sendSwitchCommand(char *command)
+{
+    sendSwitchSetupCommand(command);
 }
 
 void stopSimulation(interface_t *simulation, int nodes_num, int links_num)

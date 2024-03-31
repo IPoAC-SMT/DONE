@@ -1,4 +1,5 @@
 #include "../lib/logicalController.h"
+#include <string.h>
 
 #define MAX_FILENAME 50
 
@@ -99,10 +100,57 @@ void initEnvironment()
 
 void start(settings_t *settings)
 { // sending data to logical controller, that starts the simulation
-    if (settings->isSimulating)
+    if (settings->isSimulating || settings->numnodes == 0)
         return;
     settings->isSimulating = 42;
     startSimulation((interface_t *)settings->GUIdata, settings->numnodes, settings->numlink);
+
+    if (settings->openProjectName)
+    { // if a project is open, we need to eventually load configs
+
+        char config_filename[50];
+        strcpy(config_filename, settings->openProjectName);
+        strcat(config_filename, ".conf");
+        printf("config_filename: %s\n", config_filename);
+        FILE *file = fopen(config_filename, "r");
+        if (file != NULL)
+        {
+            char buf[100]; // buffer for reading the file
+            char *nodeName;
+
+            while (fgets(buf, 100, file)) // reading the node name line
+            {
+                nodeName = strtok(strdup(buf), ":"); // retrieving the node name from the config
+                if (nodeName != NULL)
+                {
+                    printf("nodeName: %s\n", nodeName);
+                    printf("nodeName: %s\n", nodeName);
+                    fgets(buf, 100, file); // reading the command line
+                    buf[strlen(buf) - 1] = '\0'; // removing the newline character
+                    printf("sending command to node %s: %s\n", nodeName, buf);
+                    sendNodeCommand(nodeName, buf); // sending the command to the logical controller
+                    /*do{
+                        fgets(buf, 100, file); // reading the command line
+                        if(buf != NULL || buf[0] == '\n') break; // if i reached the end of the commands for this node, break and go to the next one
+                        if(nodeName[0] == 's'){
+                            //sendSwitchCommand(buf); 
+                        }else{
+                            printf("sending command to node %s: %s\n", nodeName, buf);
+                            sendNodeCommand(nodeName, buf); // sending the command to the logical controller
+                        }
+                    }while(1);*/
+                }else{
+                    printf("error\n");
+                    fclose(file);
+                    return;
+                }
+            }
+        }
+        else
+        {
+            printf("ALERT: There was an error while opening the config file. Have you touched it?!\n");
+        }
+    }
 }
 
 void stop(settings_t *settings)
@@ -135,12 +183,13 @@ void clearCanvas(settings_t *settings)
     }
 }
 
-char *getFilename(){
-    char *res = (char *) calloc(MAX_FILENAME, sizeof(char));
-    char buf[30];
+char *getFilename()
+{
+    char *res = (char *)calloc(MAX_FILENAME, sizeof(char));
+    char buf[20];
     strcpy(res, "./saves/");
     printf("Specify the file pathname: ./saves/");
-    scanf("%30s", buf);
+    scanf("%20s", buf);
     strcat(res, buf);
     return res;
 }
@@ -152,10 +201,14 @@ void openProject(settings_t *settings) // TODO: fix crash
         stop(settings);
     }
 
-    //clearCanvas(settings); // first, clearing the canvas
+    clearCanvas(settings); // first, clearing the canvas
+
+    free(settings->openProjectName); // freeing the old project name
 
     char *filename = getFilename();
+    strcat(filename, ".done");
 
+    settings->openProjectName = filename; // updating the project name
     FILE *file = fopen(filename, "r");
     int numnodes, numlinks;
     node_t *nodes;
@@ -169,7 +222,7 @@ void openProject(settings_t *settings) // TODO: fix crash
 
         printf("numnodes: %d\n", numnodes);
 
-        settings->numnodes = numnodes;
+        // settings->numnodes = numnodes;
         printf("settings->numnodes: %d\n", settings->numnodes);
 
         // nodes = (node_t *)malloc(numnodes * sizeof(node_t));
@@ -194,7 +247,6 @@ void openProject(settings_t *settings) // TODO: fix crash
     {
         printf("ALERT: There was an error while opening the file. Perhaps the path is wrong?\n");
     }
-    free(filename);
 }
 
 void saveProject(settings_t *settings)
@@ -203,12 +255,18 @@ void saveProject(settings_t *settings)
     { // if an experiment was running we need to kill the containers
         stop(settings);
     }
-                    
+
+    free(settings->openProjectName); // freeing the old project name
+
     char *filename = getFilename();
+    strcat(filename, ".done");
     FILE *file = fopen(filename, "w");
 
     if (file != NULL)
     {
+        settings->openProjectName = filename;
+
+        // creating the project file
         printf("%d\n", settings->numnodes);
         fprintf(file, "%d\n%d\n", settings->numnodes, settings->numlink); // saving node number and link number at the top of the file
 
@@ -227,10 +285,41 @@ void saveProject(settings_t *settings)
         }
 
         fclose(file);
+
+        // creating the config file template
+        char *config_filename = (char *)calloc(strlen(filename) + 5, sizeof(char));
+        strcpy(config_filename, filename);
+        strcat(config_filename, ".conf");
+
+        file = fopen(config_filename, "a"); // creating the config file, and if already exists, dont overwrite it
+        if (file != NULL)
+        {
+
+            fclose(file);
+            file = fopen(config_filename, "r");
+
+            fseek(file, 0, SEEK_END);
+            if (!ftell(file)) // if the file is empty
+            {
+                fclose(file);
+                file = fopen(config_filename, "w");
+                for (int i = 0; i < settings->numnodes; i++)
+                { // saving every node
+                    node_t current_node = gui->nodes[i];
+                    fprintf(file, "%s:\n\n", current_node.name); // name for every node
+                }
+            }
+
+            fclose(file);
+        }
+        else
+        {
+            printf("ALERT: There was an error while creating the config file. Perhaps the path is wrong?\n");
+        }
+        free(config_filename);
     }
     else
     {
         printf("ALERT: There was an error while opening the file. Perhaps the path is wrong?\n");
     }
-    free(filename);
 }
