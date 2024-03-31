@@ -1,11 +1,11 @@
 #include "../lib/GUI.h"
 
-void DrawButton(button_t pulsante, settings_t *settings)
+void DrawButton(button_t *pulsante, settings_t *settings)
 {
     bool hovering;
     if (
-        (GetMouseX() >= pulsante.x && GetMouseX() <= (pulsante.x + pulsante.width)) &&
-        (GetMouseY() >= pulsante.y && GetMouseY() <= (pulsante.y + pulsante.height)))
+        (GetMouseX() >= pulsante->x && GetMouseX() <= (pulsante->x + pulsante->width)) &&
+        (GetMouseY() >= pulsante->y && GetMouseY() <= (pulsante->y + pulsante->height)))
     {
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
         {
@@ -14,17 +14,40 @@ void DrawButton(button_t pulsante, settings_t *settings)
             settings->placing_link = false;
             settings->drawing_rectangle = false;
             hovering = false;
-            pulsante.pressed(settings);
+            pulsante->pressed(settings);
         }
         else {
             hovering = true;
-            DrawText(pulsante.alt_text,GetMouseX()+20,GetMouseY()+20,STD_FONT_SIZE,GRAY);
+            DrawText(pulsante->alt_text,GetMouseX()+20,GetMouseY()+20,STD_FONT_SIZE,GRAY);
         }
     }
     else
         hovering = false;
 
-    DrawRectangleLines(pulsante.x, pulsante.y, pulsante.width, pulsante.height, hovering ? YELLOW : GRAY); // lo creo con colore diverso se ci sto o meno hoverando
+    DrawRectangleLines(pulsante->x, pulsante->y, pulsante->width, pulsante->height, hovering ? YELLOW : GRAY); // lo creo con colore diverso se ci sto o meno hoverando
+
+    // debug, understand me: printf("HEREEEE\n");
+
+    if (pulsante->edges == NULL) {
+        // TODO load edges from file
+        char * filename = calloc(101,sizeof(char));
+        snprintf(filename,100,"./resources/GUIelements/%s",pulsante->filename);
+        FILE * drawing = fopen(filename,"r");
+        fgets(filename,100,drawing);
+        sscanf(filename,"%d",&(pulsante->numEdges));
+        pulsante->edges = (int **) calloc (pulsante->numEdges,sizeof(int*));
+        for( int i=0; i<pulsante->numEdges; i++) {
+            // allocate
+            pulsante->edges[i] = (int *) calloc (4,sizeof(int));
+            // read values
+            fgets(filename,100,drawing);
+            sscanf(filename,"%d %d --- %d %d",&(pulsante->edges[i][0]),&(pulsante->edges[i][1]),&(pulsante->edges[i][2]),&(pulsante->edges[i][3]));
+        }
+    }
+
+    for (int i=0; i<pulsante->numEdges; i++) {
+        DrawLineEx((Vector2){pulsante->edges[i][0]+pulsante->x,pulsante->edges[i][1]+pulsante->y},(Vector2){pulsante->edges[i][2]+pulsante->x,pulsante->edges[i][3]+pulsante->y},hovering?5:1,hovering?YELLOW:GRAY);
+    }
 }
 
 Vector2 getPos(node_t *nodes, char *name)
@@ -379,7 +402,7 @@ void DrawMessageAtAngle(char*message) {
 void DrawGUI(settings_t* settings, interface_t * interface) {
 
     // 1. piazzo i buttons
-    for (int i=0;i<NUMbuttons;i++) DrawButton(interface->buttons[i],settings);
+    for (int i=0;i<NUMbuttons;i++) DrawButton(&(interface->buttons[i]),settings);
     
     // 2. se premo esc disattivo dragging e placing TODO bugged
     if(IsKeyReleased(KEY_ESCAPE)) {
@@ -489,5 +512,5 @@ void DrawGUI(settings_t* settings, interface_t * interface) {
     // ora posiziono tutto: nodes e link
     for (int i=0; i<settings->numlink;i++) DrawLink(interface->links[i],settings,interface->nodes);
     for (int i=0; i<settings->numnodes;i++) DrawNode(&(interface->nodes[i]),settings,true);
-
+    
 }

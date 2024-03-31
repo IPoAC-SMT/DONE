@@ -8,4 +8,7 @@ typedef struct
     int iconType;                  // type of the icon
     void (*pressed)(settings_t *); // function to be called when pressed
     char * alt_text;               // text to display when hovering
+    int numEdges;
+    int ** edges;
+    char * filename;
 } button_t;

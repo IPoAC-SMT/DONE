@@ -212,31 +212,56 @@ void openProject(settings_t *settings) // TODO: fix crash
     if (file != NULL)
     {
         fscanf(file, "%d\n%d\n", &numnodes, &numlinks);
-        printf("%d %d\n", numnodes, numlinks);
-        printf("%d %d\n", settings->numnodes, settings->numlink);
+        printf("dio pera %d %d\n", numnodes, numlinks);
+        printf("dio castoro %d %d\n", settings->numnodes, settings->numlink);
 
         printf("numnodes: %d\n", numnodes);
 
         // settings->numnodes = numnodes;
         printf("settings->numnodes: %d\n", settings->numnodes);
 
-        // nodes = (node_t *)malloc(numnodes * sizeof(node_t));
-        // links = (link_t *)malloc(numlinks * sizeof(link_t));
+        nodes = (node_t *)malloc(numnodes * sizeof(node_t));
+        links = (link_t *)malloc(numlinks * sizeof(link_t));
 
         char name[50]; // buffer
+        char othername[50];
+        int type, type2;
 
-        /*
+        //sem_wait(settings->dio_melanzana);
+
         for(int i=0; i < numnodes; i++){    // reading all nodes
-            fscanf(file,"%s\n%d\n%d %d\n", name, &nodes[i].type, &nodes[i].x, &nodes[i].y);
-            printf("%s\n", name);
+            printf("reading NODE %d\n",i);
+            fscanf(file,"%s\n%d\n%d %d\n", name, &type, &nodes[i].x, &nodes[i].y);
+            nodes[i].type = type;
+            //printf("%s\n", name);
             nodes[i].name = (char *)malloc(strlen(name) * sizeof(char));    // allocating memory for node name
-            //strcpy(name, nodes[i].name);
-            //printf("node name: %s\n", nodes[i].name);
+            strcpy(nodes[i].name,name);
+            printf("\tnode name: %s\n", nodes[i].name);
         }
-        */
-        // for(int i=0; i < numlinks; i++){    // reading all links
-        // fscanf(file,"%s\n%d\n%d %d\n",&nodes[i].name, &nodes[i].type, &nodes[i].x, &nodes[i].y);
-        //}
+        
+        for(int i=0; i < numlinks; i++){    // reading all links
+            printf("reading LINK %d\n",i);
+            fscanf(file,"%s\n%s\n%d\n%d\n",name, othername, &type, &type2);
+            links[i].node1_type = type;
+            links[i].node2_type = type2;
+            links[i].node1 = (char *)malloc(strlen(name) * sizeof(char));
+            links[i].node2 = (char *)malloc(strlen(othername) * sizeof(char));
+            strcpy(links[i].node1,name);
+            strcpy(links[i].node2,othername);
+            printf("\tlinked nodes names: %s and %s\n", links[i].node1,links[i].node2);
+        }
+
+        printf("read everything correctly!\n");
+
+        interface_t *gui = settings->GUIdata;
+        gui->nodes = nodes;
+        gui->links = links;
+        settings->numnodes = numnodes;
+        settings->numlink = numlinks;
+
+        //sem_post(settings->dio_melanzana);
+
+        printf("even modified settings: numnodes: %d numlinks: %d!\n", settings->numnodes,settings->numlink);
     }
     else
     {
