@@ -380,7 +380,7 @@ int sendNodeSetupCommand(char *name, char *command)
 
     if (name != NULL && command != NULL && strlen(name) <= MAX_PID_SIZE)
     {
-        snprintf(fullCommand, MAX_COMMAND_SIZE, "docker exec -it %s '%s'", name, command);
+        snprintf(fullCommand, MAX_COMMAND_SIZE, "docker exec %s %s", name, command);
         printf("%s\n", fullCommand);    
 
         return system(fullCommand);

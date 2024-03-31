@@ -123,22 +123,17 @@ void start(settings_t *settings)
                 nodeName = strtok(strdup(buf), ":"); // retrieving the node name from the config
                 if (nodeName != NULL)
                 {
-                    printf("nodeName: %s\n", nodeName);
-                    printf("nodeName: %s\n", nodeName);
-                    fgets(buf, 100, file); // reading the command line
-                    buf[strlen(buf) - 1] = '\0'; // removing the newline character
-                    printf("sending command to node %s: %s\n", nodeName, buf);
-                    sendNodeCommand(nodeName, buf); // sending the command to the logical controller
-                    /*do{
+                    do{
                         fgets(buf, 100, file); // reading the command line
-                        if(buf != NULL || buf[0] == '\n') break; // if i reached the end of the commands for this node, break and go to the next one
+                        if(buf == NULL || buf[0] == '\n') break; // if i reached the end of the commands for this node, break and go to the next one
+                        printf("buf: %s\n", buf);
                         if(nodeName[0] == 's'){
-                            //sendSwitchCommand(buf); 
+                            sendSwitchCommand(buf); 
                         }else{
                             printf("sending command to node %s: %s\n", nodeName, buf);
                             sendNodeCommand(nodeName, buf); // sending the command to the logical controller
                         }
-                    }while(1);*/
+                    }while(1);
                 }else{
                     printf("error\n");
                     fclose(file);
