@@ -123,18 +123,25 @@ void start(settings_t *settings)
                 nodeName = strtok(strdup(buf), ":"); // retrieving the node name from the config
                 if (nodeName != NULL)
                 {
-                    do{
+                    do
+                    {
                         fgets(buf, 100, file); // reading the command line
-                        if(buf == NULL || buf[0] == '\n') break; // if i reached the end of the commands for this node, break and go to the next one
+                        if (buf == NULL || buf[0] == '\n')
+                            break; // if i reached the end of the commands for this node, break and go to the next one
                         printf("buf: %s\n", buf);
-                        if(nodeName[0] == 's'){
-                            sendSwitchCommand(buf); 
-                        }else{
+                        if (nodeName[0] == 's')
+                        {
+                            sendSwitchCommand(buf);
+                        }
+                        else
+                        {
                             printf("sending command to node %s: %s\n", nodeName, buf);
                             sendNodeCommand(nodeName, buf); // sending the command to the logical controller
                         }
-                    }while(1);
-                }else{
+                    } while (1);
+                }
+                else
+                {
                     printf("error\n");
                     fclose(file);
                     return;
@@ -212,13 +219,6 @@ void openProject(settings_t *settings) // TODO: fix crash
     if (file != NULL)
     {
         fscanf(file, "%d\n%d\n", &numnodes, &numlinks);
-        printf("dio pera %d %d\n", numnodes, numlinks);
-        printf("dio castoro %d %d\n", settings->numnodes, settings->numlink);
-
-        printf("numnodes: %d\n", numnodes);
-
-        // settings->numnodes = numnodes;
-        printf("settings->numnodes: %d\n", settings->numnodes);
 
         nodes = (node_t *)malloc(numnodes * sizeof(node_t));
         links = (link_t *)malloc(numlinks * sizeof(link_t));
@@ -227,41 +227,34 @@ void openProject(settings_t *settings) // TODO: fix crash
         char othername[50];
         int type, type2;
 
-        //sem_wait(settings->dio_melanzana);
+        // sem_wait(settings->dio_melanzana);
 
-        for(int i=0; i < numnodes; i++){    // reading all nodes
-            printf("reading NODE %d\n",i);
-            fscanf(file,"%s\n%d\n%d %d\n", name, &type, &nodes[i].x, &nodes[i].y);
+        for (int i = 0; i < numnodes; i++)
+        { // reading all nodes
+
+            fscanf(file, "%s\n%d\n%d %d\n", name, &type, &nodes[i].x, &nodes[i].y);
             nodes[i].type = type;
-            //printf("%s\n", name);
-            nodes[i].name = (char *)malloc(strlen(name) * sizeof(char));    // allocating memory for node name
-            strcpy(nodes[i].name,name);
-            printf("\tnode name: %s\n", nodes[i].name);
+            // printf("%s\n", name);
+            nodes[i].name = (char *)malloc(strlen(name) * sizeof(char)); // allocating memory for node name
+            strcpy(nodes[i].name, name);
         }
-        
-        for(int i=0; i < numlinks; i++){    // reading all links
-            printf("reading LINK %d\n",i);
-            fscanf(file,"%s\n%s\n%d\n%d\n",name, othername, &type, &type2);
+
+        for (int i = 0; i < numlinks; i++)
+        { // reading all links
+            fscanf(file, "%s\n%s\n%d\n%d\n", name, othername, &type, &type2);
             links[i].node1_type = type;
             links[i].node2_type = type2;
             links[i].node1 = (char *)malloc(strlen(name) * sizeof(char));
             links[i].node2 = (char *)malloc(strlen(othername) * sizeof(char));
-            strcpy(links[i].node1,name);
-            strcpy(links[i].node2,othername);
-            printf("\tlinked nodes names: %s and %s\n", links[i].node1,links[i].node2);
+            strcpy(links[i].node1, name);
+            strcpy(links[i].node2, othername);
         }
-
-        printf("read everything correctly!\n");
 
         interface_t *gui = settings->GUIdata;
         gui->nodes = nodes;
         gui->links = links;
         settings->numnodes = numnodes;
         settings->numlink = numlinks;
-
-        //sem_post(settings->dio_melanzana);
-
-        printf("even modified settings: numnodes: %d numlinks: %d!\n", settings->numnodes,settings->numlink);
     }
     else
     {
@@ -276,7 +269,10 @@ void saveProject(settings_t *settings)
         stop(settings);
     }
 
-    free(settings->openProjectName); // freeing the old project name
+    if(settings->openProjectName)
+    {
+        //free(settings->openProjectName); // freeing the old project name
+    }
 
     char *filename = getFilename();
     strcat(filename, ".done");
@@ -287,7 +283,6 @@ void saveProject(settings_t *settings)
         settings->openProjectName = filename;
 
         // creating the project file
-        printf("%d\n", settings->numnodes);
         fprintf(file, "%d\n%d\n", settings->numnodes, settings->numlink); // saving node number and link number at the top of the file
 
         interface_t *gui = (interface_t *)(settings->GUIdata);
@@ -336,7 +331,7 @@ void saveProject(settings_t *settings)
         {
             printf("ALERT: There was an error while creating the config file. Perhaps the path is wrong?\n");
         }
-        free(config_filename);
+        //free(config_filename);
     }
     else
     {
