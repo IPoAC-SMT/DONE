@@ -4,14 +4,6 @@
 #define HEIGHT 1000
 #define TITLE "Docker Orchestrator for Network Emulation"
 
-/*
-char*completePath(char*name){ // took this from SO, not my responsibility
-    char *result = malloc(strlen("./resources/icons/") + strlen(name) + 1); // +1 for the null-terminator
-    // in real code you would check for errors in malloc here
-    strncpy(result, "./resources/icons/",strlen("./resources/icons/"));
-    strncat(result, name, strlen(name));
-    return result;
-}*/
 
 int main(int argc, char** argv)
 {

@@ -144,10 +144,10 @@ void start(settings_t *settings)
                 {
                     do
                     {
-                        fgets(buf, 100, file); // reading the command line
-                        if (buf == NULL || buf[0] == '\n')
+                        if (!fgets(buf, 100, file))
                             break; // if i reached the end of the commands for this node, break and go to the next one
-                        printf("buf: %s\n", buf);
+                        else if (buf[0] == '\n')
+                            break; // if i reached the end of the commands for this node, break and go to the next one
                         if (nodeName[0] == 's')
                         {
                             sendSwitchCommand(buf);
