@@ -21,3 +21,7 @@ exec:
 .PHONY: cli
 cli:
 	./bin/executable --no-gui
+
+.PHONY: IPoAC
+IPoAC:
+	./bin/executable --ipoac

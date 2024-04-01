@@ -28,6 +28,7 @@ typedef struct
     char gettingName;
     char resetName;
     char deletingNodes;
+    char ipoac;
 } settings_t;
 
 void toggleInterface(settings_t *settings);

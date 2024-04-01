@@ -24,18 +24,20 @@ int main(int argc, char** argv)
         }
     }
 
+    bool c = (argc>1)&&(!strcmp(argv[1],"--ipoac"));
+
     initEnvironment(); // set up signal handling, create netns dir if not present
     
     interface_t *interface = init_interface((button_t[NUMbuttons]){
-        {24, 129, 100, 100, placehub,"place a hub",0,NULL,"hub"},
-        {24, 234, 100, 100, placeswitch,"place a switch",0,NULL,"switch"},
-        {24, 339, 100, 100, placerouter,"place a router",0,NULL,"router"},
-        {24, 444, 100, 100, placehost,"place a host",0,NULL,"host"},
-        {24, 549, 100, 100, placeexternalinterface,"place an external interface",0,NULL,"externalinterface"},
-        {24, 654, 100, 100, placeexternalnattedinterface,"place an external NATted interface",0,NULL,"externalnattedinterface"},
-        {24, 759, 100, 100, placelink,"link two nodes together",0,NULL,"link"},
-        {129, 24, 100, 100, start,"start simulation!",0,NULL,"start"},       // first of the horizontal row
-        {234, 24, 100, 100, stop,"end simulation",0,NULL,"stop"},        // second of the horizontal row
+        {24, 129, 100, 100, placehub,"Place a hub",0,NULL,"hub"},
+        {24, 234, 100, 100, placeswitch,"Place a switch",0,NULL,"switch"},
+        {24, 339, 100, 100, placerouter,c?"Place an RFC1149-compatible \"router\"":"Place a router",0,NULL,c?"IPoAC":"router"},
+        {24, 444, 100, 100, placehost,"Place a host",0,NULL,"host"},
+        {24, 549, 100, 100, placeexternalinterface,"Place an external interface",0,NULL,"externalinterface"},
+        {24, 654, 100, 100, placeexternalnattedinterface,"Place an external NATted interface",0,NULL,"externalnattedinterface"},
+        {24, 759, 100, 100, placelink,"Link two nodes together",0,NULL,"link"},
+        {129, 24, 100, 100, start,"Start simulation!",0,NULL,"start"},       // first of the horizontal row
+        {234, 24, 100, 100, stop,"Stop simulation",0,NULL,"stop"},        // second of the horizontal row
         {339, 24, 100, 100, openProject,"Open a file",0,NULL,"openProject"},
         {444, 24, 100, 100, saveProject,"Save project",0,NULL,"saveProject"},
         {549, 24, 100, 100, clearCanvas,"Clear Canvas",0,NULL,"clearCanvas"},
@@ -50,7 +52,7 @@ int main(int argc, char** argv)
  
     SetExitKey(KEY_NULL);
 
-    settings_t settings = {0,0, 0,"",0,0,0,0,"",0,0,(void*)interface,0,0,0,0,0,NULL,1,1,0};
+    settings_t settings = {0,0, 0,"",0,0,0,0,"",0,0,(void*)interface,0,0,0,0,0,NULL,1,1,0,c};
 
     while (!WindowShouldClose())
     {
