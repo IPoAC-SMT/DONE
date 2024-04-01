@@ -10,6 +10,8 @@ void deleteNode(settings_t *settings);
 
 void placeRectangle(settings_t *settings);
 
+void quit(settings_t*settings);
+
 void initEnvironment();
 void start(settings_t *settings);
 void stop(settings_t *settings);

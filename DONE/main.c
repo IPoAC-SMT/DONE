@@ -42,7 +42,7 @@ int main(int argc, char** argv)
         {444, 24, 100, 100, saveProject,"Save project",0,NULL,"saveProject"},
         {549, 24, 100, 100, clearCanvas,"Clear Canvas",0,NULL,"clearCanvas"},
         {654, 24, 100, 100, deleteNode,"Delete a node or a link by clicking on it",0,NULL,"link"},
-        //{759, 24, 100, 100, helloworld,"helloworld",0,NULL,"helloworld"},
+        {759, 24, 100, 100, quit,"Quit",0,NULL,"quit"},
         {864, 24, 100, 100, placeRectangle,"Draw a Rectangle",0,NULL,"rectangle"}},
     NULL,NULL,NULL);
 

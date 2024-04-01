@@ -174,6 +174,10 @@ void start(settings_t *settings)
     }
 }
 
+void quit(settings_t*settings) {
+    forcedCLIExit();
+}
+
 void stop(settings_t *settings)
 { // sending data, again, to logical controller, that stops the simulation
     if (!settings->isSimulating)
