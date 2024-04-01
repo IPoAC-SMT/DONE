@@ -17,6 +17,7 @@ void placehub(settings_t *settings)
     settings->drawing_rectangle = 0;
     settings->placing_node = 1;
     settings->node_type = 0;
+    settings->deletingNodes = 0;
 }
 
 void placeswitch(settings_t *settings)
@@ -28,6 +29,7 @@ void placeswitch(settings_t *settings)
     settings->moving_node = 0;
     settings->placing_node = 1;
     settings->node_type = 1;
+    settings->deletingNodes = 0;
 }
 
 void placerouter(settings_t *settings)
@@ -39,6 +41,7 @@ void placerouter(settings_t *settings)
     settings->moving_node = 0;
     settings->placing_node = 1;
     settings->node_type = 2;
+    settings->deletingNodes = 0;
 }
 
 void placehost(settings_t *settings)
@@ -50,6 +53,7 @@ void placehost(settings_t *settings)
     settings->moving_node = 0;
     settings->placing_node = 1;
     settings->node_type = 3;
+    settings->deletingNodes = 0;
 }
 
 void placeexternalinterface(settings_t *settings)
@@ -61,6 +65,18 @@ void placeexternalinterface(settings_t *settings)
     settings->moving_node = 0;
     settings->placing_node = 1;
     settings->node_type = 4;
+    settings->deletingNodes = 0;
+}
+
+void deleteNode(settings_t*settings) {
+    if (settings->isSimulating)
+        return;
+    settings->placing_link = 0;
+    settings->drawing_rectangle = 0;
+    settings->moving_node = 0;
+    settings->placing_node = 0;
+    settings->node_type = 0;
+    settings->deletingNodes = 1;
 }
 
 void placeexternalnattedinterface(settings_t *settings)
@@ -72,6 +88,7 @@ void placeexternalnattedinterface(settings_t *settings)
     settings->moving_node = 0;
     settings->placing_node = 1;
     settings->node_type = 5;
+    settings->deletingNodes = 0;
 }
 
 void placelink(settings_t *settings)
@@ -82,6 +99,7 @@ void placelink(settings_t *settings)
     settings->moving_node = 0;
     settings->placing_node = 0;
     settings->placing_link = 1;
+    settings->deletingNodes = 0;
 }
 
 void placeRectangle(settings_t *settings)
@@ -92,6 +110,7 @@ void placeRectangle(settings_t *settings)
     settings->moving_node = 0;
     settings->placing_node = 0;
     settings->placing_link = 0;
+    settings->deletingNodes = 0;
 }
 void initEnvironment()
 {

@@ -23,6 +23,11 @@ typedef struct
     // TODO there was something else
     /* end things for rectangles */
     char *openProjectName;
+    /*for file opening*/
+    char * filename;
+    char gettingName;
+    char resetName;
+    char deletingNodes;
 } settings_t;
 
 void toggleInterface(settings_t *settings);

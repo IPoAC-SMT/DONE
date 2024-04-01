@@ -13,6 +13,7 @@ void DrawButton(button_t *pulsante, settings_t *settings)
             settings->placing_node = false;
             settings->placing_link = false;
             settings->drawing_rectangle = false;
+            settings->deletingNodes = 0;
             hovering = false;
             pulsante->pressed(settings);
         }
@@ -83,7 +84,7 @@ void DrawLink(link_t link, settings_t* settings,node_t* nodes){
     // quindi q = y_0 - m x_0
     float q = positions[1].y - m * positions[1].x;
     // quindi la distanza punto-retta si calcola come \mod(y_mouse - (m x_mouse + y_0))/\sqrt(1+m^2)
-    float d = (float)abs(GetMouseY() - (m * GetMouseX() + q)) / (sqrt(1 + m * m));
+    float d = (float)abs(GetMouseY() - (int)(m * GetMouseX() + q)) / (sqrt(1 + m * m));
     bool cond = ((d <= 5) &&
                  GetMouseX() >= min(positions[0].x, positions[1].x) &&
                  GetMouseX() <= max(positions[0].x, positions[1].x) &&
@@ -91,18 +92,12 @@ void DrawLink(link_t link, settings_t* settings,node_t* nodes){
                  GetMouseY() <= max(positions[0].y, positions[1].y));
     DrawLineEx(positions[0], positions[1], /*thick*/ cond ? 5 : 1, /*Color color*/ RED);
 
-    if (d && IsMouseButtonReleased(MOUSE_BUTTON_RIGHT))
+    /*if (d && settings->deletingNodes && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) TODO
     {
         settings->moving_node = false;
         settings->placing_node = false;
         settings->drawing_rectangle = false;
-        printf("HERE I should open the configs\n");
-    }
-    /* debug
-    char toPrint[15];
-    snprintf(toPrint,10,"%f",d);
-    DrawText(toPrint, 420, 420, 42, BLUE);
-    */
+    }*/
 }
 
 void DrawFakeLink(settings_t*settings,node_t*nodes){
@@ -280,10 +275,10 @@ void DrawNode(node_t* node, settings_t* settings, bool true_node){
         GetMouseX() <= node->x+20 &&
         GetMouseX() >= node->x-20 &&
         GetMouseY() <= node->y+20 &&
-        GetMouseY() >= node->y-20)
+        GetMouseY() >= node->y-20) // sono nell'area del vero nodo
     {
         if (
-            IsMouseButtonReleased(MOUSE_BUTTON_LEFT) &&
+            IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && // tasto sinistro
             ! settings->dragging_deactivated
             )
         {
@@ -297,6 +292,7 @@ void DrawNode(node_t* node, settings_t* settings, bool true_node){
                     }
                     else {
                         settings->placing_node = false;
+                        settings->deletingNodes = 0;
                         settings->drawing_rectangle = false;
                         settings->moving_node = 1;
                         settings->node_type = node->type;
@@ -311,14 +307,20 @@ void DrawNode(node_t* node, settings_t* settings, bool true_node){
             )
         {
             if(settings->isSimulating) {
-                // TODO open shell on node NOT TESTED
-                settings->placing_node = false;
-                settings->placing_link = false;
-                settings->drawing_rectangle = false;
-                settings->moving_node = false;
+                // TODO open shell on node WHY TF is the node being dragged around
+                settings->placing_node = 0;
+                settings->placing_link = 0;
+                settings->drawing_rectangle = 0;
+                settings->moving_node = 0;
                 settings->node_type = node->type;
+                settings->dragging_deactivated = true;
+                settings->deletingNodes = 0;
                 settings->node_name = (char*) calloc(NAMELENGTH,sizeof(char));
                 snprintf(settings->node_name,NAMELENGTH,"%s",node->name);
+                openShell(settings);
+                free(settings->node_name);
+                settings->node_name = (char*) calloc(NAMELENGTH,sizeof(char));
+
             }
             else {
                 // TODO open node configs
@@ -334,6 +336,20 @@ void setNode(char * name, node_t* nodes, settings_t * settings){
             nodes[i].y = GetMouseY();
         }
     }
+}
+
+void getName(settings_t*settings){
+    // TODO bugged, don't care
+    char * toPrint = (char*) calloc (300,sizeof(char));
+    char character = GetCharPressed();
+    if (character >= 32 && character <= 126) {
+        // valid letter
+        snprintf(settings->filename,min(200,strlen(settings->filename)+2),"%s%c",settings->filename,character);
+        printf ("%s\n",settings->filename);
+    }
+    snprintf(toPrint,300,"Insert the name of the file: ./saves/%s",settings->filename);
+    DrawText(toPrint,1100,20,STD_FONT_SIZE,GRAY);
+    free(toPrint);
 }
 
 char * identify(int num){
@@ -411,6 +427,7 @@ void DrawGUI(settings_t* settings, interface_t * interface) {
         settings->drawing_rectangle = false;
         settings->placing_link = false;
         settings->node_type = -1;
+        settings->deletingNodes = 0;
     }
 
     // 3. se sto spostando cose
@@ -507,6 +524,49 @@ void DrawGUI(settings_t* settings, interface_t * interface) {
         else {
             settings->drawing_rectangle = 1;
         }
+    }
+    else if (settings->deletingNodes) { // TODO FIX, bugged when deleting links
+        if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
+            node_t * nodo = getInversePos(GetMouseX(),GetMouseY(),interface->nodes,settings);
+            char * stringa = (char*)calloc(200,sizeof(char));
+            if(nodo) {
+                strncpy(stringa,nodo->name,200);
+                char a;
+                settings->numnodes -= 1;
+                for (int i = 0; i<settings->numnodes; i++) {
+                    if(a||!strcmp(interface->nodes[i].name,stringa)) {
+                        a = true;
+                        strncpy(interface->nodes[i].name,interface->nodes[i+1].name,NAMELENGTH);
+                        interface->nodes[i].x = interface->nodes[i+1].x;
+                        interface->nodes[i].y = interface->nodes[i+1].y;
+                        interface->nodes[i].type = interface->nodes[i+1].type;
+                    }
+                }
+                for (int i=0; i<settings->numlink;i++) {
+                    if(!strcmp(interface->links[i].node1,stringa)||!strcmp(interface->links[i].node2,stringa)) {
+                        settings->numlink-=1;
+                        for(int j=i;j<settings->numlink;j++) {
+                            printf("%d<-%d\n",j,j+1);
+                            strncpy(interface->links[j].node1,interface->links[j+1].node1,NAMELENGTH);
+                            strncpy(interface->links[j].node2,interface->links[j+1].node2,NAMELENGTH);
+                            interface->links[j].node1_type = interface->links[j+1].node1_type;
+                            interface->links[j].node2_type = interface->links[j+1].node2_type;
+                            printf("done\n");
+                        }
+                    }
+                }
+                free(stringa);
+            }
+        }
+    }
+
+    if(settings->gettingName) {
+        if (settings->resetName) {
+            if(settings->filename != NULL) free(settings->filename);
+            settings->filename = (char*)calloc(200,sizeof(char));
+            settings->resetName = 0;
+            }
+        getName(settings);
     }
 
     // ora posiziono tutto: nodes e link
