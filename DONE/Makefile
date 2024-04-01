@@ -16,12 +16,12 @@ clean:
 
 .PHONY: exec
 exec:
-	./bin/executable
+	sudo ./bin/executable
 
 .PHONY: cli
 cli:
-	./bin/executable --no-gui
+	sudo ./bin/executable --no-gui
 
 .PHONY: IPoAC
 IPoAC:
-	./bin/executable --ipoac
+	sudo ./bin/executable --ipoac
