@@ -3,7 +3,7 @@
 
 typedef struct
 {
-    char interfaceHidden;
+    int absoluteCount;
     char moving_node;
     char node_type;
     char *node_name;
@@ -31,4 +31,3 @@ typedef struct
     char ipoac;
 } settings_t;
 
-void toggleInterface(settings_t *settings);

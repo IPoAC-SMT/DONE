@@ -467,7 +467,7 @@ void DrawGUI(settings_t* settings, interface_t * interface) {
     else if (settings->placing_node) {
         // creo il name del nuovo nodo
         char name[50];
-        snprintf(name,50,"%s-%d",identify(settings->node_type), settings->numnodes);
+        snprintf(name,50,"%s-%d",identify(settings->node_type), settings->absoluteCount);
         // disegno un nodo "fantasma" dove sto muovendo il mouse
         DrawNode(&(node_t){name,settings->node_type,GetMouseX(),GetMouseY()},settings,false);
         // se premo il mouse
@@ -478,6 +478,7 @@ void DrawGUI(settings_t* settings, interface_t * interface) {
             appendNode(interface,(node_t){name,settings->node_type,GetMouseX(),GetMouseY()},settings);
             // e aumento il numero di nodes
             settings->numnodes++;
+            settings->absoluteCount++;
         }
         else DrawMessageAtAngle("Choose the position for this new node");
     }
