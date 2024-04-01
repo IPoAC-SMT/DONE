@@ -81,17 +81,17 @@ void startSimulation(interface_t *simulation, int nodes_num, int links_num)
         link_t *current_link = &simdata.links[i];
 
         // differentiating between different kinds of connections
-        if (current_link->node1_type == switch_t && current_link->node2_type == switch_t)
+        if ((current_link->node1_type == switch_t && current_link->node2_type == switch_t) || (current_link->node1_type == hub_t && current_link->node2_type == hub_t))
         {
             // 1. switch-switch
             addCableBetweenSwitches(current_link->node1, current_link->node2);
         }
-        else if (current_link->node1_type == switch_t)
+        else if (current_link->node1_type == switch_t || current_link->node1_type == hub_t)
         {
             // 2. switch-node
             addCableBetweenNodeAndSwitch(current_link->node2, current_link->node1);
         }
-        else if (current_link->node2_type == switch_t)
+        else if (current_link->node2_type == switch_t || current_link->node2_type == hub_t)
         {
             // 3. node-switch
             addCableBetweenNodeAndSwitch(current_link->node1, current_link->node2);
@@ -138,7 +138,7 @@ void stopSimulation(interface_t *simulation, int nodes_num, int links_num)
     { // handling nodes is enough, all links between them will be deleted automatically
         node_t *current_node = &simdata.nodes[i];
 
-        if (current_node->type == switch_t)
+        if (current_node->type == switch_t || current_node->type == hub_t)
         {
             delSwitch(current_node->name);
         }

@@ -179,7 +179,7 @@ int addCableBetweenNodes(char *firstNode, char *secondNode)
         // creating the connector's name
         snprintf(endpoint1, MAX_NAME_SIZE + 10, "veth-%s-%s", firstNode, secondNode);
 
-        snprintf(endpoint2, MAX_NAME_SIZE + 10, "veth-%s-%s", secondNode, secondNode);
+        snprintf(endpoint2, MAX_NAME_SIZE + 10, "veth-%s-%s", secondNode, firstNode);
 
         snprintf(command, MAX_COMMAND_SIZE, "sudo ip link add %s type veth peer name %s", endpoint1, endpoint2);
 
@@ -226,7 +226,7 @@ int delCableBetweenNodes(char *firstNode, char *secondNode)
         // creating the connector's name
         snprintf(endpoint1, MAX_NAME_SIZE + 10, "veth-%s-%s", firstNode, secondNode);
 
-        snprintf(endpoint2, MAX_NAME_SIZE + 10, "veth-%s-%s", secondNode, secondNode);
+        snprintf(endpoint2, MAX_NAME_SIZE + 10, "veth-%s-%s", secondNode, firstNode);
 
         // deleting the cable from the first container
         snprintf(command, MAX_COMMAND_SIZE, "sudo ip netns exec %s ip link del %s", getContainerPID(firstNode), endpoint1);
@@ -327,7 +327,7 @@ int addCableBetweenSwitches(char *firstSwitch, char *secondSwitch)
         // creating the connector's name
         snprintf(endpoint1, MAX_NAME_SIZE + 10, "patch-%s-%s", firstSwitch, secondSwitch);
 
-        snprintf(endpoint2, MAX_NAME_SIZE + 10, "patch-%s-%s", secondSwitch, secondSwitch);
+        snprintf(endpoint2, MAX_NAME_SIZE + 10, "patch-%s-%s", secondSwitch, firstSwitch);
 
         // snprintf(command, MAX_COMMAND_SIZE, "sudo ip link add %s type veth peer name %s", endpoint1, endpoint2);
         snprintf(command, MAX_COMMAND_SIZE, "sudo ovs-vsctl add-port %s %s -- set interface %s type=patch options:peer=%s", firstSwitch, endpoint1, endpoint1, endpoint2);
@@ -357,7 +357,7 @@ int delCableBetweenSwitches(char *firstSwitch, char *secondSwitch)
         // creating the connector's name
         snprintf(endpoint1, MAX_NAME_SIZE + 10, "veth-%s-%s", firstSwitch, secondSwitch);
 
-        snprintf(endpoint2, MAX_NAME_SIZE + 10, "veth-%s-%s", secondSwitch, secondSwitch);
+        snprintf(endpoint2, MAX_NAME_SIZE + 10, "veth-%s-%s", secondSwitch, firstSwitch);
 
         // deleting the cable from the first switch
         snprintf(command, MAX_COMMAND_SIZE, "sudo ovs-vsctl del-port %s %s", firstSwitch, endpoint1);
@@ -381,8 +381,6 @@ int sendNodeSetupCommand(char *name, char *command)
     if (name != NULL && command != NULL && strlen(name) <= MAX_PID_SIZE)
     {
         snprintf(fullCommand, MAX_COMMAND_SIZE, "docker exec %s %s", name, command);
-        printf("%s\n", fullCommand);    
-
         return system(fullCommand);
     }
     return -1;
