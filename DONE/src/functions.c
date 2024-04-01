@@ -205,7 +205,10 @@ void openProject(settings_t *settings) // TODO: fix crash
 
     clearCanvas(settings); // first, clearing the canvas
 
-    free(settings->openProjectName); // freeing the old project name
+    if(settings->openProjectName)
+    {
+        free(settings->openProjectName); // freeing the old project name
+    }
 
     char *filename = getFilename();
     strcat(filename, ".done");
