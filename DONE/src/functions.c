@@ -68,7 +68,8 @@ void placeexternalinterface(settings_t *settings)
     settings->deletingNodes = 0;
 }
 
-void deleteNode(settings_t*settings) {
+void deleteNode(settings_t *settings)
+{
     if (settings->isSimulating)
         return;
     settings->placing_link = 0;
@@ -174,7 +175,8 @@ void start(settings_t *settings)
     }
 }
 
-void quit(settings_t*settings) {
+void quit(settings_t *settings)
+{
     forcedCLIExit();
 }
 
@@ -190,6 +192,7 @@ void openShell(settings_t *settings)
 {
     if (!settings->isSimulating)
         return;
+    printf("antani");
     settings->node_type == switch_t ? openSwitchShellWrapper() : openNodeShellWrapper(settings->node_name);
 }
 
@@ -219,7 +222,7 @@ char *getFilename()
     return res;
 }
 
-void openProject(settings_t *settings) // TODO: fix crash
+void openProject(settings_t *settings)
 {
     if (settings->isSimulating)
     { // if an experiment was running we need to kill the containers
@@ -228,7 +231,7 @@ void openProject(settings_t *settings) // TODO: fix crash
 
     clearCanvas(settings); // first, clearing the canvas
 
-    if(settings->openProjectName)
+    if (settings->openProjectName)
     {
         free(settings->openProjectName); // freeing the old project name
     }
@@ -236,7 +239,6 @@ void openProject(settings_t *settings) // TODO: fix crash
     char *filename = getFilename();
     strcat(filename, ".done");
 
-    settings->openProjectName = filename; // updating the project name
     FILE *file = fopen(filename, "r");
     int numnodes, numlinks;
     node_t *nodes;
@@ -244,6 +246,8 @@ void openProject(settings_t *settings) // TODO: fix crash
 
     if (file != NULL)
     {
+        settings->openProjectName = filename; // updating the project name
+
         fscanf(file, "%d\n%d\n", &numnodes, &numlinks);
 
         nodes = (node_t *)malloc(numnodes * sizeof(node_t));
@@ -295,9 +299,9 @@ void saveProject(settings_t *settings)
         stop(settings);
     }
 
-    if(settings->openProjectName)
+    if (settings->openProjectName)
     {
-        //free(settings->openProjectName); // freeing the old project name
+        // free(settings->openProjectName); // freeing the old project name
     }
 
     char *filename = getFilename();
@@ -357,7 +361,7 @@ void saveProject(settings_t *settings)
         {
             printf("ALERT: There was an error while creating the config file. Perhaps the path is wrong?\n");
         }
-        //free(config_filename);
+        // free(config_filename);
     }
     else
     {

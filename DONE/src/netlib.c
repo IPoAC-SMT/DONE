@@ -423,7 +423,7 @@ int openSwitchShell()
 {
     char command[MAX_COMMAND_SIZE];
 
-    snprintf(command, MAX_COMMAND_SIZE, "konsole -e sudo ovs-vsctl show");
+    snprintf(command, MAX_COMMAND_SIZE, "konsole");
     pid_t pid = fork();
     if (pid == 0)
     {
