@@ -41,8 +41,8 @@ int main(int argc, char **argv)
         {24, 759, 100, 100, placelink, "Link two nodes together", 0, NULL, "link"},
         {129, 24, 100, 100, start, "Start simulation!", 0, NULL, "start"}, // first of the horizontal row
         {234, 24, 100, 100, stop, "Stop simulation", 0, NULL, "stop"},     // second of the horizontal row
-        {339, 24, 100, 100, openProject, "Open a file", 0, NULL, "openProject"},
-        {444, 24, 100, 100, saveProject, "Save project", 0, NULL, "saveProject"},
+        {339, 24, 100, 100, prepareToOpenProject, "Open a file", 0, NULL, "openProject"},
+        {444, 24, 100, 100, prepareToSaveProject, "Save project", 0, NULL, "saveProject"},
         {549, 24, 100, 100, clearCanvas, "Clear Canvas", 0, NULL, "clearCanvas"},
         {654, 24, 100, 100, deleteNode, "Delete a node or a link by clicking on it", 0, NULL, "link"},
         {759, 24, 100, 100, quit, "Quit", 0, NULL, "quit"},
@@ -54,7 +54,7 @@ int main(int argc, char **argv)
 
     SetExitKey(KEY_NULL);
 
-    settings_t settings = {0, 0, 0, "", 0, 0, 0, 0, "", 0, 0, (void *)interface, 0, 0, 0, 0, 0, NULL, 1, 1, 0, c, 0};
+    settings_t settings = {0, 0, 0, "", 0, 0, 0, 0, "", 0, 0, (void *)interface, 0, 0, 0, 0, 0, NULL, 0, 0, 0, c, 0};
 
     while (!WindowShouldClose())
     {

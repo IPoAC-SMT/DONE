@@ -223,6 +223,12 @@ char *getFilename()
     return res;
 }
 
+void prepareToOpenProject(settings_t *settings){
+    settings->resetName = 1;
+    settings->gettingName = 1;
+}
+
+
 void openProject(settings_t *settings)
 {
     if (settings->isSimulating)
@@ -237,7 +243,7 @@ void openProject(settings_t *settings)
         free(settings->openProjectName); // freeing the old project name
     }
 
-    char *filename = getFilename();
+    char *filename = settings->filename;
     strcat(filename, ".done");
 
     FILE *file = fopen(filename, "r");
@@ -293,6 +299,12 @@ void openProject(settings_t *settings)
     }
 }
 
+
+void prepareToSaveProject(settings_t *settings){
+    settings->resetName = 1;
+    settings->gettingName = 2;
+}
+
 void saveProject(settings_t *settings)
 {
     if (settings->isSimulating)
@@ -305,7 +317,7 @@ void saveProject(settings_t *settings)
         // free(settings->openProjectName); // freeing the old project name
     }
 
-    char *filename = getFilename();
+    char *filename = settings->filename;
     strcat(filename, ".done");
     FILE *file = fopen(filename, "w");
 

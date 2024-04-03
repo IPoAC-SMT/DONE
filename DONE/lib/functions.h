@@ -17,7 +17,11 @@ void start(settings_t *settings);
 void stop(settings_t *settings);
 void openShell(settings_t *settings);
 
+void prepareToOpenProject(settings_t *settings);
 void openProject(settings_t *settings);
+
+void prepareToSaveProject(settings_t *settings);
 void saveProject(settings_t *settings);
+
 void clearCanvas(settings_t *settings);
 
