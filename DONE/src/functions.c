@@ -243,8 +243,8 @@ void openProject(settings_t *settings)
         free(settings->openProjectName); // freeing the old project name
     }
 
-    char *filename = settings->filename;
-    strcat(filename, ".done");
+    char *filename = (char *)calloc(MAX_FILENAME, sizeof(char));
+    snprintf(filename, MAX_FILENAME, "./saves/%s.done", settings->filename);
 
     FILE *file = fopen(filename, "r");
     int numnodes, numlinks;
@@ -297,6 +297,7 @@ void openProject(settings_t *settings)
     {
         printf("ALERT: There was an error while opening the file. Perhaps the path is wrong?\n");
     }
+    free(filename);
 }
 
 
@@ -317,8 +318,8 @@ void saveProject(settings_t *settings)
         // free(settings->openProjectName); // freeing the old project name
     }
 
-    char *filename = settings->filename;
-    strcat(filename, ".done");
+    char *filename = (char *)calloc(MAX_FILENAME, sizeof(char));
+    snprintf(filename, MAX_FILENAME, "./saves/%s.done", settings->filename);
     FILE *file = fopen(filename, "w");
 
     if (file != NULL)
@@ -374,7 +375,8 @@ void saveProject(settings_t *settings)
         {
             printf("ALERT: There was an error while creating the config file. Perhaps the path is wrong?\n");
         }
-        // free(config_filename);
+        free(filename);
+        free(config_filename);
     }
     else
     {
