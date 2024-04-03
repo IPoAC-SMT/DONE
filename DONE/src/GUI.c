@@ -376,7 +376,6 @@ void getName(settings_t *settings)
     char character = GetCharPressed();
     if (IsKeyReleased(KEY_ENTER))
     {
-        printf("submitting %s\n", settings->filename);
         functions[settings->gettingName - 1](settings); // TODO submit
         settings->resetName = true;
         return;
@@ -386,7 +385,7 @@ void getName(settings_t *settings)
         // valid letter
         char temp[200];
         snprintf(temp, 200, "%s%c", settings->filename, character);
-        strncpy(settings->filename, temp, strlen(settings->filename));
+        strncpy(settings->filename, temp, 200);
     }
     else if (IsKeyReleased(KEY_BACKSPACE))
     {
