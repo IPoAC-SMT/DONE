@@ -634,7 +634,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             if (nodo)
             {
                 strncpy(stringa, nodo->name, 200);
-                char a;
+                char a = false;
                 settings->numnodes -= 1;
                 for (int i = 0; i < settings->numnodes; i++)
                 {

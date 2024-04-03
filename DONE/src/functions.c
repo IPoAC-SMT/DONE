@@ -130,6 +130,7 @@ void start(settings_t *settings)
 
         char config_filename[50];
         strcpy(config_filename, settings->openProjectName);
+        printf("openProject: %s\n", settings->openProjectName);
         strcat(config_filename, ".conf");
         printf("config_filename: %s\n", config_filename);
         FILE *file = fopen(config_filename, "r");
@@ -297,7 +298,6 @@ void openProject(settings_t *settings)
     {
         printf("ALERT: There was an error while opening the file. Perhaps the path is wrong?\n");
     }
-    free(filename);
 }
 
 
