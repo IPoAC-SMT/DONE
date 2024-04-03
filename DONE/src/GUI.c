@@ -114,7 +114,7 @@ void DrawNode(node_t* node, settings_t* settings, bool true_node){
     }
     switch(node->type){
         case switch_t:
-            DrawRectangle(nodex-20, nodey-20, 40, 40, BACKGROUND_COLOR); // this should fix the compenetrations, but it doesn't. :-(
+            //DrawRectangle(nodex-20, nodey-20, 40, 40, BACKGROUND_COLOR); // this should fix the compenetrations, but it doesn't. :-(
             // external lines
             DrawLineEx((Vector2){nodex-18,nodey-15},(Vector2){nodex+18,nodey-15},2,FIGURE_COLOR);
             DrawLineEx((Vector2){nodex-18,nodey+15},(Vector2){nodex+18,nodey+15},2,FIGURE_COLOR);
@@ -227,7 +227,7 @@ void DrawNode(node_t* node, settings_t* settings, bool true_node){
         case router_t:
             if(!settings->ipoac) {
                 // draw a circle
-                DrawRectangle(nodex-20, nodey-20, 40, 40, BACKGROUND_COLOR); // this should fix the compenetrations, but it doesn't. :-(
+                //DrawRectangle(nodex-20, nodey-20, 40, 40, BACKGROUND_COLOR); // this should fix the compenetrations, but it doesn't. :-(
                 DrawRing((Vector2){nodex,nodey}, 16, 18, 0, 360, 0, FIGURE_COLOR);
                 DrawLineEx((Vector2){nodex-3,nodey},(Vector2){nodex-14,nodey},2,FIGURE_COLOR);
                 DrawLineEx((Vector2){nodex-3,nodey},(Vector2){nodex-8,nodey+4},2,FIGURE_COLOR);
@@ -262,7 +262,7 @@ void DrawNode(node_t* node, settings_t* settings, bool true_node){
             }
             break;
         case host_t:
-            DrawRectangle(nodex-20, nodey-20, 40, 40, BACKGROUND_COLOR); // this should fix the compenetrations, but it doesn't. :-(
+            //DrawRectangle(nodex-20, nodey-20, 40, 40, BACKGROUND_COLOR); // this should fix the compenetrations, but it doesn't. :-(
             DrawLineEx((Vector2){nodex-18,nodey-18},(Vector2){nodex+18,nodey-18},2,FIGURE_COLOR);
             DrawLineEx((Vector2){nodex-18,nodey-18},(Vector2){nodex-18,nodey+5},2,FIGURE_COLOR);
             DrawLineEx((Vector2){nodex+18,nodey-18},(Vector2){nodex+18,nodey+5},2,FIGURE_COLOR);
@@ -273,14 +273,7 @@ void DrawNode(node_t* node, settings_t* settings, bool true_node){
             DrawLineEx((Vector2){nodex-15,nodey+18},(Vector2){nodex+15,nodey+18},2,FIGURE_COLOR);
             DrawLineEx((Vector2){nodex-15,nodey+15},(Vector2){nodex-15,nodey+18},2,FIGURE_COLOR);
             DrawLineEx((Vector2){nodex+15,nodey+15},(Vector2){nodex+15,nodey+18},2,FIGURE_COLOR);
-            // draw a something else
-            // temporaneamente commentato in attesa di capire come si usi
-            /*Texture2D router = LoadTexture("./resources/icons/elfuny.png");
-            Rectangle source_rec = { 0.0f, 0.0f, router.width, router.height};  // takes all the image 
-            Rectangle dest_rec = {nodex-20, nodey-20, 40,40};   // where the image should be placed and how big it will be
-            Vector2 origin = {0.0f,0.0f};   // the origin is the top right corner
-            DrawTexturePro(router, source_rec, dest_rec, origin, 0.0f, WHITE);  // draw a router and do not rotate it (0.0f)
-            */
+
             break;
     }
     DrawText(node->name,nodex-20,nodey+40,STD_FONT_SIZE,GRAY);
@@ -355,12 +348,23 @@ void setNode(char * name, node_t* nodes, settings_t * settings){
 
 void getName(settings_t*settings){
     // TODO bugged, don't care
+    static void(*functions[2])(settings_t*) = {openProject,saveProject};
     char * toPrint = (char*) calloc (300,sizeof(char));
     char character = GetCharPressed();
+    if (IsKeyReleased(KEY_ENTER)) {
+        printf("submitting %s\n",settings->filename);
+        functions[settings->gettingName](settings);// TODO submit
+        settings->resetName = true;
+        return;
+    }
     if (character >= 32 && character <= 126) {
         // valid letter
-        snprintf(settings->filename,min(200,strlen(settings->filename)+2),"%s%c",settings->filename,character);
-        printf ("%s\n",settings->filename);
+        char temp[200];
+        snprintf(temp, 200, "%s%c", settings->filename, character);
+        strncpy(settings->filename, temp, sizeof(settings->filename));
+    }
+    else if (IsKeyReleased(KEY_BACKSPACE)) {
+        settings->filename[strlen(settings->filename)-1]='\0';
     }
     snprintf(toPrint,300,"Insert the name of the file: ./saves/%s",settings->filename);
     DrawText(toPrint,1100,20,STD_FONT_SIZE,GRAY);
@@ -368,7 +372,7 @@ void getName(settings_t*settings){
 }
 
 char * identify(int num){
-    return (char[50][50]){"hu","s","r","h","e","en"}[num]; // hub, switch, router, host, external interface, external natted interface
+    return (char[10][10]){"hu","s","r","h","e","en"}[num]; // hub, switch, router, host, external interface, external natted interface
 }
 
 void appendNode(interface_t*interface,node_t newnode,settings_t*settings) {
@@ -432,7 +436,7 @@ void DrawMessageAtAngle(char*message) {
 
 void DrawRectangleWrapper(rectangle_t * rectangle){
     //printf("drawing the rectangle %p\n",rectangle);
-    DrawRectangle(min(rectangle->x,rectangle->x1),min(rectangle->y,rectangle->y1),abs(rectangle->x1-rectangle->x),abs(rectangle->y1-rectangle->y),CLITERAL(Color){rectangle->r,rectangle->g,rectangle->b,127});
+    DrawRectangle(min(rectangle->x,rectangle->x1),min(rectangle->y,rectangle->y1),abs(rectangle->x1-rectangle->x),abs(rectangle->y1-rectangle->y),CLITERAL(Color){rectangle->r,rectangle->g,rectangle->b,63});
     DrawRectangleLines(min(rectangle->x,rectangle->x1),min(rectangle->y,rectangle->y1),abs(rectangle->x1-rectangle->x),abs(rectangle->y1-rectangle->y),CLITERAL(Color){rectangle->r,rectangle->g,rectangle->b,255});
 
 }
@@ -547,7 +551,6 @@ void DrawGUI(settings_t* settings, interface_t * interface) {
             settings->dragging_deactivated = true;
             if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
                 settings->dragging_deactivated = false;
-                // TODO add rectangle to interface
                 settings->drawing_rectangle = 0;
                 addRectangle(interface,settings);
                 settings->numrectangles+=1;
@@ -555,7 +558,6 @@ void DrawGUI(settings_t* settings, interface_t * interface) {
             else {
                 DrawMessageAtAngle("Select the second angle");
                 DrawRectangleLines(min(settings->posX,GetMouseX()),min(settings->posY,GetMouseY()),abs(GetMouseX()-settings->posX),abs(GetMouseY()-settings->posY),PURPLE);
-                // TODO draw partial rectangle
             }
         }
         else {
