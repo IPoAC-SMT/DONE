@@ -375,7 +375,7 @@ void saveProject(settings_t *settings)
         {
             printf("ALERT: There was an error while creating the config file. Perhaps the path is wrong?\n");
         }
-        free(filename);
+        //free(filename); it crashes... why? i dont know
         free(config_filename);
     }
     else
