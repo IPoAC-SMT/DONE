@@ -403,16 +403,15 @@ int sendSwitchSetupCommand(char *command)
 // open a shell in a device (host or switch)
 int openNodeShell(char *name)
 {
-    char command[MAX_COMMAND_SIZE];
+    char *command[] = {"konsole", "-e", "sudo", "docker", "exec", "-it", name, "/bin/bash", NULL};
 
     if (name != NULL && strlen(name) <= MAX_NAME_SIZE)
     {
-        snprintf(command, MAX_COMMAND_SIZE, "konsole -e sudo docker exec -it %s /bin/bash", name);
         pid_t pid = fork();
-        /*if (pid == 0)
+        if (pid == 0)
         {
-            system(command);
-        }*/
+            execvp(command[0], command);
+        }
     }
     return -1;
 }
@@ -420,14 +419,12 @@ int openNodeShell(char *name)
 // open a shell for the switch
 int openSwitchShell()
 {
-    char command[MAX_COMMAND_SIZE];
+    char *command[] = {"konsole", "-e", "sudo", "bash", NULL};
 
-    snprintf(command, MAX_COMMAND_SIZE, "konsole");
     pid_t pid = fork();
     if (pid == 0)
     {
-        system(command);
-        exit(0);
+        execvp(command[0], command);
     }
     return -1;
 }

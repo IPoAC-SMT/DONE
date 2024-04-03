@@ -378,6 +378,7 @@ void getName(settings_t *settings)
     {
         functions[settings->gettingName - 1](settings); // TODO submit
         settings->resetName = true;
+        settings->gettingName = 0;
         return;
     }
     if (character >= 32 && character <= 126)
@@ -634,13 +635,14 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             if (nodo)
             {
                 strncpy(stringa, nodo->name, 200);
-                char a = false;
                 settings->numnodes -= 1;
                 for (int i = 0; i < settings->numnodes; i++)
                 {
+                    char a = false;
                     if (a || !strcmp(interface->nodes[i].name, stringa))
                     {
                         a = true;
+                        printf("moving node %d\n", i);
                         strncpy(interface->nodes[i].name, interface->nodes[i + 1].name, NAMELENGTH);
                         interface->nodes[i].x = interface->nodes[i + 1].x;
                         interface->nodes[i].y = interface->nodes[i + 1].y;

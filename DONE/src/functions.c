@@ -206,9 +206,12 @@ void clearCanvas(settings_t *settings)
         settings->numlink = 0;
         settings->numrectangles = 0;
         interface_t *interface = (interface_t *)settings->GUIdata;
-        free(interface->links);
-        free(interface->nodes);
-        free(interface->rectangles);
+        if (settings->numlink)
+            free(interface->links);
+        if (settings->numnodes)
+            free(interface->nodes);
+        if (settings->numrectangles)
+            free(interface->rectangles);
     }
 }
 
@@ -223,11 +226,11 @@ char *getFilename()
     return res;
 }
 
-void prepareToOpenProject(settings_t *settings){
+void prepareToOpenProject(settings_t *settings)
+{
     settings->resetName = 1;
     settings->gettingName = 1;
 }
-
 
 void openProject(settings_t *settings)
 {
@@ -299,8 +302,8 @@ void openProject(settings_t *settings)
     }
 }
 
-
-void prepareToSaveProject(settings_t *settings){
+void prepareToSaveProject(settings_t *settings)
+{
     settings->resetName = 1;
     settings->gettingName = 2;
 }
@@ -376,8 +379,8 @@ void saveProject(settings_t *settings)
         {
             printf("ALERT: There was an error while creating the config file. Perhaps the path is wrong?\n");
         }
-        //free(filename); it crashes... why? i dont know
-        //free(config_filename);
+        // free(filename); it crashes... why? i dont know
+        // free(config_filename);
     }
     else
     {
