@@ -45,7 +45,7 @@ int addNode(char *name, char type)
     if (name != NULL && strlen(name) <= MAX_NAME_SIZE && (type == 'h' || type == 'r'))
     {
 
-        snprintf(command, MAX_COMMAND_SIZE, "sudo docker run -id --cap-add=NET_ADMIN --name %s --network none node:1.0.0 /bin/bash", name);
+        snprintf(command, MAX_COMMAND_SIZE, "sudo docker run -id --hostname %s --cap-add=NET_ADMIN --name %s --network none node:1.0.0 /bin/bash", name, name);
 
         if (!system(command))
         { // once the node is created, adding the node's namespace to the netns folder
@@ -409,11 +409,10 @@ int openNodeShell(char *name)
     {
         snprintf(command, MAX_COMMAND_SIZE, "konsole -e sudo docker exec -it %s /bin/bash", name);
         pid_t pid = fork();
-        if (pid == 0)
+        /*if (pid == 0)
         {
             system(command);
-            exit(0);
-        }
+        }*/
     }
     return -1;
 }

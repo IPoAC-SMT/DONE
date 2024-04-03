@@ -193,7 +193,6 @@ void openShell(settings_t *settings)
 {
     if (!settings->isSimulating)
         return;
-    printf("antani");
     settings->node_type == switch_t ? openSwitchShellWrapper() : openNodeShellWrapper(settings->node_name);
 }
 
@@ -369,6 +368,8 @@ void saveProject(settings_t *settings)
                 }
             }
 
+            system("chmod 666 ./saves/*"); // temporary fix, i'd like to cry (Access control skill issues)
+
             fclose(file);
         }
         else
@@ -376,7 +377,7 @@ void saveProject(settings_t *settings)
             printf("ALERT: There was an error while creating the config file. Perhaps the path is wrong?\n");
         }
         //free(filename); it crashes... why? i dont know
-        free(config_filename);
+        //free(config_filename);
     }
     else
     {
