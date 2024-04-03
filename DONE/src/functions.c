@@ -200,10 +200,11 @@ void clearCanvas(settings_t *settings)
 {
     if (settings->isSimulating)
         return;
-    if (settings->numlink > 0 || settings->numnodes > 0)
+    if (settings->numlink > 0 || settings->numnodes > 0 || settings->numrectangles > 0)
     {
         settings->numnodes = 0;
         settings->numlink = 0;
+        settings->numrectangles = 0;
         interface_t *interface = (interface_t *)settings->GUIdata;
         free(interface->links);
         free(interface->nodes);

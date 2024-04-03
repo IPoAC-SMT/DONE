@@ -27,10 +27,8 @@ void DrawButton(button_t *pulsante, settings_t *settings)
 
     DrawRectangleLines(pulsante->x, pulsante->y, pulsante->width, pulsante->height, hovering ? YELLOW : GRAY); // lo creo con colore diverso se ci sto o meno hoverando
 
-    // debug, understand me: printf("HEREEEE\n");
-
     if (pulsante->edges == NULL) {
-        // TODO load edges from file
+        // load edges from file
         char * filename = calloc(101,sizeof(char));
         snprintf(filename,100,"./resources/GUIelements/%s",pulsante->filename);
         FILE * drawing = fopen(filename,"r");
@@ -432,6 +430,25 @@ void DrawMessageAtAngle(char*message) {
     DrawText(message,1900-STD_FONT_SIZE/2*strlen(message),970,STD_FONT_SIZE,GRAY);
 }
 
+void DrawRectangleWrapper(rectangle_t * rectangle){
+    //printf("drawing the rectangle %p\n",rectangle);
+    DrawRectangle(min(rectangle->x,rectangle->x1),min(rectangle->y,rectangle->y1),abs(rectangle->x1-rectangle->x),abs(rectangle->y1-rectangle->y),CLITERAL(Color){rectangle->r,rectangle->g,rectangle->b,127});
+    DrawRectangleLines(min(rectangle->x,rectangle->x1),min(rectangle->y,rectangle->y1),abs(rectangle->x1-rectangle->x),abs(rectangle->y1-rectangle->y),CLITERAL(Color){rectangle->r,rectangle->g,rectangle->b,255});
+
+}
+
+void addRectangle(interface_t * interface, settings_t* settings) {
+    if (settings->numrectangles==0) interface->rectangles = (rectangle_t*) calloc(1,sizeof(rectangle_t));
+    else interface->rectangles = (rectangle_t*) realloc(interface->rectangles,(settings->numrectangles+1)*sizeof(rectangle_t));
+    interface->rectangles[settings->numrectangles].x = settings->posX;
+    interface->rectangles[settings->numrectangles].y = settings->posY;
+    interface->rectangles[settings->numrectangles].x1 = GetMouseX();
+    interface->rectangles[settings->numrectangles].y1 = GetMouseY();
+    interface->rectangles[settings->numrectangles].r = rand()%256;
+    interface->rectangles[settings->numrectangles].g = rand()%256;
+    interface->rectangles[settings->numrectangles].b = rand()%256;
+}
+
 void DrawGUI(settings_t* settings, interface_t * interface) {
 
     // 1. piazzo i buttons
@@ -532,6 +549,8 @@ void DrawGUI(settings_t* settings, interface_t * interface) {
                 settings->dragging_deactivated = false;
                 // TODO add rectangle to interface
                 settings->drawing_rectangle = 0;
+                addRectangle(interface,settings);
+                settings->numrectangles+=1;
             }
             else {
                 DrawMessageAtAngle("Select the second angle");
@@ -586,6 +605,9 @@ void DrawGUI(settings_t* settings, interface_t * interface) {
             }
         getName(settings);
     }
+
+    // posiziono i rettangoli
+    for (int i=0;i<settings->numrectangles;i++) DrawRectangleWrapper(&(interface->rectangles[i]));
 
     // ora posiziono tutto: nodes e link
     for (int i=0; i<settings->numlink;i++) DrawLink(interface->links[i],settings,interface->nodes);

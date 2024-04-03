@@ -52,7 +52,7 @@ int main(int argc, char** argv)
  
     SetExitKey(KEY_NULL);
 
-    settings_t settings = {0,0, 0,"",0,0,0,0,"",0,0,(void*)interface,0,0,0,0,0,NULL,1,1,0,c};
+    settings_t settings = {0,0, 0,"",0,0,0,0,"",0,0,(void*)interface,0,0,0,0,0,NULL,1,1,0,c,0};
 
     while (!WindowShouldClose())
     {

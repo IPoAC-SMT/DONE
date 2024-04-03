@@ -29,5 +29,6 @@ typedef struct
     char resetName;
     char deletingNodes;
     char ipoac;
+    int numrectangles;
 } settings_t;
 
