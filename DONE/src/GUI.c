@@ -334,7 +334,6 @@ void DrawNode(node_t *node, settings_t *settings, bool true_node)
         {
             if (settings->isSimulating)
             {
-                // TODO open shell on node WHY TF is the node being dragged around
                 settings->placing_node = 0;
                 settings->placing_link = 0;
                 settings->drawing_rectangle = 0;
@@ -350,7 +349,23 @@ void DrawNode(node_t *node, settings_t *settings, bool true_node)
             }
             else
             {
-                // TODO open node configs
+                if(settings->openProjectName == NULL) {
+                    printf("Save the project first!\n");
+                }
+                else {
+                    char temp[200];
+                    snprintf(temp,200,"%s.conf",settings->openProjectName);
+                    int a=0;
+                    if((a=fork())==0){
+                        char *args[] = {"x-terminal-emulator", "-e", "vim", temp, NULL};
+                        execvp(args[0], args);
+                    }
+                    else if(a>0) {
+                        //waitpid
+                        waitpid(a, NULL, 0);
+                    }
+                    else printf("Wasn't able to open project configs, sorry\n");
+                }
             }
         }
     }
