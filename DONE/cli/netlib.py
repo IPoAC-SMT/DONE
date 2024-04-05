@@ -38,9 +38,6 @@ addCableBetweenSwitches.restype = ctypes.c_int
 delCableBetweenSwitches = C_library.delCableBetweenSwitches
 delCableBetweenSwitches.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
 delCableBetweenSwitches.restype = ctypes.c_int
-sendNetworkSetupCommand = C_library.sendNetworkSetupCommand
-sendNetworkSetupCommand.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
-sendNetworkSetupCommand.restype = ctypes.c_int
 openNodeShell = C_library.openNodeShell
 openNodeShell.argtypes = [ctypes.c_char_p]
 openNodeShell.restype = ctypes.c_int
@@ -68,7 +65,6 @@ delCableBetweenNodeAndSwitch(nodeName:bytes, switchName:bytes) -> int
 addCableBetweenSwitches(firstSwitch:bytes, secondSwitch:bytes) -> int
 delCableBetweenSwitches(firstSwitch:bytes, secondSwitch:bytes) -> int
 
-sendNetworkSetupCommand(name:bytes, command:bytes) -> int
 openNodeShell(name:bytes) -> int
 
 """)
