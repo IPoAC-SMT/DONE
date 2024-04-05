@@ -636,9 +636,9 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             {
                 strncpy(stringa, nodo->name, 200);
                 settings->numnodes -= 1;
+                char a = false;
                 for (int i = 0; i < settings->numnodes; i++)
                 {
-                    char a = false;
                     if (a || !strcmp(interface->nodes[i].name, stringa))
                     {
                         a = true;
