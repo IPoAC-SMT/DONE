@@ -32,7 +32,6 @@ int main(int argc, char **argv)
     initEnvironment(); // set up signal handling, create netns dir if not present
 
     interface_t *interface = init_interface((button_t[NUMbuttons]){
-        {24, 129, 100, 100, placehub, "Place a hub", 0, NULL, "hub"},
         {24, 234, 100, 100, placeswitch, "Place a switch", 0, NULL, "switch"},
         {24, 339, 100, 100, placerouter, c ? "Place an RFC1149-compatible \"router\"" : "Place a router", 0, NULL, c ? "IPoAC" : "router"},
         {24, 444, 100, 100, placehost, "Place a host", 0, NULL, "host"},

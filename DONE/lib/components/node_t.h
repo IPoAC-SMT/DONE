@@ -1,4 +1,4 @@
-typedef enum {hub_t,switch_t,router_t,host_t,external_interface_t,external_natted_interface_t} component_type_t;
+typedef enum {switch_t,router_t,host_t,external_interface_t,external_natted_interface_t} component_type_t;
 
 #define NAMELENGTH 50
 

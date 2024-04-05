@@ -165,20 +165,6 @@ void DrawNode(node_t *node, settings_t *settings, bool true_node)
         DrawLineEx((Vector2){nodex - 15, nodey + 9}, (Vector2){nodex - 10, nodey + 5}, 2, FIGURE_COLOR);
 
         break;
-    case hub_t:
-        // external lines
-        DrawLineEx((Vector2){nodex - 18, nodey - 12}, (Vector2){nodex + 18, nodey - 12}, 2, FIGURE_COLOR);
-        DrawLineEx((Vector2){nodex - 18, nodey + 12}, (Vector2){nodex + 18, nodey + 12}, 2, FIGURE_COLOR);
-        DrawLineEx((Vector2){nodex - 18, nodey - 12}, (Vector2){nodex - 18, nodey + 12}, 2, FIGURE_COLOR);
-        DrawLineEx((Vector2){nodex + 18, nodey - 12}, (Vector2){nodex + 18, nodey + 12}, 2, FIGURE_COLOR);
-        // frecce
-        DrawLineEx((Vector2){nodex - 15, nodey}, (Vector2){nodex + 15, nodey}, 2, FIGURE_COLOR);
-        DrawLineEx((Vector2){nodex - 15, nodey}, (Vector2){nodex - 10, nodey + 4}, 2, FIGURE_COLOR);
-        DrawLineEx((Vector2){nodex - 15, nodey}, (Vector2){nodex - 10, nodey - 4}, 2, FIGURE_COLOR);
-        DrawLineEx((Vector2){nodex + 15, nodey}, (Vector2){nodex + 10, nodey + 4}, 2, FIGURE_COLOR);
-        DrawLineEx((Vector2){nodex + 15, nodey}, (Vector2){nodex + 10, nodey - 4}, 2, FIGURE_COLOR);
-
-        break;
     case external_interface_t:
         DrawLineEx((Vector2){nodex - 3, nodey + 18}, (Vector2){nodex - 3, nodey + 13}, 2, FIGURE_COLOR);
         DrawLineEx((Vector2){nodex + 3, nodey + 18}, (Vector2){nodex + 3, nodey + 13}, 2, FIGURE_COLOR);
@@ -431,7 +417,7 @@ void getName(settings_t *settings)
 
 char *identify(int num)
 {
-    return (char[10][10]){"hu", "s", "r", "h", "e", "en"}[num]; // hub, switch, router, host, external interface, external natted interface
+    return (char[10][10]){"s", "r", "h", "e", "en"}[num]; // hub, switch, router, host, external interface, external natted interface
 }
 
 void appendNode(interface_t *interface, node_t newnode, settings_t *settings)

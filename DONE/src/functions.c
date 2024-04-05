@@ -8,18 +8,6 @@ void helloworld(settings_t *settings)
     printf("%d\n", settings->numlink);
 }
 
-void placehub(settings_t *settings)
-{
-    if (settings->isSimulating)
-        return;
-    settings->moving_node = 0;
-    settings->placing_link = 0;
-    settings->drawing_rectangle = 0;
-    settings->placing_node = 1;
-    settings->node_type = 0;
-    settings->deletingNodes = 0;
-}
-
 void placeswitch(settings_t *settings)
 {
     if (settings->isSimulating)
@@ -28,7 +16,7 @@ void placeswitch(settings_t *settings)
     settings->drawing_rectangle = 0;
     settings->moving_node = 0;
     settings->placing_node = 1;
-    settings->node_type = 1;
+    settings->node_type = 0;
     settings->deletingNodes = 0;
 }
 
@@ -40,7 +28,7 @@ void placerouter(settings_t *settings)
     settings->drawing_rectangle = 0;
     settings->moving_node = 0;
     settings->placing_node = 1;
-    settings->node_type = 2;
+    settings->node_type = 1;
     settings->deletingNodes = 0;
 }
 
@@ -52,7 +40,7 @@ void placehost(settings_t *settings)
     settings->drawing_rectangle = 0;
     settings->moving_node = 0;
     settings->placing_node = 1;
-    settings->node_type = 3;
+    settings->node_type = 2;
     settings->deletingNodes = 0;
 }
 
@@ -64,7 +52,7 @@ void placeexternalinterface(settings_t *settings)
     settings->drawing_rectangle = 0;
     settings->moving_node = 0;
     settings->placing_node = 1;
-    settings->node_type = 4;
+    settings->node_type = 3;
     settings->deletingNodes = 0;
 }
 
@@ -88,7 +76,7 @@ void placeexternalnattedinterface(settings_t *settings)
     settings->drawing_rectangle = 0;
     settings->moving_node = 0;
     settings->placing_node = 1;
-    settings->node_type = 5;
+    settings->node_type = 4;
     settings->deletingNodes = 0;
 }
 
