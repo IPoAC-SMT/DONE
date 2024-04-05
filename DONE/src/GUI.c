@@ -560,8 +560,6 @@ void DrawGUI(settings_t *settings, interface_t *interface)
         settings->deletingNodes = 0;
         settings->gettingName = 0;
         settings->resetName = 1;
-        free(settings->node_name);
-        settings->node_name = (char*)calloc(NAMELENGTH,sizeof(char));
     }
 
     // 3. se sto spostando cose
