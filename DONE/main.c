@@ -56,6 +56,8 @@ int main(int argc, char **argv)
 
     settings_t settings = {0, 0, 0, "", 0, 0, 0, 0, "", 0, 0, (void *)interface, 0, 0, 0, 0, 0, NULL, 0, 0, 0, c, 0};
 
+    system("clear");
+
     while (!WindowShouldClose())
     {
         BeginDrawing();

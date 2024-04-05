@@ -178,6 +178,7 @@ void start(settings_t *settings)
 
 void quit(settings_t *settings)
 {
+    if(settings->isSimulating) printf("be careful: it was simulating. Now we are stopping the simulation\n");
     forcedCLIExit();
 }
 
