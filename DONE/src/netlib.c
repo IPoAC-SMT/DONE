@@ -403,7 +403,7 @@ int sendSwitchSetupCommand(char *command)
 // open a shell in a device (host or switch)
 int openNodeShell(char *name)
 {
-    char *command[] = {"konsole", "-e", "sudo", "docker", "exec", "-it", name, "/bin/bash", NULL};
+    char *command[] = {"x-terminal-emulator", "-e", "sudo", "docker", "exec", "-it", name, "/bin/bash", NULL};
 
     if (name != NULL && strlen(name) <= MAX_NAME_SIZE)
     {
@@ -419,7 +419,7 @@ int openNodeShell(char *name)
 // open a shell for the switch
 int openSwitchShell()
 {
-    char *command[] = {"konsole", "-e", "sudo", "bash", NULL};
+    char *command[] = {"x-terminal-emulator", "-e", "sudo", "bash", NULL};
 
     pid_t pid = fork();
     if (pid == 0)

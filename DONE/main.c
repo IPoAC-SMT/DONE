@@ -11,7 +11,7 @@ int main(int argc, char **argv)
         int a = 0;
         if (((a = fork()) == 0))
         {
-            char *args[] = {"konsole", "-e", "python3", "-i", "./cli/netlib.py", NULL};
+            char *args[] = {"x-terminal-emulator", "-e", "python3", "-i", "./cli/netlib.py", NULL};
             execvp(args[0], args);
         }
         else if (a > 0)
