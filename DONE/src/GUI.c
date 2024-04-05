@@ -128,7 +128,7 @@ void DrawFakeLink(settings_t *settings, node_t *nodes)
 void DrawNode(node_t *node, settings_t *settings, bool true_node)
 {
     int nodex, nodey;
-    if (!strcmp(node->name, settings->node_name))
+    if (settings->moving_node && !strcmp(node->name, settings->node_name))
     {
         nodex = GetMouseX();
         nodey = GetMouseY();
@@ -358,8 +358,6 @@ void DrawNode(node_t *node, settings_t *settings, bool true_node)
                 settings->node_name = (char *)calloc(NAMELENGTH, sizeof(char));
                 snprintf(settings->node_name, NAMELENGTH, "%s", node->name);
                 openShell(settings);
-                free(settings->node_name);
-                settings->node_name = (char *)calloc(NAMELENGTH, sizeof(char));
             }
             else
             {
@@ -560,13 +558,17 @@ void DrawGUI(settings_t *settings, interface_t *interface)
         settings->placing_link = false;
         settings->node_type = -1;
         settings->deletingNodes = 0;
+        settings->gettingName = 0;
+        settings->resetName = 1;
+        free(settings->node_name);
+        settings->node_name = (char*)calloc(NAMELENGTH,sizeof(char));
     }
 
     // 3. se sto spostando cose
     if (settings->moving_node)
     {
         // giusto per sicurezza, disattivo il placing se sto piazzando cose
-        settings->placing_node = false;
+        //settings->placing_node = false;
         // disegno un nodo "fantasma" dove sto muovendo il mouse
         DrawNode(&(node_t){settings->node_name, settings->node_type, GetMouseX(), GetMouseY()}, settings, false);
         // se sto premendo (rilasciando, tbh) il tasto sinistro del mouse
@@ -577,8 +579,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             // ne imposto le posizioni
             setNode(settings->node_name, interface->nodes, settings);
         }
-        else
-            DrawMessageAtAngle("Select a new position for the node");
+        else DrawMessageAtAngle("Select a new position for the node");
     }
 
     // 4. altrimenti, se sto posizionando qualcosa di nuovo
@@ -678,7 +679,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
         }
     }
     else if (settings->deletingNodes) // deleting nodes or links
-    {                                 // TODO FIX, bugged when deleting links
+    {
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
         {
             node_t *nodo = getInversePos(GetMouseX(), GetMouseY(), interface->nodes, settings);
@@ -687,7 +688,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             {
                 strncpy(stringa, nodo->name, 200);
 
-                char a = false;
+                /* char a = false; <= we will never forget you */
 
                 settings->numnodes--;
 
