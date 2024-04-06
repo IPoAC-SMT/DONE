@@ -239,18 +239,20 @@ void openProject(settings_t *settings)
     snprintf(filename, MAX_FILENAME, "./saves/%s.done", settings->filename);
 
     FILE *file = fopen(filename, "r");
-    int numnodes, numlinks;
+    int numnodes, numlinks, numrectangles;
     node_t *nodes;
     link_t *links;
+    rectangle_t *rectangles;
 
     if (file != NULL)
     {
         settings->openProjectName = filename; // updating the project name
 
-        fscanf(file, "%d\n%d\n", &numnodes, &numlinks);
+        fscanf(file, "%d\n%d\n%d\n", &numnodes, &numlinks, &numrectangles);
 
         nodes = (node_t *)malloc(numnodes * sizeof(node_t));
         links = (link_t *)malloc(numlinks * sizeof(link_t));
+        rectangles = (rectangle_t *)malloc(numrectangles * sizeof(rectangle_t));
 
         char name[50]; // buffer
         char othername[50];
@@ -279,11 +281,18 @@ void openProject(settings_t *settings)
             strcpy(links[i].node2, othername);
         }
 
+        for(int i = 0; i < numrectangles; i++)
+        {   // reading all rectangles
+            fscanf(file, "%d %d\n%d %d\n%d %d %d\n", &rectangles[i].x, &rectangles[i].y, &rectangles[i].x1, &rectangles[i].y1, (int *)&rectangles[i].r, (int *)&rectangles[i].g, (int *)&rectangles[i].b);
+        }
+
         interface_t *gui = settings->GUIdata;
         gui->nodes = nodes;
         gui->links = links;
+        gui->rectangles = rectangles;
         settings->numnodes = numnodes;
         settings->numlink = numlinks;
+        settings->numrectangles = numrectangles;
     }
     else
     {
@@ -318,7 +327,7 @@ void saveProject(settings_t *settings)
         settings->openProjectName = filename;
 
         // creating the project file
-        fprintf(file, "%d\n%d\n", settings->numnodes, settings->numlink); // saving node number and link number at the top of the file
+        fprintf(file, "%d\n%d\n%d\n", settings->numnodes, settings->numlink, settings->numrectangles); // saving node number and link number + rectangle number at the top of the file
 
         interface_t *gui = (interface_t *)(settings->GUIdata);
 
@@ -332,6 +341,12 @@ void saveProject(settings_t *settings)
         { // saving every link
             link_t current_link = gui->links[i];
             fprintf(file, "%s\n%s\n%d\n%d\n", current_link.node1, current_link.node2, current_link.node1_type, current_link.node2_type); // data for every link
+        }
+
+        for (int i = 0; i < settings->numrectangles; i++)
+        { // saving every rectangle
+            rectangle_t current_rect = gui->rectangles[i];
+            fprintf(file, "%d %d\n%d %d\n%d %d %d\n", current_rect.x, current_rect.y, current_rect.x1, current_rect.y1, current_rect.r, current_rect.g, current_rect.b); // data for every link
         }
 
         fclose(file);
