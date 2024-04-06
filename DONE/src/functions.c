@@ -1,12 +1,13 @@
 #include "../lib/logicalController.h"
+#include "../lib/log.h"
 #include <string.h>
 
 #define MAX_FILENAME 50
-
+/*
 void helloworld(settings_t *settings)
 {
     printf("%d\n", settings->numlink);
-}
+}*/
 
 void placeswitch(settings_t *settings)
 {
@@ -18,6 +19,7 @@ void placeswitch(settings_t *settings)
     settings->placing_node = 1;
     settings->node_type = 0;
     settings->deletingNodes = 0;
+    logInfo("Ready to place a node","type switch");
 }
 
 void placerouter(settings_t *settings)
@@ -30,6 +32,7 @@ void placerouter(settings_t *settings)
     settings->placing_node = 1;
     settings->node_type = 1;
     settings->deletingNodes = 0;
+    logInfo("Ready to place a node","type router");
 }
 
 void placehost(settings_t *settings)
@@ -42,6 +45,7 @@ void placehost(settings_t *settings)
     settings->placing_node = 1;
     settings->node_type = 2;
     settings->deletingNodes = 0;
+    logInfo("Ready to place a node","type host");
 }
 
 void placeexternalinterface(settings_t *settings)
@@ -54,6 +58,7 @@ void placeexternalinterface(settings_t *settings)
     settings->placing_node = 1;
     settings->node_type = 3;
     settings->deletingNodes = 0;
+    logInfo("Ready to place a node","type external interface");
 }
 
 void deleteNode(settings_t *settings)
@@ -66,6 +71,7 @@ void deleteNode(settings_t *settings)
     settings->placing_node = 0;
     settings->node_type = 0;
     settings->deletingNodes = 1;
+    logInfo("Ready to delete a node","");
 }
 
 void placeexternalnattedinterface(settings_t *settings)
@@ -78,6 +84,7 @@ void placeexternalnattedinterface(settings_t *settings)
     settings->placing_node = 1;
     settings->node_type = 4;
     settings->deletingNodes = 0;
+    logInfo("Ready to place a node","type external natted interface");
 }
 
 void placelink(settings_t *settings)
@@ -89,6 +96,7 @@ void placelink(settings_t *settings)
     settings->placing_node = 0;
     settings->placing_link = 1;
     settings->deletingNodes = 0;
+    logInfo("Ready to place a link","");
 }
 
 void placeRectangle(settings_t *settings)
@@ -100,10 +108,12 @@ void placeRectangle(settings_t *settings)
     settings->placing_node = 0;
     settings->placing_link = 0;
     settings->deletingNodes = 0;
+    logInfo("Ready to place a rectangle","");
 }
 void initEnvironment()
 {
     initEnv();
+    logSuccess("Environment initialized successfully","");
 }
 
 void start(settings_t *settings)
@@ -118,9 +128,9 @@ void start(settings_t *settings)
 
         char config_filename[50];
         strcpy(config_filename, settings->openProjectName);
-        printf("openProject: %s\n", settings->openProjectName);
+        logInfo("Open Project Name:","%s", settings->openProjectName);
         strcat(config_filename, ".conf");
-        printf("config_filename: %s\n", config_filename);
+        logInfo("Config Filename:","%s", config_filename);
         FILE *file = fopen(config_filename, "r");
         if (file != NULL)
         {
@@ -144,14 +154,15 @@ void start(settings_t *settings)
                         }
                         else
                         {
-                            printf("sending command to node %s: %s\n", nodeName, buf);
+                            logInfo("sending command to node","%s: %s", nodeName, buf);
                             sendNodeCommand(nodeName, buf); // sending the command to the logical controller
                         }
                     } while (1);
+                    logSuccess("Simulation running","setup finished");
                 }
                 else
                 {
-                    printf("error\n");
+                    logError("error","");
                     fclose(file);
                     return;
                 }
@@ -159,14 +170,14 @@ void start(settings_t *settings)
         }
         else
         {
-            printf("ALERT: There was an error while opening the config file. Have you touched it?!\n");
+            logWarning("There was an error while opening the config file.","Have you touched it?!");
         }
     }
 }
 
 void quit(settings_t *settings)
 {
-    if(settings->isSimulating) printf("be careful: it was simulating. Now we are stopping the simulation\n");
+    if(settings->isSimulating) logInfo("be careful: it was simulating.","Now we are stopping the simulation. You're welcome");
     forcedCLIExit();
 }
 
@@ -202,8 +213,9 @@ void clearCanvas(settings_t *settings)
         if (settings->numrectangles)
             free(interface->rectangles);
     }
+    logSuccess("Canvas cleared","");
 }
-
+/*
 char *getFilename()
 {
     char *res = (char *)calloc(MAX_FILENAME, sizeof(char));
@@ -213,12 +225,13 @@ char *getFilename()
     scanf("%20s", buf);
     strcat(res, buf);
     return res;
-}
+}*/
 
 void prepareToOpenProject(settings_t *settings)
 {
     settings->resetName = 1;
     settings->gettingName = 1;
+    logInfo("Ready to read project name from GUI","");
 }
 
 void openProject(settings_t *settings)
@@ -293,10 +306,11 @@ void openProject(settings_t *settings)
         settings->numnodes = numnodes;
         settings->numlink = numlinks;
         settings->numrectangles = numrectangles;
+        logSuccess("Loaded project","");
     }
     else
     {
-        printf("ALERT: There was an error while opening the file. Perhaps the path is wrong?\n");
+        logWarning("There was an error while opening the file.","Perhaps the path is wrong?");
     }
 }
 
@@ -381,13 +395,13 @@ void saveProject(settings_t *settings)
         }
         else
         {
-            printf("ALERT: There was an error while creating the config file. Perhaps the path is wrong?\n");
+            logWarning("There was an error while creating the config file.","Perhaps the path is wrong?");
         }
         // free(filename); it crashes... why? i dont know
         // free(config_filename);
     }
     else
     {
-        printf("ALERT: There was an error while opening the file. Perhaps the path is wrong?\n");
+        logWarning("There was an error while opening the file.","Perhaps the path is wrong?");
     }
 }

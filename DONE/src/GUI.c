@@ -1,4 +1,5 @@
 #include "../lib/GUI.h"
+#include "../lib/log.h"
 
 void DrawButton(button_t *pulsante, settings_t *settings)
 {
@@ -349,7 +350,7 @@ void DrawNode(node_t *node, settings_t *settings, bool true_node)
             {
                 if (settings->openProjectName == NULL)
                 {
-                    printf("Save the project first!\n");
+                    logWarning("Save the project first!","");
                 }
                 else
                 {
@@ -367,7 +368,7 @@ void DrawNode(node_t *node, settings_t *settings, bool true_node)
                         waitpid(a, NULL, 0);
                     }
                     else
-                        printf("Wasn't able to open project configs, sorry\n");
+                        logWarning("Wasn't able to open project configs","sorry");
                 }
             }
         }
@@ -538,6 +539,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
     // 2. se premo esc disattivo dragging e placing TODO bugged
     if (IsKeyReleased(KEY_ESCAPE))
     {
+        logInfo("Escape key pressed","");
         settings->moving_node = false;
         settings->placing_node = false;
         settings->drawing_rectangle = false;
@@ -546,6 +548,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
         settings->deletingNodes = 0;
         settings->gettingName = 0;
         settings->resetName = 1;
+        logSuccess("All effects successfully deactivated","esc worked correctly");
     }
 
     // 3. se sto spostando cose
@@ -562,6 +565,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             settings->moving_node = false;
             // ne imposto le posizioni
             setNode(settings->node_name, interface->nodes, settings);
+            logSuccess("Correctly moved node","");
         }
         else DrawMessageAtAngle("Select a new position for the node");
     }
@@ -584,6 +588,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             // e aumento il numero di nodes
             settings->numnodes++;
             settings->absoluteCount++;
+            logSuccess("Correctly created node","");
         }
         else
             DrawMessageAtAngle("Choose the position for this new node");
@@ -600,6 +605,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             settings->first_place_nodetype = (void *)getInversePos(GetMouseX(), GetMouseY(), interface->nodes, settings)->type; // adding type of first selected node to settings
             settings->dragging_deactivated = true;
             settings->placing_link = 2;
+            logInfo("First node selected", "now select the second");
         }
         else if (settings->placing_link == 1)
         {
@@ -615,6 +621,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             // aumento il numero di link
             settings->numlink++;
             settings->dragging_deactivated = false;
+            logSuccess("Correctly linked nodes","");
         }
         else if (settings->placing_link == 2)
         {
@@ -634,6 +641,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                 settings->posX = GetMouseX();
                 settings->posY = GetMouseY();
                 settings->drawing_rectangle = 2;
+                logInfo("Saved first point","now select the opposite");
             }
             else
             {
@@ -650,6 +658,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                 settings->drawing_rectangle = 0;
                 addRectangle(interface, settings);
                 settings->numrectangles += 1;
+                logSuccess("Rectangle successfully placed","");
             }
             else
             {
@@ -680,6 +689,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                 nodo->x = interface->nodes[settings->numnodes].x;
                 nodo->y = interface->nodes[settings->numnodes].y;
                 nodo->type = interface->nodes[settings->numnodes].type;
+                logSuccess("Deleted node","");
 
                 for (int i = 0; i < settings->numlink; i++)
                 {
@@ -691,8 +701,10 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                         interface->links[i].node2 = strdup(interface->links[settings->numlink].node2);
                         interface->links[i].node1_type = interface->links[settings->numlink].node1_type;
                         interface->links[i].node2_type = interface->links[settings->numlink].node2_type;
+                        logInfo("Deleted related link","");
                     }
                 }
+
 
                 free(stringa);
             }
@@ -707,6 +719,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                     link->node2 = strdup(interface->links[settings->numlink].node2);
                     link->node1_type = interface->links[settings->numlink].node1_type;
                     link->node2_type = interface->links[settings->numlink].node2_type;
+                    logSuccess("Deleted link","");
                 }
             }
         }

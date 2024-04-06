@@ -1,5 +1,6 @@
 // Docker orchestration commands library
 #include "../lib/netlib.h"
+#include "../lib/log.h"
 
 #include <sys/socket.h>
 #include <ifaddrs.h>

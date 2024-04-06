@@ -1,5 +1,6 @@
 #include "../lib/logicalController.h"
 #include "../lib/netlib.h"
+#include "../lib/log.h"
 
 interface_t *lastSimulation = NULL;
 int lastNodesNum, lastLinksNum;
@@ -44,7 +45,7 @@ void startSimulation(interface_t *simulation, int nodes_num, int links_num)
     lastNodesNum = nodes_num;
     lastLinksNum = links_num;
 
-    printf("starting...\n");
+    logInfo("Starting simulation","");
 
     // actually sending data to docker
 
@@ -128,7 +129,7 @@ void stopSimulation(interface_t *simulation, int nodes_num, int links_num)
     simdata.nodes_num = nodes_num;
     simdata.links_num = links_num;
 
-    printf("stopping...\n");
+    logInfo("Stopping simulation","");
 
     for (int i = 0; i < nodes_num; i++)
     { // handling nodes is enough, all links between them will be deleted automatically

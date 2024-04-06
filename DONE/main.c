@@ -1,4 +1,5 @@
 #include "./lib/GUI.h"
+#include "./lib/log.h"
 
 #define WIDTH 1900
 #define HEIGHT 1000
@@ -6,6 +7,10 @@
 
 int main(int argc, char **argv)
 {
+    /*logError("prova","prova");
+    logWarning("prova","prova");
+    logSuccess("prova","prova");
+    logInfo("prova","prova");*/
     if (argc > 1 && !strcmp(argv[1], "--no-gui"))
     {
         int a = 0;
@@ -16,13 +21,13 @@ int main(int argc, char **argv)
         }
         else if (a > 0)
         {
-            printf("CLI running in other window\n");
+            logInfo("CLI running in other window","");
             waitpid(a, NULL, 0);
             return 0;
         }
         else
         {
-            printf("tried to spawn the CLI but failed. so sad :(\n");
+            logError("tried to spawn the CLI but failed.","so sad :(");
             return -1;
         }
     }
