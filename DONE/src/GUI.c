@@ -1,4 +1,5 @@
 #include "../lib/GUI.h"
+#include "../lib/log.h"
 
 void DrawButton(button_t *pulsante, settings_t *settings)
 {
@@ -53,12 +54,17 @@ void DrawButton(button_t *pulsante, settings_t *settings)
     }
 }
 
-Vector2 getPos(node_t *nodes, char *name)
+Vector2 getPos(node_t *nodes, char *name, settings_t *settings)
 {
     int i = 0;
-    while (strcmp(nodes[i].name, name))
-        i++;
-    return (Vector2){nodes[i].x, nodes[i].y};
+    while (i < settings->numnodes)
+    {
+        if (!strcmp(nodes[i].name, name))
+            return (Vector2){nodes[i].x, nodes[i].y};
+        else
+            i++;
+    }
+    return (Vector2){-1, -1}; // if the node is not found
 }
 
 int min(int a, int b)
@@ -70,16 +76,8 @@ int max(int a, int b)
     return (a > b ? a : b);
 }
 
-void DrawLink(link_t link, settings_t *settings, node_t *nodes)
+bool isNearLink(Vector2 *positions)
 {
-    Vector2 positions[2] = {getPos(nodes, link.node1), getPos(nodes, link.node2)};
-    if (settings->moving_node)
-    {
-        if (!strcmp(link.node1, settings->node_name))
-            positions[0] = (Vector2){GetMouseX(), GetMouseY()};
-        else if (!strcmp(link.node2, settings->node_name))
-            positions[1] = (Vector2){GetMouseX(), GetMouseY()};
-    }
     // breve digressione matematica: per verificare se sono su una linea verifico che la distanza del punto dalla linea sia minore di un qualcosa, diciamo 5 pixel.
     // ora, questo significa che posso rappresentare la mia linea con la seguente equazione:
     // y = mx + q, ossia y - mx - q = 0
@@ -91,12 +89,29 @@ void DrawLink(link_t link, settings_t *settings, node_t *nodes)
     float q = positions[1].y - m * positions[1].x;
     // quindi la distanza punto-retta si calcola come \mod(y_mouse - (m x_mouse + y_0))/\sqrt(1+m^2)
     float d = (float)abs(GetMouseY() - (int)(m * GetMouseX() + q)) / (sqrt(1 + m * m));
-    bool cond = ((d <= 5) &&
-                 GetMouseX() >= min(positions[0].x, positions[1].x) &&
-                 GetMouseX() <= max(positions[0].x, positions[1].x) &&
-                 GetMouseY() >= min(positions[0].y, positions[1].y) &&
-                 GetMouseY() <= max(positions[0].y, positions[1].y));
-    DrawLineEx(positions[0], positions[1], /*thick*/ cond ? 5 : 1, /*Color color*/ RED);
+    return ((d <= 5) &&
+            GetMouseX() >= min(positions[0].x, positions[1].x) &&
+            GetMouseX() <= max(positions[0].x, positions[1].x) &&
+            GetMouseY() >= min(positions[0].y, positions[1].y) &&
+            GetMouseY() <= max(positions[0].y, positions[1].y));
+}
+
+void DrawLink(link_t link, settings_t *settings, node_t *nodes)
+{
+    Vector2 positions[2] = {getPos(nodes, link.node1, settings), getPos(nodes, link.node2, settings)};
+
+    if (positions[0].x == -1 || positions[0].y == -1 || positions[1].x == -1 || positions[1].y == -1) // maybe yes, maybe no
+        return;
+
+    if (settings->moving_node)
+    {
+        if (!strcmp(link.node1, settings->node_name))
+            positions[0] = (Vector2){GetMouseX(), GetMouseY()};
+        else if (!strcmp(link.node2, settings->node_name))
+            positions[1] = (Vector2){GetMouseX(), GetMouseY()};
+    }
+
+    DrawLineEx(positions[0], positions[1], /*thick*/ isNearLink(positions) ? 5 : 1, /*Color color*/ RED);
 
     /*if (d && settings->deletingNodes && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) TODO
     {
@@ -108,13 +123,13 @@ void DrawLink(link_t link, settings_t *settings, node_t *nodes)
 
 void DrawFakeLink(settings_t *settings, node_t *nodes)
 {
-    DrawLineEx(getPos(nodes, settings->first_place), (Vector2){GetMouseX(), GetMouseY()}, 5, PURPLE);
+    DrawLineEx(getPos(nodes, settings->first_place, settings), (Vector2){GetMouseX(), GetMouseY()}, 5, PURPLE);
 }
 
 void DrawNode(node_t *node, settings_t *settings, bool true_node)
 {
     int nodex, nodey;
-    if (!strcmp(node->name, settings->node_name))
+    if (settings->moving_node && !strcmp(node->name, settings->node_name))
     {
         nodex = GetMouseX();
         nodey = GetMouseY();
@@ -149,20 +164,6 @@ void DrawNode(node_t *node, settings_t *settings, bool true_node)
         DrawLineEx((Vector2){nodex - 15, nodey + 9}, (Vector2){nodex - 1, nodey + 9}, 2, FIGURE_COLOR);
         DrawLineEx((Vector2){nodex - 15, nodey + 9}, (Vector2){nodex - 10, nodey + 13}, 2, FIGURE_COLOR);
         DrawLineEx((Vector2){nodex - 15, nodey + 9}, (Vector2){nodex - 10, nodey + 5}, 2, FIGURE_COLOR);
-
-        break;
-    case hub_t:
-        // external lines
-        DrawLineEx((Vector2){nodex - 18, nodey - 12}, (Vector2){nodex + 18, nodey - 12}, 2, FIGURE_COLOR);
-        DrawLineEx((Vector2){nodex - 18, nodey + 12}, (Vector2){nodex + 18, nodey + 12}, 2, FIGURE_COLOR);
-        DrawLineEx((Vector2){nodex - 18, nodey - 12}, (Vector2){nodex - 18, nodey + 12}, 2, FIGURE_COLOR);
-        DrawLineEx((Vector2){nodex + 18, nodey - 12}, (Vector2){nodex + 18, nodey + 12}, 2, FIGURE_COLOR);
-        // frecce
-        DrawLineEx((Vector2){nodex - 15, nodey}, (Vector2){nodex + 15, nodey}, 2, FIGURE_COLOR);
-        DrawLineEx((Vector2){nodex - 15, nodey}, (Vector2){nodex - 10, nodey + 4}, 2, FIGURE_COLOR);
-        DrawLineEx((Vector2){nodex - 15, nodey}, (Vector2){nodex - 10, nodey - 4}, 2, FIGURE_COLOR);
-        DrawLineEx((Vector2){nodex + 15, nodey}, (Vector2){nodex + 10, nodey + 4}, 2, FIGURE_COLOR);
-        DrawLineEx((Vector2){nodex + 15, nodey}, (Vector2){nodex + 10, nodey - 4}, 2, FIGURE_COLOR);
 
         break;
     case external_interface_t:
@@ -344,14 +345,12 @@ void DrawNode(node_t *node, settings_t *settings, bool true_node)
                 settings->node_name = (char *)calloc(NAMELENGTH, sizeof(char));
                 snprintf(settings->node_name, NAMELENGTH, "%s", node->name);
                 openShell(settings);
-                free(settings->node_name);
-                settings->node_name = (char *)calloc(NAMELENGTH, sizeof(char));
             }
             else
             {
                 if (settings->openProjectName == NULL)
                 {
-                    printf("Save the project first!\n");
+                    logWarning("Save the project first!","");
                 }
                 else
                 {
@@ -369,7 +368,7 @@ void DrawNode(node_t *node, settings_t *settings, bool true_node)
                         waitpid(a, NULL, 0);
                     }
                     else
-                        printf("Wasn't able to open project configs, sorry\n");
+                        logWarning("Wasn't able to open project configs","sorry");
                 }
             }
         }
@@ -419,7 +418,7 @@ void getName(settings_t *settings)
 
 char *identify(int num)
 {
-    return (char[10][10]){"hu", "s", "r", "h", "e", "en"}[num]; // hub, switch, router, host, external interface, external natted interface
+    return (char[10][10]){"s", "r", "h", "e", "en"}[num]; // hub, switch, router, host, external interface, external natted interface
 }
 
 void appendNode(interface_t *interface, node_t newnode, settings_t *settings)
@@ -466,6 +465,23 @@ node_t *getInversePos(int x, int y, node_t *nodes, settings_t *settings)
         {
             return &nodes[i];
         }
+    }
+    return NULL;
+}
+
+link_t *getInverseLink(interface_t *interface, settings_t *settings)
+{ // now returns entire struct link
+
+    for (int i = 0; i < settings->numlink; i++)
+    {
+        Vector2 positions[2] = {getPos(interface->nodes, interface->links[i].node1, settings), getPos(interface->nodes, interface->links[i].node2, settings)};
+
+        if (positions[0].x == -1 || positions[0].y == -1 || positions[1].x == -1 || positions[1].y == -1) // maybe yes, maybe no
+            return NULL;
+
+        if(isNearLink(positions))
+            return &interface->links[i];
+
     }
     return NULL;
 }
@@ -523,19 +539,23 @@ void DrawGUI(settings_t *settings, interface_t *interface)
     // 2. se premo esc disattivo dragging e placing TODO bugged
     if (IsKeyReleased(KEY_ESCAPE))
     {
+        logInfo("Escape key pressed","");
         settings->moving_node = false;
         settings->placing_node = false;
         settings->drawing_rectangle = false;
         settings->placing_link = false;
         settings->node_type = -1;
         settings->deletingNodes = 0;
+        settings->gettingName = 0;
+        settings->resetName = 1;
+        logSuccess("All effects successfully deactivated","esc worked correctly");
     }
 
     // 3. se sto spostando cose
     if (settings->moving_node)
     {
         // giusto per sicurezza, disattivo il placing se sto piazzando cose
-        settings->placing_node = false;
+        //settings->placing_node = false;
         // disegno un nodo "fantasma" dove sto muovendo il mouse
         DrawNode(&(node_t){settings->node_name, settings->node_type, GetMouseX(), GetMouseY()}, settings, false);
         // se sto premendo (rilasciando, tbh) il tasto sinistro del mouse
@@ -545,9 +565,9 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             settings->moving_node = false;
             // ne imposto le posizioni
             setNode(settings->node_name, interface->nodes, settings);
+            logSuccess("Correctly moved node","");
         }
-        else
-            DrawMessageAtAngle("Select a new position for the node");
+        else DrawMessageAtAngle("Select a new position for the node");
     }
 
     // 4. altrimenti, se sto posizionando qualcosa di nuovo
@@ -568,6 +588,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             // e aumento il numero di nodes
             settings->numnodes++;
             settings->absoluteCount++;
+            logSuccess("Correctly created node","");
         }
         else
             DrawMessageAtAngle("Choose the position for this new node");
@@ -584,6 +605,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             settings->first_place_nodetype = (void *)getInversePos(GetMouseX(), GetMouseY(), interface->nodes, settings)->type; // adding type of first selected node to settings
             settings->dragging_deactivated = true;
             settings->placing_link = 2;
+            logInfo("First node selected", "now select the second");
         }
         else if (settings->placing_link == 1)
         {
@@ -599,6 +621,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             // aumento il numero di link
             settings->numlink++;
             settings->dragging_deactivated = false;
+            logSuccess("Correctly linked nodes","");
         }
         else if (settings->placing_link == 2)
         {
@@ -618,6 +641,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                 settings->posX = GetMouseX();
                 settings->posY = GetMouseY();
                 settings->drawing_rectangle = 2;
+                logInfo("Saved first point","now select the opposite");
             }
             else
             {
@@ -634,6 +658,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                 settings->drawing_rectangle = 0;
                 addRectangle(interface, settings);
                 settings->numrectangles += 1;
+                logSuccess("Rectangle successfully placed","");
             }
             else
             {
@@ -646,8 +671,8 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             settings->drawing_rectangle = 1;
         }
     }
-    else if (settings->deletingNodes)
-    { // TODO FIX, bugged when deleting links
+    else if (settings->deletingNodes) // deleting nodes or links
+    {
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
         {
             node_t *nodo = getInversePos(GetMouseX(), GetMouseY(), interface->nodes, settings);
@@ -656,39 +681,51 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             {
                 settings->numlink = 0;
                 strncpy(stringa, nodo->name, 200);
-                char a = false;
-                for (int i = 0; i < settings->numnodes - 1; i++)
-                {
-                    if (a || !strcmp(interface->nodes[i].name, stringa))
-                    {
-                        a = true;
-                        printf("moving node %d\n", i);
-                        strncpy(interface->nodes[i].name, interface->nodes[i + 1].name, NAMELENGTH);
-                        interface->nodes[i].x = interface->nodes[i + 1].x;
-                        interface->nodes[i].y = interface->nodes[i + 1].y;
-                        interface->nodes[i].type = interface->nodes[i + 1].type;
-                    }
-                }
+
+                /* char a = false; <= we will never forget you */
+
                 settings->numnodes--;
-                /*for (int i = 0; i < settings->numlink; i++)
+
+                nodo->name = strdup(interface->nodes[settings->numnodes].name);
+                nodo->x = interface->nodes[settings->numnodes].x;
+                nodo->y = interface->nodes[settings->numnodes].y;
+                nodo->type = interface->nodes[settings->numnodes].type;
+                logSuccess("Deleted node","");
+
+                for (int i = 0; i < settings->numlink; i++)
                 {
                     if (!strcmp(interface->links[i].node1, stringa) || !strcmp(interface->links[i].node2, stringa))
                     {
-                        settings->numlink -= 1;
-                        for (int j = i; j < settings->numlink; j++)
-                        {
-                            printf("%d<-%d\n", j, j + 1);
-                            strncpy(interface->links[j].node1, interface->links[j + 1].node1, NAMELENGTH);
-                            strncpy(interface->links[j].node2, interface->links[j + 1].node2, NAMELENGTH);
-                            interface->links[j].node1_type = interface->links[j + 1].node1_type;
-                            interface->links[j].node2_type = interface->links[j + 1].node2_type;
-                            printf("done\n");
-                        }
+                        settings->numlink--;
+
+                        interface->links[i].node1 = strdup(interface->links[settings->numlink].node1);
+                        interface->links[i].node2 = strdup(interface->links[settings->numlink].node2);
+                        interface->links[i].node1_type = interface->links[settings->numlink].node1_type;
+                        interface->links[i].node2_type = interface->links[settings->numlink].node2_type;
+                        logInfo("Deleted related link","");
                     }
                 }
-                free(stringa);*/
+
+
+                free(stringa);
+            }
+            else
+            { // deleting (maybe) a link
+                link_t *link = getInverseLink(interface, settings);
+                if (link)
+                {
+                    settings->numlink--;
+
+                    link->node1 = strdup(interface->links[settings->numlink].node1);
+                    link->node2 = strdup(interface->links[settings->numlink].node2);
+                    link->node1_type = interface->links[settings->numlink].node1_type;
+                    link->node2_type = interface->links[settings->numlink].node2_type;
+                    logSuccess("Deleted link","");
+                }
             }
         }
+        else
+            DrawMessageAtAngle("Select the node or the link to delete");
     }
 
     if (settings->gettingName)

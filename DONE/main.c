@@ -1,4 +1,5 @@
 #include "./lib/GUI.h"
+#include "./lib/log.h"
 
 #define WIDTH 1900
 #define HEIGHT 1000
@@ -6,6 +7,10 @@
 
 int main(int argc, char **argv)
 {
+    /*logError("prova","prova");
+    logWarning("prova","prova");
+    logSuccess("prova","prova");
+    logInfo("prova","prova");*/
     if (argc > 1 && !strcmp(argv[1], "--no-gui"))
     {
         int a = 0;
@@ -16,13 +21,13 @@ int main(int argc, char **argv)
         }
         else if (a > 0)
         {
-            printf("CLI running in other window\n");
+            logInfo("CLI running in other window","");
             waitpid(a, NULL, 0);
             return 0;
         }
         else
         {
-            printf("tried to spawn the CLI but failed. so sad :(\n");
+            logError("tried to spawn the CLI but failed.","so sad :(");
             return -1;
         }
     }
@@ -32,7 +37,6 @@ int main(int argc, char **argv)
     initEnvironment(); // set up signal handling, create netns dir if not present
 
     interface_t *interface = init_interface((button_t[NUMbuttons]){
-        {24, 129, 100, 100, placehub, "Place a hub", 0, NULL, "hub"},
         {24, 234, 100, 100, placeswitch, "Place a switch", 0, NULL, "switch"},
         {24, 339, 100, 100, placerouter, c ? "Place an RFC1149-compatible \"router\"" : "Place a router", 0, NULL, c ? "IPoAC" : "router"},
         {24, 444, 100, 100, placehost, "Place a host", 0, NULL, "host"},
@@ -55,6 +59,8 @@ int main(int argc, char **argv)
     SetExitKey(KEY_NULL);
 
     settings_t settings = {0, 0, 0, "", 0, 0, 0, 0, "", 0, 0, (void *)interface, 0, 0, 0, 0, 0, NULL, 0, 0, 0, c, 0};
+
+    system("clear");
 
     while (!WindowShouldClose())
     {
