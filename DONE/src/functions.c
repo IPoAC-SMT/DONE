@@ -129,9 +129,9 @@ void start(settings_t *settings)
         char config_filename[50];
         strcpy(config_filename, settings->openProjectName);
         printf("%s", config_filename);
-        //logInfo("Open Project Name:", "%s", settings->openProjectName);
+        logInfo("Open Project Name:", "%s", settings->openProjectName);
         strcat(config_filename, ".conf");
-        //logInfo("Config Filename:", "%s", config_filename);
+        logInfo("Config Filename:", "%s", config_filename);
         FILE *file = fopen(config_filename, "r");
         if (file != NULL)
         {

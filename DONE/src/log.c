@@ -17,7 +17,9 @@ void logInfo(char * message, char * format, ...){
     va_list args;
     char * composite = (char*) calloc(strlen(message)+strlen(format)+50,sizeof(char));
     snprintf(composite,strlen(message)+strlen(format)+50,"%s %lu\t|    INFO\t| %s\033[0m %s \n",INFO, getTime(), message,format);
+    va_start(args,format);
     vprintf(composite,args);
+    va_end(args);
     free(composite);
 }
 
@@ -25,7 +27,9 @@ void logSuccess(char * message, char * format, ...){
     va_list args;
     char * composite = (char*) calloc(strlen(message)+strlen(format)+50,sizeof(char));
     snprintf(composite,strlen(message)+strlen(format)+50,"%s %lu\t|    SUCCESS\t| %s\033[0m %s \n",SUCCESS, getTime(), message,format);
+    va_start(args,format);
     vprintf(composite,args);
+    va_end(args);
     free(composite);
 }
 
@@ -33,7 +37,9 @@ void logWarning(char * message, char * format, ...){
     va_list args;
     char * composite = (char*) calloc(strlen(message)+strlen(format)+50,sizeof(char));
     snprintf(composite,strlen(message)+strlen(format)+50,"%s %lu\t|    WARNING\t| %s\033[0m %s \n",WARNING, getTime(), message,format);
+    va_start(args,format);
     vprintf(composite,args);
+    va_end(args);
     free(composite);
 }
 
@@ -41,6 +47,8 @@ void logError(char * message, char * format, ...){
     va_list args;
     char * composite = (char*) calloc(strlen(message)+strlen(format)+50,sizeof(char));
     snprintf(composite,strlen(message)+strlen(format)+50,"%s %lu\t|    ERROR\t| %s\033[0m %s \n",ERROR, getTime(), message,format);
+    va_start(args,format);
     vprintf(composite,args);
+    va_end(args);
     free(composite);
 }
