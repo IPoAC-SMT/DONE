@@ -19,7 +19,7 @@ void placeswitch(settings_t *settings)
     settings->placing_node = 1;
     settings->node_type = 0;
     settings->deletingNodes = 0;
-    logInfo("Ready to place a node","type switch");
+    logInfo("Ready to place a node", "type switch");
 }
 
 void placerouter(settings_t *settings)
@@ -32,7 +32,7 @@ void placerouter(settings_t *settings)
     settings->placing_node = 1;
     settings->node_type = 1;
     settings->deletingNodes = 0;
-    logInfo("Ready to place a node","type router");
+    logInfo("Ready to place a node", "type router");
 }
 
 void placehost(settings_t *settings)
@@ -45,7 +45,7 @@ void placehost(settings_t *settings)
     settings->placing_node = 1;
     settings->node_type = 2;
     settings->deletingNodes = 0;
-    logInfo("Ready to place a node","type host");
+    logInfo("Ready to place a node", "type host");
 }
 
 void placeexternalinterface(settings_t *settings)
@@ -58,7 +58,7 @@ void placeexternalinterface(settings_t *settings)
     settings->placing_node = 1;
     settings->node_type = 3;
     settings->deletingNodes = 0;
-    logInfo("Ready to place a node","type external interface");
+    logInfo("Ready to place a node", "type external interface");
 }
 
 void deleteNode(settings_t *settings)
@@ -71,7 +71,7 @@ void deleteNode(settings_t *settings)
     settings->placing_node = 0;
     settings->node_type = 0;
     settings->deletingNodes = 1;
-    logInfo("Ready to delete a node","");
+    logInfo("Ready to delete a node", "");
 }
 
 void placeexternalnattedinterface(settings_t *settings)
@@ -84,7 +84,7 @@ void placeexternalnattedinterface(settings_t *settings)
     settings->placing_node = 1;
     settings->node_type = 4;
     settings->deletingNodes = 0;
-    logInfo("Ready to place a node","type external natted interface");
+    logInfo("Ready to place a node", "type external natted interface");
 }
 
 void placelink(settings_t *settings)
@@ -96,7 +96,7 @@ void placelink(settings_t *settings)
     settings->placing_node = 0;
     settings->placing_link = 1;
     settings->deletingNodes = 0;
-    logInfo("Ready to place a link","");
+    logInfo("Ready to place a link", "");
 }
 
 void placeRectangle(settings_t *settings)
@@ -108,12 +108,12 @@ void placeRectangle(settings_t *settings)
     settings->placing_node = 0;
     settings->placing_link = 0;
     settings->deletingNodes = 0;
-    logInfo("Ready to place a rectangle","");
+    logInfo("Ready to place a rectangle", "");
 }
 void initEnvironment()
 {
     initEnv();
-    logSuccess("Environment initialized successfully","");
+    logSuccess("Environment initialized successfully", "");
 }
 
 void start(settings_t *settings)
@@ -128,9 +128,10 @@ void start(settings_t *settings)
 
         char config_filename[50];
         strcpy(config_filename, settings->openProjectName);
-        logInfo("Open Project Name:","%s", settings->openProjectName);
+        printf("%s", config_filename);
+        //logInfo("Open Project Name:", "%s", settings->openProjectName);
         strcat(config_filename, ".conf");
-        logInfo("Config Filename:","%s", config_filename);
+        //logInfo("Config Filename:", "%s", config_filename);
         FILE *file = fopen(config_filename, "r");
         if (file != NULL)
         {
@@ -155,15 +156,15 @@ void start(settings_t *settings)
                         }
                         else
                         {
-                            logInfo("sending command to node","%s: %s", nodeName, buf);
+                            //logInfo("sending command to node", "%s", "a");
                             sendNodeCommand(nodeName, buf); // sending the command to the logical controller
                         }
                     } while (1);
-                    logSuccess("Simulation running","setup finished");
+                    logSuccess("Simulation running", "setup finished");
                 }
                 else
                 {
-                    logError("error","");
+                    logError("error", "");
                     fclose(file);
                     return;
                 }
@@ -171,14 +172,15 @@ void start(settings_t *settings)
         }
         else
         {
-            logWarning("There was an error while opening the config file.","Have you touched it?!");
+            logWarning("There was an error while opening the config file.", "Have you touched it?!");
         }
     }
 }
 
 void quit(settings_t *settings)
 {
-    if(settings->isSimulating) logInfo("be careful: it was simulating.","Now we are stopping the simulation. You're welcome");
+    if (settings->isSimulating)
+        logInfo("be careful: it was simulating.", "Now we are stopping the simulation. You're welcome");
     forcedCLIExit();
 }
 
@@ -214,7 +216,7 @@ void clearCanvas(settings_t *settings)
         if (settings->numrectangles)
             free(interface->rectangles);
     }
-    logSuccess("Canvas cleared","");
+    logSuccess("Canvas cleared", "");
 }
 /*
 char *getFilename()
@@ -232,7 +234,7 @@ void prepareToOpenProject(settings_t *settings)
 {
     settings->resetName = 1;
     settings->gettingName = 1;
-    logInfo("Ready to read project name from GUI","");
+    logInfo("Ready to read project name from GUI", "");
 }
 
 void openProject(settings_t *settings)
@@ -295,8 +297,8 @@ void openProject(settings_t *settings)
             strcpy(links[i].node2, othername);
         }
 
-        for(int i = 0; i < numrectangles; i++)
-        {   // reading all rectangles
+        for (int i = 0; i < numrectangles; i++)
+        { // reading all rectangles
             fscanf(file, "%d %d\n%d %d\n%d %d %d\n", &rectangles[i].x, &rectangles[i].y, &rectangles[i].x1, &rectangles[i].y1, (int *)&rectangles[i].r, (int *)&rectangles[i].g, (int *)&rectangles[i].b);
         }
 
@@ -307,11 +309,11 @@ void openProject(settings_t *settings)
         settings->numnodes = numnodes;
         settings->numlink = numlinks;
         settings->numrectangles = numrectangles;
-        logSuccess("Loaded project","");
+        logSuccess("Loaded project", "");
     }
     else
     {
-        logWarning("There was an error while opening the file.","Perhaps the path is wrong?");
+        logWarning("There was an error while opening the file.", "Perhaps the path is wrong?");
     }
 }
 
@@ -396,13 +398,13 @@ void saveProject(settings_t *settings)
         }
         else
         {
-            logWarning("There was an error while creating the config file.","Perhaps the path is wrong?");
+            logWarning("There was an error while creating the config file.", "Perhaps the path is wrong?");
         }
         // free(filename); it crashes... why? i dont know
         // free(config_filename);
     }
     else
     {
-        logWarning("There was an error while opening the file.","Perhaps the path is wrong?");
+        logWarning("There was an error while opening the file.", "Perhaps the path is wrong?");
     }
 }
