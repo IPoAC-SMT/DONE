@@ -136,22 +136,23 @@ void start(settings_t *settings)
         FILE *file = fopen(config_filename, "r");
         if (file != NULL)
         {
-            char buf[100]; // buffer for reading the file
+            char buf[200]; // buffer for reading the file
             char *nodeName;
 
-            while (fgets(buf, 100, file)) // reading the node name line
+            while (fgets(buf, 200, file)) // reading the node name line
             {
                 nodeName = strtok(strdup(buf), ":"); // retrieving the node name from the config
                 if (nodeName != NULL)
                 {
                     do
                     {
-                        if (!fgets(buf, 100, file))
+                        if (!fgets(buf, 200, file))
                             break; // if i reached the end of the commands for this node, break and go to the next one
                         else if (buf[0] == '\n')
                             break; // if i reached the end of the commands for this node, break and go to the next one
                         if (nodeName[0] == 's')
                         {
+                            printf("sending to switch: %s\n", buf);
                             sendSwitchCommand(buf);
                         }
                         else

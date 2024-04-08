@@ -349,22 +349,27 @@ void DrawNode(node_t *node, settings_t *settings, bool true_node)
             }
             else
             {
-                if(settings->openProjectName == NULL) {
+                if (settings->openProjectName == NULL)
+                {
                     printf("Save the project first!\n");
                 }
-                else {
+                else
+                {
                     char temp[200];
-                    snprintf(temp,200,"%s.conf",settings->openProjectName);
-                    int a=0;
-                    if((a=fork())==0){
+                    snprintf(temp, 200, "%s.conf", settings->openProjectName);
+                    int a = 0;
+                    if ((a = fork()) == 0)
+                    {
                         char *args[] = {"x-terminal-emulator", "-e", "vim", temp, NULL};
                         execvp(args[0], args);
                     }
-                    else if(a>0) {
-                        //waitpid
+                    else if (a > 0)
+                    {
+                        // waitpid
                         waitpid(a, NULL, 0);
                     }
-                    else printf("Wasn't able to open project configs, sorry\n");
+                    else
+                        printf("Wasn't able to open project configs, sorry\n");
                 }
             }
         }
@@ -649,10 +654,10 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             char *stringa = (char *)calloc(200, sizeof(char));
             if (nodo)
             {
+                settings->numlink = 0;
                 strncpy(stringa, nodo->name, 200);
-                settings->numnodes -= 1;
                 char a = false;
-                for (int i = 0; i < settings->numnodes; i++)
+                for (int i = 0; i < settings->numnodes - 1; i++)
                 {
                     if (a || !strcmp(interface->nodes[i].name, stringa))
                     {
@@ -664,7 +669,8 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                         interface->nodes[i].type = interface->nodes[i + 1].type;
                     }
                 }
-                for (int i = 0; i < settings->numlink; i++)
+                settings->numnodes--;
+                /*for (int i = 0; i < settings->numlink; i++)
                 {
                     if (!strcmp(interface->links[i].node1, stringa) || !strcmp(interface->links[i].node2, stringa))
                     {
@@ -680,7 +686,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                         }
                     }
                 }
-                free(stringa);
+                free(stringa);*/
             }
         }
     }
