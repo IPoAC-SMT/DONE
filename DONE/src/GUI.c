@@ -3,54 +3,56 @@
 
 void DrawButton(button_t *pulsante, settings_t *settings)
 {
-    bool hovering;
-    if (
-        (GetMouseX() >= pulsante->x && GetMouseX() <= (pulsante->x + pulsante->width)) &&
-        (GetMouseY() >= pulsante->y && GetMouseY() <= (pulsante->y + pulsante->height)))
-    {
-        if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
+    if(!settings->isSimulating || pulsante->always_show){
+        bool hovering;
+        if (
+            (GetMouseX() >= pulsante->x && GetMouseX() <= (pulsante->x + pulsante->width)) &&
+            (GetMouseY() >= pulsante->y && GetMouseY() <= (pulsante->y + pulsante->height)))
         {
-            settings->moving_node = false;
-            settings->placing_node = false;
-            settings->placing_link = false;
-            settings->drawing_rectangle = false;
-            settings->deletingNodes = 0;
-            hovering = false;
-            pulsante->pressed(settings);
+            if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
+            {
+                settings->moving_node = false;
+                settings->placing_node = false;
+                settings->placing_link = false;
+                settings->drawing_rectangle = false;
+                settings->deletingNodes = 0;
+                hovering = false;
+                pulsante->pressed(settings);
+            }
+            else
+            {
+                hovering = true;
+                DrawText(pulsante->alt_text, GetMouseX() + 20, GetMouseY() + 20, STD_FONT_SIZE, GRAY);
+            }
         }
         else
+            hovering = false;
+    
+        DrawRectangleLines(pulsante->x, pulsante->y, pulsante->width, pulsante->height, hovering ? YELLOW : GRAY); // lo creo con colore diverso se ci sto o meno hoverando
+
+        if (pulsante->edges == NULL)
         {
-            hovering = true;
-            DrawText(pulsante->alt_text, GetMouseX() + 20, GetMouseY() + 20, STD_FONT_SIZE, GRAY);
+            // load edges from file
+            char *filename = calloc(101, sizeof(char));
+            snprintf(filename, 100, "./resources/GUIelements/%s", pulsante->filename);
+            FILE *drawing = fopen(filename, "r");
+            fgets(filename, 100, drawing);
+            sscanf(filename, "%d", &(pulsante->numEdges));
+            pulsante->edges = (int **)calloc(pulsante->numEdges, sizeof(int *));
+            for (int i = 0; i < pulsante->numEdges; i++)
+            {
+                // allocate
+                pulsante->edges[i] = (int *)calloc(4, sizeof(int));
+                // read values
+                fgets(filename, 100, drawing);
+                sscanf(filename, "%d %d --- %d %d", &(pulsante->edges[i][0]), &(pulsante->edges[i][1]), &(pulsante->edges[i][2]), &(pulsante->edges[i][3]));
+            }
         }
-    }
-    else
-        hovering = false;
 
-    DrawRectangleLines(pulsante->x, pulsante->y, pulsante->width, pulsante->height, hovering ? YELLOW : GRAY); // lo creo con colore diverso se ci sto o meno hoverando
-
-    if (pulsante->edges == NULL)
-    {
-        // load edges from file
-        char *filename = calloc(101, sizeof(char));
-        snprintf(filename, 100, "./resources/GUIelements/%s", pulsante->filename);
-        FILE *drawing = fopen(filename, "r");
-        fgets(filename, 100, drawing);
-        sscanf(filename, "%d", &(pulsante->numEdges));
-        pulsante->edges = (int **)calloc(pulsante->numEdges, sizeof(int *));
         for (int i = 0; i < pulsante->numEdges; i++)
         {
-            // allocate
-            pulsante->edges[i] = (int *)calloc(4, sizeof(int));
-            // read values
-            fgets(filename, 100, drawing);
-            sscanf(filename, "%d %d --- %d %d", &(pulsante->edges[i][0]), &(pulsante->edges[i][1]), &(pulsante->edges[i][2]), &(pulsante->edges[i][3]));
+            DrawLineEx((Vector2){pulsante->edges[i][0] + pulsante->x, pulsante->edges[i][1] + pulsante->y}, (Vector2){pulsante->edges[i][2] + pulsante->x, pulsante->edges[i][3] + pulsante->y}, hovering ? 3 : 1, hovering ? YELLOW : GRAY);
         }
-    }
-
-    for (int i = 0; i < pulsante->numEdges; i++)
-    {
-        DrawLineEx((Vector2){pulsante->edges[i][0] + pulsante->x, pulsante->edges[i][1] + pulsante->y}, (Vector2){pulsante->edges[i][2] + pulsante->x, pulsante->edges[i][3] + pulsante->y}, hovering ? 3 : 1, hovering ? YELLOW : GRAY);
     }
 }
 
@@ -531,6 +533,8 @@ void addRectangle(interface_t *interface, settings_t *settings)
 
 void DrawGUI(settings_t *settings, interface_t *interface)
 {
+
+    if(settings->isSimulating) DrawMessageAtAngle("Simulation in progress...");
 
     // 1. piazzo i buttons
     for (int i = 0; i < NUMbuttons; i++)

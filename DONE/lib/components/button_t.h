@@ -10,4 +10,5 @@ typedef struct
     int numEdges;
     int ** edges;
     char * filename;
+    char always_show;
 } button_t;
