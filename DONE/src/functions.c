@@ -178,6 +178,7 @@ void start(settings_t *settings)
             logWarning("There was an error while opening the config file.", "Have you touched it?!");
         }
     }
+    logSuccess("Done!", "");
 }
 
 void quit(settings_t *settings)
