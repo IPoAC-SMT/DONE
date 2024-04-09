@@ -50,7 +50,7 @@ void DrawButton(button_t *pulsante, settings_t *settings)
 
     for (int i = 0; i < pulsante->numEdges; i++)
     {
-        DrawLineEx((Vector2){pulsante->edges[i][0] + pulsante->x, pulsante->edges[i][1] + pulsante->y}, (Vector2){pulsante->edges[i][2] + pulsante->x, pulsante->edges[i][3] + pulsante->y}, hovering ? 5 : 1, hovering ? YELLOW : GRAY);
+        DrawLineEx((Vector2){pulsante->edges[i][0] + pulsante->x, pulsante->edges[i][1] + pulsante->y}, (Vector2){pulsante->edges[i][2] + pulsante->x, pulsante->edges[i][3] + pulsante->y}, hovering ? 3 : 1, hovering ? YELLOW : GRAY);
     }
 }
 
