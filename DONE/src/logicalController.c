@@ -111,14 +111,14 @@ void openSwitchShellWrapper()
     openSwitchShell();
 }
 
-void sendNodeCommand(char *name, char *command)
+int sendNodeCommand(char *name, char *command)
 {
-    sendNodeSetupCommand(name, command);
+    return sendNodeSetupCommand(name, command);
 }
 
-void sendSwitchCommand(char *command)
+int sendSwitchCommand(char *command)
 {
-    sendSwitchSetupCommand(command);
+    return sendSwitchSetupCommand(command);
 }
 
 void stopSimulation(interface_t *simulation, int nodes_num, int links_num)
@@ -146,4 +146,5 @@ void stopSimulation(interface_t *simulation, int nodes_num, int links_num)
     }
 
     lastSimulation = NULL; // to avoid errors while closing from cli
+    logSuccess("Simulation successfully terminated", "");
 }

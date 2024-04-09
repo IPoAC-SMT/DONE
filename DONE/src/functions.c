@@ -128,7 +128,6 @@ void start(settings_t *settings)
 
         char config_filename[50];
         strcpy(config_filename, settings->openProjectName);
-        printf("%s", config_filename);
         logInfo("Open Project Name:", "%s", settings->openProjectName);
         strcat(config_filename, ".conf");
         logInfo("Config Filename:", "%s", config_filename);
@@ -151,16 +150,19 @@ void start(settings_t *settings)
                             break; // if i reached the end of the commands for this node, break and go to the next one
                         if (nodeName[0] == 's')
                         {
-                            printf("sending to switch: %s\n", buf);
-                            sendSwitchCommand(buf);
+                            logInfo("sending to switch:", "%s", buf);
+                            if(sendSwitchCommand(buf)){
+                                logError("An error was found in the config", "");
+                            }
                         }
                         else
                         {
-                            //logInfo("sending command to node", "%s", "a");
-                            sendNodeCommand(nodeName, buf); // sending the command to the logical controller
+                            logInfo("sending command to node", "%s", buf); // sending the command to the logical controller
+                            if(sendNodeCommand(nodeName, buf)){
+                                logError("An error was found in the config", "");
+                            }
                         }
                     } while (1);
-                    logSuccess("Simulation running", "setup finished");
                 }
                 else
                 {
@@ -169,6 +171,7 @@ void start(settings_t *settings)
                     return;
                 }
             }
+            logSuccess("Simulation running", "setup finished");
         }
         else
         {

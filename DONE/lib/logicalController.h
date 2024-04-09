@@ -16,7 +16,7 @@ void forcedCLIExit();
 void startSimulation(interface_t *simulation, int nodes_num, int links_num);
 void openSwitchShellWrapper();
 void openNodeShellWrapper(char *node_name);
-void sendNodeCommand(char *name, char *command);
-void sendSwitchCommand(char *command);
+int sendNodeCommand(char *name, char *command);
+int sendSwitchCommand(char *command);
 
 void stopSimulation(interface_t *simulation, int nodes_num, int links_num);

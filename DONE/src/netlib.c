@@ -46,7 +46,7 @@ int addNode(char *name, char type)
     if (name != NULL && strlen(name) <= MAX_NAME_SIZE && (type == 'h' || type == 'r'))
     {
 
-        snprintf(command, MAX_COMMAND_SIZE, "sudo docker run -id --hostname %s --cap-add=NET_ADMIN --name %s --network none node:1.0.0 /bin/bash", name, name);
+        snprintf(command, MAX_COMMAND_SIZE, "sudo docker run -id --hostname %s --cap-add=NET_ADMIN --name %s --network none node:1.0.0 /bin/bash > /dev/null", name, name);
 
         if (!system(command))
         { // once the node is created, adding the node's namespace to the netns folder
@@ -90,7 +90,7 @@ int delNode(char *name)
 
         if (!system(command))
         {
-            snprintf(command, MAX_COMMAND_SIZE, "sudo docker kill %s && sudo docker rm %s", name, name);
+            snprintf(command, MAX_COMMAND_SIZE, "sudo docker kill %s > /dev/null && sudo docker rm %s > /dev/null", name, name);
 
             return system(command);
         }
