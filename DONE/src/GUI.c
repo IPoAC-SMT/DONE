@@ -683,7 +683,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             char *stringa = (char *)calloc(200, sizeof(char));
             if (nodo)
             {
-                settings->numlink = 0;
+                //settings->numlink = 0;
                 strncpy(stringa, nodo->name, 200);
 
                 /* char a = false; <= we will never forget you */
