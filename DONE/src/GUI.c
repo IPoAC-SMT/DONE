@@ -488,6 +488,18 @@ link_t *getInverseLink(interface_t *interface, settings_t *settings)
     return NULL;
 }
 
+rectangle_t * getInverseRectangle(interface_t * interface,settings_t * settings) {
+    for (int i = settings->numrectangles-1;i>=0;i--) {
+        if(
+            min(interface->rectangles[i].x,interface->rectangles[i].x1) <= GetMouseX() &&
+            min(interface->rectangles[i].y,interface->rectangles[i].y1) <= GetMouseY() &&
+            max(interface->rectangles[i].x,interface->rectangles[i].x1) >= GetMouseX() &&
+            max(interface->rectangles[i].y,interface->rectangles[i].y1) >= GetMouseY()
+            ) return &interface->rectangles[i];
+    }
+    return NULL;
+}
+
 bool isSomethingUnder(int x, int y, node_t *nodes, settings_t *settings)
 {
     for (int i = 0; i < settings->numnodes; i++)
@@ -675,7 +687,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             settings->drawing_rectangle = 1;
         }
     }
-    else if (settings->deletingNodes) // deleting nodes or links
+    else if (settings->deletingNodes) // deleting nodes or links or maybe rectangles
     {
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
         {
@@ -726,10 +738,25 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                     link->node2_type = interface->links[settings->numlink].node2_type;
                     logSuccess("Deleted link","");
                 }
+                else {
+                    // maybe deleting a rectangle
+                    rectangle_t *rectangle = getInverseRectangle(interface,settings);
+                    if (rectangle) {
+                        settings->numrectangles--;
+                        rectangle->x = interface->rectangles[settings->numrectangles].x;
+                        rectangle->x1 = interface->rectangles[settings->numrectangles].x1;
+                        rectangle->y = interface->rectangles[settings->numrectangles].y;
+                        rectangle->y1 = interface->rectangles[settings->numrectangles].y1;
+                        rectangle->r = interface->rectangles[settings->numrectangles].r;
+                        rectangle->g = interface->rectangles[settings->numrectangles].g;
+                        rectangle->b = interface->rectangles[settings->numrectangles].b;
+                        logSuccess("Deleted rectangle","");
+                    }
+                }
             }
         }
         else
-            DrawMessageAtAngle("Select the node or the link to delete");
+            DrawMessageAtAngle("Select the node, the link or the rectangle to delete");
     }
 
     if (settings->gettingName)
