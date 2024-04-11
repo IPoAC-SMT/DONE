@@ -313,6 +313,7 @@ void openProject(settings_t *settings)
         settings->numnodes = numnodes;
         settings->numlink = numlinks;
         settings->numrectangles = numrectangles;
+        settings->absoluteCount = numnodes;
         logSuccess("Loaded project", "");
     }
     else
