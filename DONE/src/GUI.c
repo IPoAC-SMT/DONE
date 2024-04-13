@@ -722,7 +722,6 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                     }
                 }
 
-
                 free(stringa);
             }
             else
@@ -780,4 +779,30 @@ void DrawGUI(settings_t *settings, interface_t *interface)
         DrawLink(interface->links[i], settings, interface->nodes);
     for (int i = 0; i < settings->numnodes; i++)
         DrawNode(&(interface->nodes[i]), settings, true);
+    
+    if(settings->numOptions) {
+        DrawRectangle(0, 0, WIDTH, HEIGHT, CLITERAL(Color){252, 245, 229,150});
+        int optionHeight = min((HEIGHT-500)/settings->numOptions,100);
+        for (int i = 0; i<settings->numOptions; i++) {
+            DrawRectangleLines(WIDTH/2-300,250+i*optionHeight,600,optionHeight,
+                    (
+                        i==settings->chosenOption ||
+                        (
+                            GetMouseX()>=WIDTH/2-300 &&
+                            GetMouseX()<=WIDTH/2+300 &&
+                            GetMouseY()>=250+i*optionHeight &&
+                            GetMouseY()<=250+(i+1)*optionHeight
+                        )
+                     )
+                        ?RED
+                        :BLUE
+                );
+        }
+        if(IsKeyReleased(KEY_UP)) settings->chosenOption = max(0,settings->chosenOption-1);
+        if(IsKeyReleased(KEY_DOWN)) settings->chosenOption = min(settings->numOptions-1,settings->chosenOption+1);
+    }
+    if(IsKeyReleased(KEY_P)) settings->numOptions = 0;
+    if(IsKeyReleased(KEY_A)) settings->numOptions = 3;
+    if(IsKeyReleased(KEY_B)) settings->numOptions = 5;
+    if(IsKeyReleased(KEY_C)) settings->numOptions = 7;
 }

@@ -30,5 +30,9 @@ typedef struct
     char deletingNodes;
     char ipoac;
     int numrectangles;
+    /*for multiple choices*/
+    int numOptions;
+    int chosenOption;
+    char ** options;
 } settings_t;
 

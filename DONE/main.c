@@ -1,8 +1,6 @@
 #include "./lib/GUI.h"
 #include "./lib/log.h"
 
-#define WIDTH 1900
-#define HEIGHT 1000
 #define TITLE "Docker Orchestrator for Network Emulation"
 
 int main(int argc, char **argv)
@@ -63,7 +61,7 @@ int main(int argc, char **argv)
 
     SetExitKey(KEY_NULL);
 
-    settings_t settings = {0, 0, 0, "", 0, 0, 0, 0, "", 0, 0, (void *)interface, 0, 0, 0, 0, 0, NULL, 0, 0, 0, c, 0};
+    settings_t settings = {0, 0, 0, "", 0, 0, 0, 0, "", 0, 0, (void *)interface, 0, 0, 0, 0, 0, NULL, 0, 0, 0, c, 0,0,0,NULL};
 
     system("clear");
 

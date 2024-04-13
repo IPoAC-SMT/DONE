@@ -13,6 +13,8 @@
 #define NUMLINK 0
 #define NAMELENGTH 50
 #define STD_FONT_SIZE 19
+#define WIDTH 1900
+#define HEIGHT 1000
 
 #define BACKGROUND_COLOR CLITERAL(Color){19, 31, 42,0} 
 #define FIGURE_COLOR GRAY
