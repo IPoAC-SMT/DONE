@@ -784,25 +784,46 @@ void DrawGUI(settings_t *settings, interface_t *interface)
         DrawRectangle(0, 0, WIDTH, HEIGHT, CLITERAL(Color){252, 245, 229,150});
         int optionHeight = min((HEIGHT-500)/settings->numOptions,100);
         for (int i = 0; i<settings->numOptions; i++) {
-            DrawRectangleLines(WIDTH/2-300,250+i*optionHeight,600,optionHeight,
-                    (
+
+            bool cond = (
                         i==settings->chosenOption ||
                         (
-                            GetMouseX()>=WIDTH/2-300 &&
-                            GetMouseX()<=WIDTH/2+300 &&
-                            GetMouseY()>=250+i*optionHeight &&
-                            GetMouseY()<=250+(i+1)*optionHeight
+                            GetMouseX()>WIDTH/2-300 &&
+                            GetMouseX()<WIDTH/2+300 &&
+                            GetMouseY()>250+i*optionHeight &&
+                            GetMouseY()<250+(i+1)*optionHeight
                         )
-                     )
-                        ?RED
-                        :BLUE
-                );
+                     );
+
+            DrawRectangleLines(WIDTH/2-300,250+i*optionHeight,600,optionHeight,cond?RED:BLUE);
+            DrawText(settings->options[i],WIDTH/2-250,250+i*optionHeight+optionHeight/2,STD_FONT_SIZE,BLACK);
+            if (cond) settings->chosenOption = i;
+            //printf("%d\n",subcond);
         }
+        if(
+            IsKeyReleased(KEY_ENTER) ||
+            (
+                IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && 
+                GetMouseX()>WIDTH/2-300 &&
+                GetMouseX()<WIDTH/2+300 &&
+                GetMouseY()>250 &&
+                GetMouseY()<250+(settings->numOptions)*optionHeight
+            )
+        ) printf("selezionato %d\n",settings->chosenOption);
         if(IsKeyReleased(KEY_UP)) settings->chosenOption = max(0,settings->chosenOption-1);
         if(IsKeyReleased(KEY_DOWN)) settings->chosenOption = min(settings->numOptions-1,settings->chosenOption+1);
     }
+    /*TODO for testing
     if(IsKeyReleased(KEY_P)) settings->numOptions = 0;
     if(IsKeyReleased(KEY_A)) settings->numOptions = 3;
     if(IsKeyReleased(KEY_B)) settings->numOptions = 5;
     if(IsKeyReleased(KEY_C)) settings->numOptions = 7;
+    if(!settings->options) {
+        settings->options = (char**) calloc(10,sizeof(char*));
+        for(int i = 0; i < 10 ; i++) {
+            settings->options[i] = (char*) calloc(100,sizeof(char));
+            snprintf(settings->options[i],100,"ciao: elemento %d",i);
+        }
+    }
+    */
 }
