@@ -222,17 +222,6 @@ void clearCanvas(settings_t *settings)
     }
     logSuccess("Canvas cleared", "");
 }
-/*
-char *getFilename()
-{
-    char *res = (char *)calloc(MAX_FILENAME, sizeof(char));
-    char buf[20];
-    strcpy(res, "./saves/");
-    printf("Specify the file pathname: ./saves/");
-    scanf("%20s", buf);
-    strcat(res, buf);
-    return res;
-}*/
 
 void prepareToOpenProject(settings_t *settings)
 {
@@ -412,4 +401,9 @@ void saveProject(settings_t *settings)
     {
         logWarning("There was an error while opening the file.", "Perhaps the path is wrong?");
     }
+}
+
+
+void populateInterfaceOptionsWrapper(settings_t *settings){
+    populateInterfaceOptions(settings);
 }

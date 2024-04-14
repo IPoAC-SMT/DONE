@@ -148,3 +148,15 @@ void stopSimulation(interface_t *simulation, int nodes_num, int links_num)
     lastSimulation = NULL; // to avoid errors while closing from cli
     logSuccess("Simulation successfully terminated", "");
 }
+
+void populateInterfaceOptions(settings_t *settings){
+
+    interfaces *res = getNetInterfaces();
+    settings->numOptions = res->interfaces;
+    settings->options = res->interfaces_name;
+
+    for(int i = 0; i < res->interfaces; i++){
+        logInfo("Interface found", res->interfaces_name[i]);
+    }
+
+}

@@ -44,7 +44,7 @@ int main(int argc, char **argv)
         {549, 24, 50, 50, clearCanvas, "Clear Canvas", 0, NULL, "clearCanvas",false},
         {334, 24, 50, 50, deleteNode, "Delete a node or a link by clicking on it", 0, NULL, "deleteNode",false},
         {874, 24, 50, 50, quit, "Quit", 0, NULL, "quit",true},
-        {24, 544, 50, 50, placeRectangle, "Draw a Rectangle", 0, NULL, "rectangle",false}},
+        {24, 580, 50, 50, placeRectangle, "Draw a Rectangle", 0, NULL, "rectangle",false}},
     NULL, NULL, NULL);
 
     InitWindow(WIDTH, HEIGHT, TITLE);

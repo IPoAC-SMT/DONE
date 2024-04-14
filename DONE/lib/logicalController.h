@@ -20,3 +20,5 @@ int sendNodeCommand(char *name, char *command);
 int sendSwitchCommand(char *command);
 
 void stopSimulation(interface_t *simulation, int nodes_num, int links_num);
+
+void populateInterfaceOptions(settings_t *settings);

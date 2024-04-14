@@ -169,7 +169,7 @@ int addExternalInterface(char *name, char *interface)
 // - a host and an external NATted interface
 int addCableBetweenNodes(char *firstNode, char *secondNode)
 {
-    
+
     char command[MAX_COMMAND_SIZE];
     char endpoint1[MAX_NAME_SIZE + 10]; // used to build the connector's name
     char endpoint2[MAX_NAME_SIZE + 10];
@@ -434,7 +434,7 @@ interfaces *getNetInterfaces()
 {
     struct ifaddrs *ifap, *ifa;
     interfaces *res = (interfaces *)calloc(1, sizeof(interfaces));
-
+    int i = 0;
     if (getifaddrs(&ifap) == -1)
     {
         perror("getifaddrs");
@@ -443,35 +443,48 @@ interfaces *getNetInterfaces()
 
     for (ifa = ifap; ifa != NULL; ifa = ifa->ifa_next)
     {
-        if (ifa->ifa_addr == NULL)
+        if (ifa->ifa_addr && (ifa->ifa_addr->sa_family == AF_INET || ifa->ifa_addr->sa_family == AF_INET6))
         {
-            continue;
+            res->interfaces++; // counting the available interfaces (maybe duplicates)
         }
-        res->interfaces++; // counting the available interfaces
-    }
+    } 
 
-    res->interfaces_name = (char **)calloc(res->interfaces, sizeof(char *)); // the last element is NULL
-    for (int i = 0; i < res->interfaces; i++)
+    char **temp = (char **)calloc(res->interfaces, sizeof(char *)); // the last element is NULL
+    for (i = 0; i < res->interfaces; i++)
     {
-        res->interfaces_name[i] = (char *)calloc(MAX_INTERFACE_SIZE, sizeof(char));
+        temp[i] = (char *)calloc(MAX_INTERFACE_SIZE, sizeof(char));
     }
 
-    int i = 0; 
-    for (ifa = ifap; ifa != NULL; ifa = ifa->ifa_next)
+    for(i = 0, ifa = ifap; ifa != NULL; ifa = ifa->ifa_next)
     {
-        if (ifa->ifa_addr == NULL)
+        if (ifa->ifa_addr && (ifa->ifa_addr->sa_family == AF_INET || ifa->ifa_addr->sa_family == AF_INET6))
         {
-            continue;
-        }
-
-        int family = ifa->ifa_addr->sa_family;
-        if (family == AF_INET || family == AF_INET6)
-        {
-            strcpy(res->interfaces_name[i++], ifa->ifa_name);
+            strcpy(temp[i], ifa->ifa_name);
+            i++;
         }
     }
 
-    freeifaddrs(ifap);
+    int real_interfaces = 0;
+    res->interfaces_name = (char **)calloc(res->interfaces, sizeof(char *));
+    for (i = 0; i < res->interfaces; i++)
+    {
+        int duplicate = 0;
+        for(int j = 0; j < i && !duplicate; j++)
+        {
+            if(strcmp(temp[i], temp[j]) == 0)
+            {
+                duplicate = 1;
+            }
+        }
+        if(!duplicate){
+            res->interfaces_name[real_interfaces] = (char *)calloc(MAX_INTERFACE_SIZE, sizeof(char));
+            strcpy(res->interfaces_name[real_interfaces], temp[i]);
+            real_interfaces++;
+        }
+    }
+
+    res->interfaces = real_interfaces;
+
     return res;
 }
 
@@ -483,8 +496,10 @@ void printNetInterfaces(interfaces *interfaces)
     }
 }
 
-void freeInterfaces(interfaces *interfaces){
-    for(int i = 0; i < interfaces->interfaces; i++){
+void freeInterfaces(interfaces *interfaces)
+{
+    for (int i = 0; i < interfaces->interfaces; i++)
+    {
         free(interfaces->interfaces_name[i]);
     }
     free(interfaces->interfaces_name);
