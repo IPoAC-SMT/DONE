@@ -350,27 +350,32 @@ void DrawNode(node_t *node, settings_t *settings, bool true_node)
             }
             else
             {
-                if (settings->openProjectName == NULL)
-                {
-                    logWarning("Save the project first!","");
+                if (node->type == external_interface_t || node->type == external_natted_interface_t) {
+                    populateInterfaceOptionsWrapper(settings);
                 }
-                else
-                {
-                    char temp[200];
-                    snprintf(temp, 200, "%s.conf", settings->openProjectName);
-                    int a = 0;
-                    if ((a = fork()) == 0)
+                else {
+                    if (settings->openProjectName == NULL)
                     {
-                        char *args[] = {"x-terminal-emulator", "-e", "vim", temp, NULL};
-                        execvp(args[0], args);
-                    }
-                    else if (a > 0)
-                    {
-                        // waitpid
-                        waitpid(a, NULL, 0);
+                        logWarning("Save the project first!","");
                     }
                     else
-                        logWarning("Wasn't able to open project configs","sorry");
+                    {
+                        char temp[200];
+                        snprintf(temp, 200, "%s.conf", settings->openProjectName);
+                        int a = 0;
+                        if ((a = fork()) == 0)
+                        {
+                            char *args[] = {"x-terminal-emulator", "-e", "vim", temp, NULL};
+                            execvp(args[0], args);
+                        }
+                        else if (a > 0)
+                        {
+                            // waitpid
+                            waitpid(a, NULL, 0);
+                        }
+                        else
+                            logWarning("Wasn't able to open project configs","sorry");
+                    }
                 }
             }
         }
@@ -809,7 +814,10 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                 GetMouseY()>250 &&
                 GetMouseY()<250+(settings->numOptions)*optionHeight
             )
-        ) printf("selezionato %d\n",settings->chosenOption);
+        ) printf("selezionato %d\n",settings->chosenOption); //TODO tiz cambialo con la tua chiamata a funzione.
+        /*
+         * NOTA: fai la free della settings->options e setta a 0 sia chosenOption che numOptions
+        */
         if(IsKeyReleased(KEY_UP)) settings->chosenOption = max(0,settings->chosenOption-1);
         if(IsKeyReleased(KEY_DOWN)) settings->chosenOption = min(settings->numOptions-1,settings->chosenOption+1);
     }
