@@ -25,3 +25,8 @@ cli:
 .PHONY: IPoAC
 IPoAC:
 	sudo ./bin/executable --ipoac
+
+.PHONY: prod
+prod:
+	make
+	rm ./obj/* main.o

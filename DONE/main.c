@@ -76,6 +76,7 @@ int main(int argc, char **argv)
         DrawGUI(&settings, interface);
 
         EndDrawing();
+    
     }
 
     return 0;
