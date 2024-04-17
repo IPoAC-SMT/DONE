@@ -14,7 +14,7 @@ int main(int argc, char **argv)
             execvp(args[0], args);
         }
         else if (a > 0)
-        {
+{
             logInfo("CLI running in other window","");
             waitpid(a, NULL, 0);
             return 0;
@@ -48,7 +48,9 @@ int main(int argc, char **argv)
         {24, 580, 50, 50, placeRectangle, "Draw a Rectangle", 0, NULL, "rectangle",false}},
     NULL, NULL, NULL);
 
-    InitWindow(WIDTH, HEIGHT, TITLE);
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);    // Window configuration flags
+    int screenWidth = WIDTH,screenHeigth = HEIGHT;
+    InitWindow(screenWidth/*WIDTH*/, screenHeigth/*HEIGHT*/, TITLE);
     SetTargetFPS(30);
 
     // Load icon image
@@ -65,7 +67,7 @@ int main(int argc, char **argv)
     settings_t settings = {0, 0, 0, "", 0, 0, 0, 0, "", 0, 0, (void *)interface, 0, 0, 0, 0, 0, NULL, 0, 0, 0, c, 0,0,0,NULL};
 
     system("clear");
-
+    
     while (!WindowShouldClose())
     {
         BeginDrawing();
@@ -74,6 +76,8 @@ int main(int argc, char **argv)
         DrawGUI(&settings, interface);
 
         EndDrawing();
+        screenWidth = GetScreenWidth();
+        screenWidth = GetScreenHeight();
     }
 
     return 0;
