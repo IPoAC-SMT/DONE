@@ -49,8 +49,8 @@ int main(int argc, char **argv)
     NULL, NULL, NULL);
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);    // Window configuration flags
-    int screenWidth = WIDTH,screenHeigth = HEIGHT;
-    InitWindow(screenWidth/*WIDTH*/, screenHeigth/*HEIGHT*/, TITLE);
+    int screenWidth = WIDTH,screenHeight = HEIGHT;
+    InitWindow(screenWidth/*WIDTH*/, screenHeight/*HEIGHT*/, TITLE);
     SetTargetFPS(30);
 
     // Load icon image
@@ -76,8 +76,6 @@ int main(int argc, char **argv)
         DrawGUI(&settings, interface);
 
         EndDrawing();
-        screenWidth = GetScreenWidth();
-        screenWidth = GetScreenHeight();
     }
 
     return 0;
