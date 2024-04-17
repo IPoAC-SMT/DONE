@@ -19,7 +19,7 @@ void placeInternet(settings_t *settings)
     settings->placing_node = 1;
     settings->node_type = 5;
     settings->deletingNodes = 0;
-    logInfo("Ready to place the Internet", "type switch");
+    logInfo("Ready to place a node", "type the Internet");
 }
 void placeswitch(settings_t *settings)
 {
