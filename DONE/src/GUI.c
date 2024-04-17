@@ -293,7 +293,15 @@ void DrawNode(node_t *node, settings_t *settings, bool true_node)
         DrawLineEx((Vector2){nodex + 15, nodey + 15}, (Vector2){nodex + 15, nodey + 18}, 2, FIGURE_COLOR);
 
         break;
-    case the_Internet_t:
+    /*case the_Internet_t:
+            //DrawRectangle(nodex-20, nodey-20, 40, 40, BLACK);
+            DrawLineEx((Vector2){nodex - 15, nodey + 10}, (Vector2){nodex + 14, nodey + 10}, 2, FIGURE_COLOR);
+            DrawRing((Vector2){nodex-15,nodey+7}, 2, 4, 180, 360, 0, FIGURE_COLOR);
+            DrawRing((Vector2){nodex+14,nodey+6}, 3, 5, 210, 0, 0, FIGURE_COLOR);
+            DrawRing((Vector2){nodex-9,nodey+1}, 4, 6, 160, 300, 0, FIGURE_COLOR);
+            DrawRing((Vector2){nodex+2,nodey-1}, 9,11 , 76, 267, 0, FIGURE_COLOR);
+        break;*/
+        case the_Internet_t:
             //DrawRectangle(nodex-20, nodey-20, 40, 40, BLACK);
             DrawLineEx((Vector2){nodex - 15, nodey + 10}, (Vector2){nodex + 14, nodey + 10}, 2, FIGURE_COLOR);
             DrawRing((Vector2){nodex-15,nodey+7}, 2, 4, 180, 360, 0, FIGURE_COLOR);

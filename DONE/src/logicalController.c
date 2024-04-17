@@ -70,6 +70,8 @@ void startSimulation(interface_t *simulation, int nodes_num, int links_num)
         case external_natted_interface_t:
             addExternalInterface(current_node->name, availableInterfaces->interfaces_name[1]);
             break;
+        case the_Internet_t:
+            break;
         }
     }
 
