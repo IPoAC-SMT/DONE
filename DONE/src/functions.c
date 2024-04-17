@@ -9,6 +9,18 @@ void helloworld(settings_t *settings)
     printf("%d\n", settings->numlink);
 }*/
 
+void placeInternet(settings_t *settings)
+{
+    if (settings->isSimulating)
+        return;
+    settings->placing_link = 0;
+    settings->drawing_rectangle = 0;
+    settings->moving_node = 0;
+    settings->placing_node = 1;
+    settings->node_type = 5;
+    settings->deletingNodes = 0;
+    logInfo("Ready to place the Internet", "type switch");
+}
 void placeswitch(settings_t *settings)
 {
     if (settings->isSimulating)

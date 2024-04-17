@@ -36,6 +36,7 @@ int main(int argc, char **argv)
         {24, 334, 50, 50, placehost, "Place a host", 0, NULL, "host",false},
         {24, 394, 50, 50, placeexternalinterface, "Place an external interface", 0, NULL, "externalinterface",false},
         {24, 454, 50, 50, placeexternalnattedinterface, "Place an external NATted interface", 0, NULL, "externalnattedinterface",false},
+        {24, 514, 50, 50, placeInternet, "Place the Internet", 0, NULL, "internet",false},
         {24, 154, 50, 50, placelink, "Link two nodes together", 0, NULL, "link",false},
         {144, 24, 50, 50, start, "Start simulation!", 0, NULL, "start",true}, // first of the horizontal row
         {204, 24, 50, 50, stop, "Stop simulation", 0, NULL, "stop",true},     // second of the horizontal row
