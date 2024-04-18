@@ -244,11 +244,12 @@ void clearCanvas(settings_t *settings)
 {
     if (settings->isSimulating)
         return;
-    if (settings->numlink > 0 || settings->numnodes > 0 || settings->numrectangles > 0)
+    if (settings->numlink > 0 || settings->numnodes > 0 || settings->numrectangles > 0 || settings->numTexts > 0)
     {
         settings->numnodes = 0;
         settings->numlink = 0;
         settings->numrectangles = 0;
+        settings->numTexts = 0;
         interface_t *interface = (interface_t *)settings->GUIdata;
         if (settings->numlink)
             free(interface->links);
@@ -256,6 +257,8 @@ void clearCanvas(settings_t *settings)
             free(interface->nodes);
         if (settings->numrectangles)
             free(interface->rectangles);
+        if(settings->numTexts)
+            free(interface->texts);
     }
     logSuccess("Canvas cleared", "");
 }
@@ -303,7 +306,7 @@ void openProject(settings_t *settings)
         textboxes = (text_t *)malloc(numtextboxes * sizeof(text_t));
 
         char name[50]; // buffer
-        char othername[100];
+        char othername[200];
         int type, type2;
 
         // sem_wait(settings->dio_melanzana);
@@ -336,9 +339,12 @@ void openProject(settings_t *settings)
 
         for(int i = 0; i < numtextboxes; i++){
             // reading all textboxes
-            fscanf(file, "%s\n%d %d\n", othername, &textboxes[i].x, &textboxes[i].y);
+            fgets(othername,200,file);
+            fscanf(file, "%d %d\n", &textboxes[i].x, &textboxes[i].y);
+            printf("read: %s at %d %d\n", othername, textboxes[i].x, textboxes[i].y);
             textboxes[i].text = (char *)malloc(strlen(othername) * sizeof(char));
             strcpy(textboxes[i].text, othername);
+            printf("now textboxes is %s\n", textboxes[i].text);
         }
 
         // updating settings to hold the collected data
@@ -389,6 +395,8 @@ void saveProject(settings_t *settings)
 
         // creating the project file
         fprintf(file, "%d\n%d\n%d\n%d\n", settings->numnodes, settings->numlink, settings->numrectangles, settings->numTexts); // saving node number and link number + rectangle number at the top of the file
+        //fprintf(file, "%d\n%d\n%d\n", settings->numnodes, settings->numlink, settings->numrectangles); // saving node number and link number + rectangle number at the top of the file
+
 
         interface_t *gui = (interface_t *)(settings->GUIdata);
 
@@ -410,11 +418,13 @@ void saveProject(settings_t *settings)
             fprintf(file, "%d %d\n%d %d\n%d %d %d\n", current_rect.x, current_rect.y, current_rect.x1, current_rect.y1, current_rect.r, current_rect.g, current_rect.b); // data for every link
         }
 
+        
         for(int i = 0; i < settings->numTexts; i++){
             // saving every textbox
             text_t current_text = gui->texts[i];
             fprintf(file, "%s\n%d %d\n", current_text.text, current_text.x, current_text.y);
         }
+        
 
         fclose(file);
 
@@ -445,6 +455,8 @@ void saveProject(settings_t *settings)
             system("chmod 666 ./saves/*"); // temporary fix, i'd like to cry (Access control skill issues)
 
             fclose(file);
+
+            logSuccess("File successfully saved.","");
         }
         else
         {

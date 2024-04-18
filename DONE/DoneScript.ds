@@ -1,0 +1,8 @@
+create host at 333 266 as h-0
+create external interface at 635 189 as e-1
+create rrouter at 495 305 as r-2
+link r-2 and r-2
+link h-0 and r-2
+link h-0 and e-1
+draw rectangle between 534 399 and 534 399 with color 103 -58 105
+draw rectangle between 251 194 and 556 415 with color 115 81 -1

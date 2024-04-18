@@ -836,6 +836,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                 appendText(settings,interface);
                 settings->placing_text = 0;
                 settings->numTexts++;
+                settings->dragging_deactivated=false;
             }
             if (character >= 32 && character <= 126)
             {
