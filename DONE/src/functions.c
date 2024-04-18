@@ -23,6 +23,7 @@ void placeInternet(settings_t *settings)
     settings->placing_node = 1;
     settings->node_type = 5;
     settings->deletingNodes = 0;
+    settings->placing_text = 0;
     logInfo("Ready to place a node", "type the Internet");
 }
 void placeswitch(settings_t *settings)
@@ -35,6 +36,7 @@ void placeswitch(settings_t *settings)
     settings->placing_node = 1;
     settings->node_type = 0;
     settings->deletingNodes = 0;
+    settings->placing_text = 0;
     logInfo("Ready to place a node", "type switch");
 }
 
@@ -48,6 +50,7 @@ void placerouter(settings_t *settings)
     settings->placing_node = 1;
     settings->node_type = 1;
     settings->deletingNodes = 0;
+    settings->placing_text = 0;
     logInfo("Ready to place a node", "type router");
 }
 
@@ -61,6 +64,7 @@ void placehost(settings_t *settings)
     settings->placing_node = 1;
     settings->node_type = 2;
     settings->deletingNodes = 0;
+    settings->placing_text = 0;
     logInfo("Ready to place a node", "type host");
 }
 
@@ -74,6 +78,7 @@ void placeexternalinterface(settings_t *settings)
     settings->placing_node = 1;
     settings->node_type = 3;
     settings->deletingNodes = 0;
+    settings->placing_text = 0;
     logInfo("Ready to place a node", "type external interface");
 }
 
@@ -87,6 +92,7 @@ void deleteNode(settings_t *settings)
     settings->placing_node = 0;
     settings->node_type = 0;
     settings->deletingNodes = 1;
+    settings->placing_text = 0;
     logInfo("Ready to delete a node", "");
 }
 
@@ -100,6 +106,7 @@ void placeexternalnattedinterface(settings_t *settings)
     settings->placing_node = 1;
     settings->node_type = 4;
     settings->deletingNodes = 0;
+    settings->placing_text = 0;
     logInfo("Ready to place a node", "type external natted interface");
 }
 
@@ -112,9 +119,22 @@ void placelink(settings_t *settings)
     settings->placing_node = 0;
     settings->placing_link = 1;
     settings->deletingNodes = 0;
+    settings->placing_text = 0;
     logInfo("Ready to place a link", "");
 }
 
+void placeText(settings_t *settings)
+{
+    if (settings->isSimulating)
+        return;
+    settings->drawing_rectangle = 0;
+    settings->moving_node = 0;
+    settings->placing_node = 0;
+    settings->placing_link = 0;
+    settings->deletingNodes = 0;
+    settings->placing_text = 1;
+    logInfo("Ready to place a text", "");
+}
 void placeRectangle(settings_t *settings)
 {
     if (settings->isSimulating)
@@ -124,6 +144,7 @@ void placeRectangle(settings_t *settings)
     settings->placing_node = 0;
     settings->placing_link = 0;
     settings->deletingNodes = 0;
+    settings->placing_text = 0;
     logInfo("Ready to place a rectangle", "");
 }
 void initEnvironment()

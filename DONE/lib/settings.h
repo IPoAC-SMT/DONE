@@ -35,5 +35,9 @@ typedef struct
     int chosenOption;
     char ** options;
     char exportDoneScript;
+    int numTexts;
+    int tmpx,tmpy;
+    char * tmpText;
+    char placing_text;
 } settings_t;
 

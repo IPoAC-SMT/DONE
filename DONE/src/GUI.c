@@ -570,6 +570,7 @@ void addRectangle(interface_t *interface, settings_t *settings)
 }
 
 void export(settings_t * settings,interface_t * interface) {
+    logInfo("Ready to export","as DoneScript.ds");
     FILE *ptr = fopen("DoneScript.ds","w");
     for(int i = 0;i<settings->numnodes;i++) {
         fprintf(ptr,"create %s at %d %d as %s\n",identifyType(interface->nodes[i].type), interface->nodes[i].x,interface->nodes[i].y,interface->nodes[i].name);
@@ -581,6 +582,7 @@ void export(settings_t * settings,interface_t * interface) {
         fprintf(ptr,"draw rectangle between %d %d and %d %d with color %d %d %d\n",interface->rectangles[i].x,interface->rectangles[i].y,interface->rectangles[i].x1,interface->rectangles[i].y1,interface->rectangles[i].r,interface->rectangles[i].g,interface->rectangles[i].b);
     }
     fclose(ptr);
+    logSuccess("Exporting as DoneScript","you can find it as DoneScript.ds");
 }
 
 void DrawGUI(settings_t *settings, interface_t *interface)
@@ -796,6 +798,14 @@ void DrawGUI(settings_t *settings, interface_t *interface)
         }
         else
             DrawMessageAtAngle("Select the node, the link or the rectangle to delete");
+    }
+    else if (settings->placing_text){
+        if(settings->placing_text==1) {
+            // devo setuppare le strutture
+        }
+        else if (settings->placing_text==2) {
+            // sto accumulando lettere in attesa di un invio, se c'è l'invio aggiungo le cose
+        }
     }
 
     if (settings->gettingName)
