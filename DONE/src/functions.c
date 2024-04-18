@@ -132,7 +132,7 @@ void placeText(settings_t *settings)
     settings->placing_node = 0;
     settings->placing_link = 0;
     settings->deletingNodes = 0;
-    settings->placing_text = 1;
+    settings->placing_text = -1;
     logInfo("Ready to place a text", "");
 }
 void placeRectangle(settings_t *settings)

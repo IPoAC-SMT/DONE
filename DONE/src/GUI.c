@@ -449,6 +449,21 @@ char *identifyType(int num)
     return (char[30][30]){"switch", "rrouter", "host", "external interface", "external natted interface","internet"}[num]; // hub, switch, router, host, external interface, external natted interface, Internet
 }
 
+void appendText(settings_t * settings,interface_t *interface)
+{
+    if (settings->numTexts == 0)
+    {
+        interface->texts = (text_t *)calloc(1, sizeof(text_t));
+    }
+    else
+        interface->texts = (text_t *)realloc(interface->texts, (settings->numTexts + 1) * sizeof(text_t));
+    interface->texts[settings->numTexts].text = (char *)calloc(NAMELENGTH, sizeof(char));
+    strncpy(interface->texts[settings->numTexts].text, settings->tmpText , 49);
+    interface->texts[settings->numTexts].x = settings->tmpx;
+    interface->texts[settings->numTexts].y = settings->tmpy;
+}
+
+
 void appendNode(interface_t *interface, node_t newnode, settings_t *settings)
 {
     if (settings->numnodes == 0)
@@ -606,6 +621,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
         settings->deletingNodes = 0;
         settings->gettingName = 0;
         settings->resetName = 1;
+        settings->placing_text = 0;
         logSuccess("All effects successfully deactivated","esc worked correctly");
     }
 
@@ -800,10 +816,38 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             DrawMessageAtAngle("Select the node, the link or the rectangle to delete");
     }
     else if (settings->placing_text){
-        if(settings->placing_text==1) {
-            // devo setuppare le strutture
+        if(settings->placing_text==-1){
+            settings->placing_text = 1;
+        }
+        else if(settings->placing_text==1) {
+            settings->dragging_deactivated = true;
+            if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+                settings->tmpx = GetMouseX();
+                settings->tmpy = GetMouseY();
+                settings->tmpText = (char*)calloc(200,sizeof(char));
+                settings->placing_text=2;
+            }
         }
         else if (settings->placing_text==2) {
+            DrawText(settings->tmpText,settings->tmpx,settings->tmpy,STD_FONT_SIZE,FIGURE_COLOR);
+            char character = GetCharPressed();
+            if (IsKeyReleased(KEY_ENTER))
+            {
+                appendText(settings,interface);
+                settings->placing_text = 0;
+                settings->numTexts++;
+            }
+            if (character >= 32 && character <= 126)
+            {
+                // valid letter
+                char temp[200];
+                snprintf(temp, 200, "%s%c", settings->tmpText, character);
+                strncpy(settings->tmpText, temp, 200);
+            }
+            else if (IsKeyReleased(KEY_BACKSPACE))
+            {
+                settings->tmpText[strlen(settings->tmpText) - 1] = '\0';
+            }
             // sto accumulando lettere in attesa di un invio, se c'è l'invio aggiungo le cose
         }
     }
@@ -829,6 +873,8 @@ void DrawGUI(settings_t *settings, interface_t *interface)
         DrawLink(interface->links[i], settings, interface->nodes);
     for (int i = 0; i < settings->numnodes; i++)
         DrawNode(&(interface->nodes[i]), settings, true);
+    for (int i = 0; i < settings->numTexts; i++)
+        DrawText(interface->texts[i].text,interface->texts[i].x,interface->texts[i].y,STD_FONT_SIZE,FIGURE_COLOR);
     
     if(settings->numOptions) {
         DrawRectangle(0, 0, WIDTH, HEIGHT, CLITERAL(Color){252, 245, 229,150});
