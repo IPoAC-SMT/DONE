@@ -34,5 +34,6 @@ typedef struct
     int numOptions;
     int chosenOption;
     char ** options;
+    char exportDoneScript;
 } settings_t;
 

@@ -42,6 +42,7 @@ int main(int argc, char **argv)
         {204, 24, 50, 50, stop, "Stop simulation", 0, NULL, "stop",true},     // second of the horizontal row
         {84, 24, 50, 50, prepareToOpenProject, "Open a file", 0, NULL, "openProject",true},
         {24, 24, 50, 50, prepareToSaveProject, "Save project", 0, NULL, "saveProject",true},
+        {24, 24, 50, 50, exportDoneScript, "Export DoneScript", 0, NULL, "saveProject",true},
         {549, 24, 50, 50, clearCanvas, "Clear Canvas", 0, NULL, "clearCanvas",false},
         {334, 24, 50, 50, deleteNode, "Delete a node or a link by clicking on it", 0, NULL, "deleteNode",false},
         {874, 24, 50, 50, quit, "Quit", 0, NULL, "quit",true},
@@ -64,7 +65,7 @@ int main(int argc, char **argv)
 
     SetExitKey(KEY_NULL);
 
-    settings_t settings = {0, 0, 0, "", 0, 0, 0, 0, "", 0, 0, (void *)interface, 0, 0, 0, 0, 0, NULL, 0, 0, 0, c, 0,0,0,NULL};
+    settings_t settings = {0, 0, 0, "", 0, 0, 0, 0, "", 0, 0, (void *)interface, 0, 0, 0, 0, 0, NULL, 0, 0, 0, c, 0,0,0,NULL,0};
 
     system("clear");
     

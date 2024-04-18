@@ -9,6 +9,10 @@ void helloworld(settings_t *settings)
     printf("%d\n", settings->numlink);
 }*/
 
+void exportDoneScript(settings_t *settings){
+    settings->exportDoneScript = 1;
+}
+
 void placeInternet(settings_t *settings)
 {
     if (settings->isSimulating)

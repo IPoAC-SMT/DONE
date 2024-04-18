@@ -436,6 +436,11 @@ char *identify(int num)
     return (char[10][10]){"s", "r", "h", "e", "en","I"}[num]; // hub, switch, router, host, external interface, external natted interface, Internet
 }
 
+char *identifyType(int num)
+{
+    return (char[30][30]){"switch", "rrouter", "host", "external interface", "external natted interface","internet"}[num]; // hub, switch, router, host, external interface, external natted interface, Internet
+}
+
 void appendNode(interface_t *interface, node_t newnode, settings_t *settings)
 {
     if (settings->numnodes == 0)
@@ -554,6 +559,20 @@ void addRectangle(interface_t *interface, settings_t *settings)
     interface->rectangles[settings->numrectangles].r = rand() % 256;
     interface->rectangles[settings->numrectangles].g = rand() % 256;
     interface->rectangles[settings->numrectangles].b = rand() % 256;
+}
+
+void export(settings_t * settings,interface_t * interface) {
+    FILE *ptr = fopen("DoneScript.ds","w");
+    for(int i = 0;i<settings->numnodes;i++) {
+        fprintf(ptr,"create %s at %d %d as %s\n",identifyType(interface->nodes[i].type), interface->nodes[i].x,interface->nodes[i].y,interface->nodes[i].name);
+    }
+    for(int i = 0; i< settings->numlink;i++) {
+        fprintf(ptr,"link %s and %s\n",interface->links[i].node1,interface->links[i].node2);
+    }
+    for(int i = 0; i<settings->numrectangles;i++) {
+        fprintf(ptr,"draw rectangle between %d %d and %d %d with color %d %d %d\n",interface->rectangles[i].x,interface->rectangles[i].y,interface->rectangles[i].x1,interface->rectangles[i].y1,interface->rectangles[i].r,interface->rectangles[i].g,interface->rectangles[i].b);
+    }
+    fclose(ptr);
 }
 
 void DrawGUI(settings_t *settings, interface_t *interface)
@@ -828,6 +847,10 @@ void DrawGUI(settings_t *settings, interface_t *interface)
         */
         if(IsKeyReleased(KEY_UP)) settings->chosenOption = max(0,settings->chosenOption-1);
         if(IsKeyReleased(KEY_DOWN)) settings->chosenOption = min(settings->numOptions-1,settings->chosenOption+1);
+    }
+    if(settings->exportDoneScript){
+        export(settings,interface);
+        settings->exportDoneScript = false;
     }
     /*TODO for testing
     if(IsKeyReleased(KEY_P)) settings->numOptions = 0;
