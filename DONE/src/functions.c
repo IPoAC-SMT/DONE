@@ -285,23 +285,25 @@ void openProject(settings_t *settings)
     snprintf(filename, MAX_FILENAME, "./saves/%s.done", settings->filename);
 
     FILE *file = fopen(filename, "r");
-    int numnodes, numlinks, numrectangles;
+    int numnodes, numlinks, numrectangles, numtextboxes;
     node_t *nodes;
     link_t *links;
     rectangle_t *rectangles;
+    text_t *textboxes;
 
     if (file != NULL)
     {
         settings->openProjectName = filename; // updating the project name
 
-        fscanf(file, "%d\n%d\n%d\n", &numnodes, &numlinks, &numrectangles);
+        fscanf(file, "%d\n%d\n%d\n%d\n", &numnodes, &numlinks, &numrectangles, &numtextboxes);
 
         nodes = (node_t *)malloc(numnodes * sizeof(node_t));
         links = (link_t *)malloc(numlinks * sizeof(link_t));
         rectangles = (rectangle_t *)malloc(numrectangles * sizeof(rectangle_t));
+        textboxes = (text_t *)malloc(numtextboxes * sizeof(text_t));
 
         char name[50]; // buffer
-        char othername[50];
+        char othername[100];
         int type, type2;
 
         // sem_wait(settings->dio_melanzana);
@@ -332,13 +334,24 @@ void openProject(settings_t *settings)
             fscanf(file, "%d %d\n%d %d\n%d %d %d\n", &rectangles[i].x, &rectangles[i].y, &rectangles[i].x1, &rectangles[i].y1, (int *)&rectangles[i].r, (int *)&rectangles[i].g, (int *)&rectangles[i].b);
         }
 
+        for(int i = 0; i < numtextboxes; i++){
+            // reading all textboxes
+            fscanf(file, "%s\n%d %d\n", othername, &textboxes[i].x, &textboxes[i].y);
+            textboxes[i].text = (char *)malloc(strlen(othername) * sizeof(char));
+            strcpy(textboxes[i].text, othername);
+        }
+
+        // updating settings to hold the collected data
+
         interface_t *gui = settings->GUIdata;
         gui->nodes = nodes;
         gui->links = links;
         gui->rectangles = rectangles;
+        gui->texts = textboxes;
         settings->numnodes = numnodes;
         settings->numlink = numlinks;
         settings->numrectangles = numrectangles;
+        settings->numTexts = numtextboxes;
         settings->absoluteCount = numnodes;
         logSuccess("Loaded project", "");
     }
@@ -375,7 +388,7 @@ void saveProject(settings_t *settings)
         settings->openProjectName = filename;
 
         // creating the project file
-        fprintf(file, "%d\n%d\n%d\n", settings->numnodes, settings->numlink, settings->numrectangles); // saving node number and link number + rectangle number at the top of the file
+        fprintf(file, "%d\n%d\n%d\n%d\n", settings->numnodes, settings->numlink, settings->numrectangles, settings->numTexts); // saving node number and link number + rectangle number at the top of the file
 
         interface_t *gui = (interface_t *)(settings->GUIdata);
 
@@ -395,6 +408,12 @@ void saveProject(settings_t *settings)
         { // saving every rectangle
             rectangle_t current_rect = gui->rectangles[i];
             fprintf(file, "%d %d\n%d %d\n%d %d %d\n", current_rect.x, current_rect.y, current_rect.x1, current_rect.y1, current_rect.r, current_rect.g, current_rect.b); // data for every link
+        }
+
+        for(int i = 0; i < settings->numTexts; i++){
+            // saving every textbox
+            text_t current_text = gui->texts[i];
+            fprintf(file, "%s\n%d %d\n", current_text.text, current_text.x, current_text.y);
         }
 
         fclose(file);
