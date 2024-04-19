@@ -611,6 +611,25 @@ void export(settings_t * settings,interface_t * interface) {
     for(int i=0;i<settings->numTexts;i++){
         fprintf(ptr,"add text \"%s\" at %d %d\n",interface->texts[i].text,interface->texts[i].x,interface->texts[i].y);
     }
+    if (settings->openProjectName) {
+        char config_filename[50];
+        snprintf(config_filename,50,"%s.conf",settings->openProjectName);
+        FILE *file = fopen(config_filename,"r");
+        if (file) {
+            char buf[200];
+            char *nodeName;
+
+            while(fgets(buf,200,file)) {
+                nodeName = strtok(strdup(buf),":");
+                if(nodeName) {
+                    do {
+                        if(!fgets(buf,200,file) || buf[0]=='\n') break;
+                        fprintf(ptr,"send command to %s %s",nodeName,buf);
+                    } while (42);
+                }
+            }
+        }
+    }
     fclose(ptr);
     logSuccess("Exporting as DoneScript","you can find it as DoneScript.ds");
 }
