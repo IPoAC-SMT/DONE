@@ -30,3 +30,12 @@ IPoAC:
 prod:
 	make
 	rm ./obj/* main.o
+
+.PHONY: compile
+compile:
+	./DoneScript/compiler.py
+
+.PHONY: import
+import:
+	cp ./DoneScript/compiled/* ./saves/
+
