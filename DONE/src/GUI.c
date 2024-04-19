@@ -529,6 +529,18 @@ link_t *getInverseLink(interface_t *interface, settings_t *settings)
     return NULL;
 }
 
+text_t * getInverseText(interface_t * interface,settings_t * settings) {
+    for (int i = settings->numTexts-1;i>=0;i--) {
+        if(
+            interface->texts[i].x-3 <= GetMouseX() &&
+            interface->texts[i].y-3 <= GetMouseY() &&
+            (interface->texts[i].x+(int)strlen(interface->texts[i].text)*STD_FONT_SIZE/2+3)>=GetMouseX() &&
+            interface->texts[i].y+STD_FONT_SIZE+3>=GetMouseY()
+            ) return &interface->texts[i];
+    }
+    return NULL;
+}
+
 rectangle_t * getInverseRectangle(interface_t * interface,settings_t * settings) {
     for (int i = settings->numrectangles-1;i>=0;i--) {
         if(
@@ -602,6 +614,12 @@ void export(settings_t * settings,interface_t * interface) {
     fclose(ptr);
     logSuccess("Exporting as DoneScript","you can find it as DoneScript.ds");
 }
+
+void DrawTextWrapped(text_t text) {
+    DrawText(text.text,text.x,text.y,STD_FONT_SIZE,FIGURE_COLOR);
+    DrawRectangleLines(text.x-3,text.y-3,strlen(text.text)*STD_FONT_SIZE/2+6,STD_FONT_SIZE+6,BLUE);
+}
+
 
 void DrawGUI(settings_t *settings, interface_t *interface)
 {
@@ -748,7 +766,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             settings->drawing_rectangle = 1;
         }
     }
-    else if (settings->deletingNodes) // deleting nodes or links or maybe rectangles
+    else if (settings->deletingNodes) // deleting nodes or links or maybe rectangles or maybe texts?
     {
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
         {
@@ -811,6 +829,17 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                         rectangle->g = interface->rectangles[settings->numrectangles].g;
                         rectangle->b = interface->rectangles[settings->numrectangles].b;
                         logSuccess("Deleted rectangle","");
+                    }
+                    else {
+                        // maybe deleting a text?
+                        text_t * text = getInverseText(interface,settings);
+                        if (text) {
+                            settings->numTexts--;
+                            text->text = strdup(interface->texts[settings->numTexts].text);
+                            text->x = interface->texts[settings->numTexts].x;
+                            text->y = interface->texts[settings->numTexts].y;
+                            logSuccess("Deleted text","");
+                        }
                     }
                 }
             }
@@ -878,7 +907,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
     for (int i = 0; i < settings->numnodes; i++)
         DrawNode(&(interface->nodes[i]), settings, true);
     for (int i = 0; i < settings->numTexts; i++)
-        DrawText(interface->texts[i].text,interface->texts[i].x,interface->texts[i].y,STD_FONT_SIZE,FIGURE_COLOR);
+        DrawTextWrapped(interface->texts[i]);
     
     if(settings->numOptions) {
         DrawRectangle(0, 0, WIDTH, HEIGHT, CLITERAL(Color){252, 245, 229,150});
