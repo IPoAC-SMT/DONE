@@ -452,7 +452,7 @@ char *identifyType(int num)
     return (char[30][30]){"switch", "rrouter", "host", "external interface", "external natted interface", "internet"}[num]; // hub, switch, router, host, external interface, external natted interface, Internet
 }
 
-void appendText(settings_t * settings,interface_t *interface)
+void appendText(settings_t *settings, interface_t *interface)
 {
     if (settings->numTexts == 0)
     {
@@ -461,11 +461,10 @@ void appendText(settings_t * settings,interface_t *interface)
     else
         interface->texts = (text_t *)realloc(interface->texts, (settings->numTexts + 1) * sizeof(text_t));
     interface->texts[settings->numTexts].text = (char *)calloc(NAMELENGTH, sizeof(char));
-    strncpy(interface->texts[settings->numTexts].text, settings->tmpText , 49);
+    strncpy(interface->texts[settings->numTexts].text, settings->tmpText, 49);
     interface->texts[settings->numTexts].x = settings->tmpx;
     interface->texts[settings->numTexts].y = settings->tmpy;
 }
-
 
 void appendNode(interface_t *interface, node_t newnode, settings_t *settings)
 {
@@ -531,26 +530,30 @@ link_t *getInverseLink(interface_t *interface, settings_t *settings)
     return NULL;
 }
 
-text_t * getInverseText(interface_t * interface,settings_t * settings) {
-    for (int i = settings->numTexts-1;i>=0;i--) {
-        if(
-            interface->texts[i].x-3 <= GetMouseX() &&
-            interface->texts[i].y-3 <= GetMouseY() &&
-            (interface->texts[i].x+(int)strlen(interface->texts[i].text)*STD_FONT_SIZE/2+3)>=GetMouseX() &&
-            interface->texts[i].y+STD_FONT_SIZE+3>=GetMouseY()
-            ) return &interface->texts[i];
+text_t *getInverseText(interface_t *interface, settings_t *settings)
+{
+    for (int i = settings->numTexts - 1; i >= 0; i--)
+    {
+        if (
+            interface->texts[i].x - 3 <= GetMouseX() &&
+            interface->texts[i].y - 3 <= GetMouseY() &&
+            (interface->texts[i].x + (int)strlen(interface->texts[i].text) * STD_FONT_SIZE / 2 + 3) >= GetMouseX() &&
+            interface->texts[i].y + STD_FONT_SIZE + 3 >= GetMouseY())
+            return &interface->texts[i];
     }
     return NULL;
 }
 
-rectangle_t * getInverseRectangle(interface_t * interface,settings_t * settings) {
-    for (int i = settings->numrectangles-1;i>=0;i--) {
-        if(
-            min(interface->rectangles[i].x,interface->rectangles[i].x1) <= GetMouseX() &&
-            min(interface->rectangles[i].y,interface->rectangles[i].y1) <= GetMouseY() &&
-            max(interface->rectangles[i].x,interface->rectangles[i].x1) >= GetMouseX() &&
-            max(interface->rectangles[i].y,interface->rectangles[i].y1) >= GetMouseY()
-            ) return &interface->rectangles[i];
+rectangle_t *getInverseRectangle(interface_t *interface, settings_t *settings)
+{
+    for (int i = settings->numrectangles - 1; i >= 0; i--)
+    {
+        if (
+            min(interface->rectangles[i].x, interface->rectangles[i].x1) <= GetMouseX() &&
+            min(interface->rectangles[i].y, interface->rectangles[i].y1) <= GetMouseY() &&
+            max(interface->rectangles[i].x, interface->rectangles[i].x1) >= GetMouseX() &&
+            max(interface->rectangles[i].y, interface->rectangles[i].y1) >= GetMouseY())
+            return &interface->rectangles[i];
     }
     return NULL;
 }
@@ -614,23 +617,30 @@ void export(settings_t *settings, interface_t *interface)
     {
         fprintf(ptr, "draw rectangle between %d %d and %d %d with color %d %d %d\n", interface->rectangles[i].x, interface->rectangles[i].y, interface->rectangles[i].x1, interface->rectangles[i].y1, interface->rectangles[i].r, interface->rectangles[i].g, interface->rectangles[i].b);
     }
-    for(int i=0;i<settings->numTexts;i++){
-        fprintf(ptr,"add text \"%s\" at %d %d\n",interface->texts[i].text,interface->texts[i].x,interface->texts[i].y);
+    for (int i = 0; i < settings->numTexts; i++)
+    {
+        fprintf(ptr, "add text \"%s\" at %d %d\n", interface->texts[i].text, interface->texts[i].x, interface->texts[i].y);
     }
-    if (settings->openProjectName) {
+    if (settings->openProjectName)
+    {
         char config_filename[50];
-        snprintf(config_filename,50,"%s.conf",settings->openProjectName);
-        FILE *file = fopen(config_filename,"r");
-        if (file) {
+        snprintf(config_filename, 50, "%s.conf", settings->openProjectName);
+        FILE *file = fopen(config_filename, "r");
+        if (file)
+        {
             char buf[200];
             char *nodeName;
 
-            while(fgets(buf,200,file)) {
-                nodeName = strtok(strdup(buf),":");
-                if(nodeName) {
-                    do {
-                        if(!fgets(buf,200,file) || buf[0]=='\n') break;
-                        fprintf(ptr,"send command to %s %s",nodeName,buf);
+            while (fgets(buf, 200, file))
+            {
+                nodeName = strtok(strdup(buf), ":");
+                if (nodeName)
+                {
+                    do
+                    {
+                        if (!fgets(buf, 200, file) || buf[0] == '\n')
+                            break;
+                        fprintf(ptr, "send command to %s %s", nodeName, buf);
                     } while (42);
                 }
             }
@@ -640,11 +650,11 @@ void export(settings_t *settings, interface_t *interface)
     logSuccess("Exporting as DoneScript", "you can find it as DoneScript.ds");
 }
 
-void DrawTextWrapped(text_t text) {
-    DrawText(text.text,text.x,text.y,STD_FONT_SIZE,FIGURE_COLOR);
-    DrawRectangleLines(text.x-3,text.y-3,strlen(text.text)*STD_FONT_SIZE/2+6,STD_FONT_SIZE+6,BLUE);
+void DrawTextWrapped(text_t text)
+{
+    DrawText(text.text, text.x, text.y, STD_FONT_SIZE, FIGURE_COLOR);
+    DrawRectangleLines(text.x - 3, text.y - 3, strlen(text.text) * STD_FONT_SIZE / 2 + 6, STD_FONT_SIZE + 6, BLUE);
 }
-
 
 void DrawGUI(settings_t *settings, interface_t *interface)
 {
@@ -669,7 +679,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
         settings->gettingName = 0;
         settings->resetName = 1;
         settings->placing_text = 0;
-        logSuccess("All effects successfully deactivated","esc worked correctly");
+        logSuccess("All effects successfully deactivated", "esc worked correctly");
     }
 
     // 3. se sto spostando cose
@@ -873,15 +883,17 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                         rectangle->b = interface->rectangles[settings->numrectangles].b;
                         logSuccess("Deleted rectangle", "");
                     }
-                    else {
+                    else
+                    {
                         // maybe deleting a text?
-                        text_t * text = getInverseText(interface,settings);
-                        if (text) {
+                        text_t *text = getInverseText(interface, settings);
+                        if (text)
+                        {
                             settings->numTexts--;
                             text->text = strdup(interface->texts[settings->numTexts].text);
                             text->x = interface->texts[settings->numTexts].x;
                             text->y = interface->texts[settings->numTexts].y;
-                            logSuccess("Deleted text","");
+                            logSuccess("Deleted text", "");
                         }
                     }
                 }
@@ -890,28 +902,33 @@ void DrawGUI(settings_t *settings, interface_t *interface)
         else
             DrawMessageAtAngle("Select the node, the link or the rectangle to delete");
     }
-    else if (settings->placing_text){
-        if(settings->placing_text==-1){
+    else if (settings->placing_text)
+    {
+        if (settings->placing_text == -1)
+        {
             settings->placing_text = 1;
         }
-        else if(settings->placing_text==1) {
+        else if (settings->placing_text == 1)
+        {
             settings->dragging_deactivated = true;
-            if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+            if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
+            {
                 settings->tmpx = GetMouseX();
                 settings->tmpy = GetMouseY();
-                settings->tmpText = (char*)calloc(200,sizeof(char));
-                settings->placing_text=2;
+                settings->tmpText = (char *)calloc(200, sizeof(char));
+                settings->placing_text = 2;
             }
         }
-        else if (settings->placing_text==2) {
-            DrawText(settings->tmpText,settings->tmpx,settings->tmpy,STD_FONT_SIZE,FIGURE_COLOR);
+        else if (settings->placing_text == 2)
+        {
+            DrawText(settings->tmpText, settings->tmpx, settings->tmpy, STD_FONT_SIZE, FIGURE_COLOR);
             char character = GetCharPressed();
             if (IsKeyReleased(KEY_ENTER))
             {
-                appendText(settings,interface);
+                appendText(settings, interface);
                 settings->placing_text = 0;
                 settings->numTexts++;
-                settings->dragging_deactivated=false;
+                settings->dragging_deactivated = false;
             }
             if (character >= 32 && character <= 126)
             {
@@ -951,72 +968,76 @@ void DrawGUI(settings_t *settings, interface_t *interface)
         DrawNode(&(interface->nodes[i]), settings, true);
     for (int i = 0; i < settings->numTexts; i++)
         DrawTextWrapped(interface->texts[i]);
-    
-    if(settings->numOptions) {
-        DrawRectangle(0, 0, WIDTH, HEIGHT, CLITERAL(Color){252, 245, 229,150});
-        int optionHeight = min((HEIGHT-500)/settings->numOptions,100);
-        for (int i = 0; i<settings->numOptions; i++) {
 
     if (settings->numOptions)
     {
-
-        if (getInversePos(GetMouseX(), GetMouseY(), interface->nodes, settings) && !settings->chosenNode)
-        {
-            settings->chosenNode = strdup(getInversePos(GetMouseX(), GetMouseY(), interface->nodes, settings)->name);
-        }
-
         DrawRectangle(0, 0, WIDTH, HEIGHT, CLITERAL(Color){252, 245, 229, 150});
         int optionHeight = min((HEIGHT - 500) / settings->numOptions, 100);
         for (int i = 0; i < settings->numOptions; i++)
         {
 
-            bool cond = (i == settings->chosenOption ||
-                         (GetMouseX() > WIDTH / 2 - 300 &&
-                          GetMouseX() < WIDTH / 2 + 300 &&
-                          GetMouseY() > 250 + i * optionHeight &&
-                          GetMouseY() < 250 + (i + 1) * optionHeight));
-
-            DrawRectangleLines(WIDTH / 2 - 300, 250 + i * optionHeight, 600, optionHeight, cond ? RED : BLUE);
-            DrawText(settings->options[i], WIDTH / 2 - 250, 250 + i * optionHeight + optionHeight / 2, STD_FONT_SIZE, BLACK);
-            if (cond)
-                settings->chosenOption = i;
-            // printf("%d\n",subcond);
-        }
-        if (
-            IsKeyReleased(KEY_ENTER) ||
-            (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) &&
-             GetMouseX() > WIDTH / 2 - 300 &&
-             GetMouseX() < WIDTH / 2 + 300 &&
-             GetMouseY() > 250 &&
-             GetMouseY() < 250 + (settings->numOptions) * optionHeight))
-        {
-            if (settings->chosenNode)
+            if (settings->numOptions)
             {
-                trackChosenInterfBinding(settings);
-                settings->chosenNode = NULL;
+
+                if (getInversePos(GetMouseX(), GetMouseY(), interface->nodes, settings) && !settings->chosenNode)
+                {
+                    settings->chosenNode = strdup(getInversePos(GetMouseX(), GetMouseY(), interface->nodes, settings)->name);
+                }
+
+                DrawRectangle(0, 0, WIDTH, HEIGHT, CLITERAL(Color){252, 245, 229, 150});
+                int optionHeight = min((HEIGHT - 500) / settings->numOptions, 100);
+                for (int i = 0; i < settings->numOptions; i++)
+                {
+
+                    bool cond = (i == settings->chosenOption ||
+                                 (GetMouseX() > WIDTH / 2 - 300 &&
+                                  GetMouseX() < WIDTH / 2 + 300 &&
+                                  GetMouseY() > 250 + i * optionHeight &&
+                                  GetMouseY() < 250 + (i + 1) * optionHeight));
+
+                    DrawRectangleLines(WIDTH / 2 - 300, 250 + i * optionHeight, 600, optionHeight, cond ? RED : BLUE);
+                    DrawText(settings->options[i], WIDTH / 2 - 250, 250 + i * optionHeight + optionHeight / 2, STD_FONT_SIZE, BLACK);
+                    if (cond)
+                        settings->chosenOption = i;
+                    // printf("%d\n",subcond);
+                }
+                if (
+                    IsKeyReleased(KEY_ENTER) ||
+                    (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) &&
+                     GetMouseX() > WIDTH / 2 - 300 &&
+                     GetMouseX() < WIDTH / 2 + 300 &&
+                     GetMouseY() > 250 &&
+                     GetMouseY() < 250 + (settings->numOptions) * optionHeight))
+                {
+                    if (settings->chosenNode)
+                    {
+                        trackChosenInterfBinding(settings);
+                        settings->chosenNode = NULL;
+                    }
+                }
+                if (IsKeyReleased(KEY_UP))
+                    settings->chosenOption = max(0, settings->chosenOption - 1);
+                if (IsKeyReleased(KEY_DOWN))
+                    settings->chosenOption = min(settings->numOptions - 1, settings->chosenOption + 1);
             }
-        }
-        if (IsKeyReleased(KEY_UP))
-            settings->chosenOption = max(0, settings->chosenOption - 1);
-        if (IsKeyReleased(KEY_DOWN))
-            settings->chosenOption = min(settings->numOptions - 1, settings->chosenOption + 1);
-    }
-    if (settings->exportDoneScript)
-    {
-        export(settings, interface);
-        settings->exportDoneScript = false;
-    }
-    /*TODO for testing
-    if(IsKeyReleased(KEY_P)) settings->numOptions = 0;
-    if(IsKeyReleased(KEY_A)) settings->numOptions = 3;
-    if(IsKeyReleased(KEY_B)) settings->numOptions = 5;
-    if(IsKeyReleased(KEY_C)) settings->numOptions = 7;
-    if(!settings->options) {
-        settings->options = (char**) calloc(10,sizeof(char*));
-        for(int i = 0; i < 10 ; i++) {
-            settings->options[i] = (char*) calloc(100,sizeof(char));
-            snprintf(settings->options[i],100,"ciao: elemento %d",i);
+            if (settings->exportDoneScript)
+            {
+                export(settings, interface);
+                settings->exportDoneScript = false;
+            }
+            /*TODO for testing
+            if(IsKeyReleased(KEY_P)) settings->numOptions = 0;
+            if(IsKeyReleased(KEY_A)) settings->numOptions = 3;
+            if(IsKeyReleased(KEY_B)) settings->numOptions = 5;
+            if(IsKeyReleased(KEY_C)) settings->numOptions = 7;
+            if(!settings->options) {
+                settings->options = (char**) calloc(10,sizeof(char*));
+                for(int i = 0; i < 10 ; i++) {
+                    settings->options[i] = (char*) calloc(100,sizeof(char));
+                    snprintf(settings->options[i],100,"ciao: elemento %d",i);
+                }
+            }
+            */
         }
     }
-    */
 }
