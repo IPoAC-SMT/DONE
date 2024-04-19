@@ -658,7 +658,6 @@ void DrawTextWrapped(text_t text)
 
 void DrawGUI(settings_t *settings, interface_t *interface)
 {
-
     if (settings->isSimulating)
         DrawMessageAtAngle("Simulation in progress...");
 
@@ -815,10 +814,10 @@ void DrawGUI(settings_t *settings, interface_t *interface)
 
                 for (int i = 0; i < settings->numBindings; i++)
                 { // checking if bindings preferences were specified for the node. If so, delete them
-                    if (!strcmp(settings->interfaceBindings[i].bindingInterfaceName, node->name))
+                    if (!strcmp(settings->interfaceBindings[i].deviceName, node->name))
                     {
-                        settings->interfaceBindings[i].bindingInterfaceName = strdup(settings->interfaceBindings[settings->numBindings].bindingInterfaceName);
-                        settings->interfaceBindings[i].deviceName = settings->interfaceBindings[settings->numBindings].deviceName;
+                        settings->interfaceBindings[i].bindingInterfaceName = strdup(settings->interfaceBindings[settings->numBindings - 1].bindingInterfaceName);
+                        settings->interfaceBindings[i].deviceName = strdup(settings->interfaceBindings[settings->numBindings - 1].deviceName);
                         settings->numBindings--;
                         settings->interfaceBindings = (binding_t *)realloc(settings->interfaceBindings, settings->numBindings * sizeof(binding_t));
                         logSuccess("Deleted binding", "");
@@ -1025,19 +1024,6 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                 export(settings, interface);
                 settings->exportDoneScript = false;
             }
-            /*TODO for testing
-            if(IsKeyReleased(KEY_P)) settings->numOptions = 0;
-            if(IsKeyReleased(KEY_A)) settings->numOptions = 3;
-            if(IsKeyReleased(KEY_B)) settings->numOptions = 5;
-            if(IsKeyReleased(KEY_C)) settings->numOptions = 7;
-            if(!settings->options) {
-                settings->options = (char**) calloc(10,sizeof(char*));
-                for(int i = 0; i < 10 ; i++) {
-                    settings->options[i] = (char*) calloc(100,sizeof(char));
-                    snprintf(settings->options[i],100,"ciao: elemento %d",i);
-                }
-            }
-            */
         }
     }
 }
