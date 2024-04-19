@@ -341,10 +341,8 @@ void openProject(settings_t *settings)
             // reading all textboxes
             fgets(othername,200,file);
             fscanf(file, "%d %d\n", &textboxes[i].x, &textboxes[i].y);
-            printf("read: %s at %d %d\n", othername, textboxes[i].x, textboxes[i].y);
             textboxes[i].text = (char *)malloc(strlen(othername) * sizeof(char));
             strcpy(textboxes[i].text, othername);
-            printf("now textboxes is %s\n", textboxes[i].text);
         }
 
         // updating settings to hold the collected data
@@ -395,8 +393,6 @@ void saveProject(settings_t *settings)
 
         // creating the project file
         fprintf(file, "%d\n%d\n%d\n%d\n", settings->numnodes, settings->numlink, settings->numrectangles, settings->numTexts); // saving node number and link number + rectangle number at the top of the file
-        //fprintf(file, "%d\n%d\n%d\n", settings->numnodes, settings->numlink, settings->numrectangles); // saving node number and link number + rectangle number at the top of the file
-
 
         interface_t *gui = (interface_t *)(settings->GUIdata);
 
