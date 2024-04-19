@@ -452,6 +452,21 @@ char *identifyType(int num)
     return (char[30][30]){"switch", "rrouter", "host", "external interface", "external natted interface", "internet"}[num]; // hub, switch, router, host, external interface, external natted interface, Internet
 }
 
+void appendText(settings_t * settings,interface_t *interface)
+{
+    if (settings->numTexts == 0)
+    {
+        interface->texts = (text_t *)calloc(1, sizeof(text_t));
+    }
+    else
+        interface->texts = (text_t *)realloc(interface->texts, (settings->numTexts + 1) * sizeof(text_t));
+    interface->texts[settings->numTexts].text = (char *)calloc(NAMELENGTH, sizeof(char));
+    strncpy(interface->texts[settings->numTexts].text, settings->tmpText , 49);
+    interface->texts[settings->numTexts].x = settings->tmpx;
+    interface->texts[settings->numTexts].y = settings->tmpy;
+}
+
+
 void appendNode(interface_t *interface, node_t newnode, settings_t *settings)
 {
     if (settings->numnodes == 0)
@@ -516,16 +531,26 @@ link_t *getInverseLink(interface_t *interface, settings_t *settings)
     return NULL;
 }
 
-rectangle_t *getInverseRectangle(interface_t *interface, settings_t *settings)
-{
-    for (int i = settings->numrectangles - 1; i >= 0; i--)
-    {
-        if (
-            min(interface->rectangles[i].x, interface->rectangles[i].x1) <= GetMouseX() &&
-            min(interface->rectangles[i].y, interface->rectangles[i].y1) <= GetMouseY() &&
-            max(interface->rectangles[i].x, interface->rectangles[i].x1) >= GetMouseX() &&
-            max(interface->rectangles[i].y, interface->rectangles[i].y1) >= GetMouseY())
-            return &interface->rectangles[i];
+text_t * getInverseText(interface_t * interface,settings_t * settings) {
+    for (int i = settings->numTexts-1;i>=0;i--) {
+        if(
+            interface->texts[i].x-3 <= GetMouseX() &&
+            interface->texts[i].y-3 <= GetMouseY() &&
+            (interface->texts[i].x+(int)strlen(interface->texts[i].text)*STD_FONT_SIZE/2+3)>=GetMouseX() &&
+            interface->texts[i].y+STD_FONT_SIZE+3>=GetMouseY()
+            ) return &interface->texts[i];
+    }
+    return NULL;
+}
+
+rectangle_t * getInverseRectangle(interface_t * interface,settings_t * settings) {
+    for (int i = settings->numrectangles-1;i>=0;i--) {
+        if(
+            min(interface->rectangles[i].x,interface->rectangles[i].x1) <= GetMouseX() &&
+            min(interface->rectangles[i].y,interface->rectangles[i].y1) <= GetMouseY() &&
+            max(interface->rectangles[i].x,interface->rectangles[i].x1) >= GetMouseX() &&
+            max(interface->rectangles[i].y,interface->rectangles[i].y1) >= GetMouseY()
+            ) return &interface->rectangles[i];
     }
     return NULL;
 }
@@ -589,9 +614,37 @@ void export(settings_t *settings, interface_t *interface)
     {
         fprintf(ptr, "draw rectangle between %d %d and %d %d with color %d %d %d\n", interface->rectangles[i].x, interface->rectangles[i].y, interface->rectangles[i].x1, interface->rectangles[i].y1, interface->rectangles[i].r, interface->rectangles[i].g, interface->rectangles[i].b);
     }
+    for(int i=0;i<settings->numTexts;i++){
+        fprintf(ptr,"add text \"%s\" at %d %d\n",interface->texts[i].text,interface->texts[i].x,interface->texts[i].y);
+    }
+    if (settings->openProjectName) {
+        char config_filename[50];
+        snprintf(config_filename,50,"%s.conf",settings->openProjectName);
+        FILE *file = fopen(config_filename,"r");
+        if (file) {
+            char buf[200];
+            char *nodeName;
+
+            while(fgets(buf,200,file)) {
+                nodeName = strtok(strdup(buf),":");
+                if(nodeName) {
+                    do {
+                        if(!fgets(buf,200,file) || buf[0]=='\n') break;
+                        fprintf(ptr,"send command to %s %s",nodeName,buf);
+                    } while (42);
+                }
+            }
+        }
+    }
     fclose(ptr);
     logSuccess("Exporting as DoneScript", "you can find it as DoneScript.ds");
 }
+
+void DrawTextWrapped(text_t text) {
+    DrawText(text.text,text.x,text.y,STD_FONT_SIZE,FIGURE_COLOR);
+    DrawRectangleLines(text.x-3,text.y-3,strlen(text.text)*STD_FONT_SIZE/2+6,STD_FONT_SIZE+6,BLUE);
+}
+
 
 void DrawGUI(settings_t *settings, interface_t *interface)
 {
@@ -615,7 +668,8 @@ void DrawGUI(settings_t *settings, interface_t *interface)
         settings->deletingNodes = 0;
         settings->gettingName = 0;
         settings->resetName = 1;
-        logSuccess("All effects successfully deactivated", "esc worked correctly");
+        settings->placing_text = 0;
+        logSuccess("All effects successfully deactivated","esc worked correctly");
     }
 
     // 3. se sto spostando cose
@@ -739,7 +793,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             settings->drawing_rectangle = 1;
         }
     }
-    else if (settings->deletingNodes) // deleting nodes or links or maybe rectangles
+    else if (settings->deletingNodes) // deleting nodes or links or maybe rectangles or maybe texts?
     {
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
         {
@@ -819,20 +873,57 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                         rectangle->b = interface->rectangles[settings->numrectangles].b;
                         logSuccess("Deleted rectangle", "");
                     }
+                    else {
+                        // maybe deleting a text?
+                        text_t * text = getInverseText(interface,settings);
+                        if (text) {
+                            settings->numTexts--;
+                            text->text = strdup(interface->texts[settings->numTexts].text);
+                            text->x = interface->texts[settings->numTexts].x;
+                            text->y = interface->texts[settings->numTexts].y;
+                            logSuccess("Deleted text","");
+                        }
+                    }
                 }
             }
         }
         else
             DrawMessageAtAngle("Select the node, the link or the rectangle to delete");
     }
-    else if (settings->placing_text)
-    {
-        if (settings->placing_text == 1)
-        {
-            // devo setuppare le strutture
+    else if (settings->placing_text){
+        if(settings->placing_text==-1){
+            settings->placing_text = 1;
         }
-        else if (settings->placing_text == 2)
-        {
+        else if(settings->placing_text==1) {
+            settings->dragging_deactivated = true;
+            if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+                settings->tmpx = GetMouseX();
+                settings->tmpy = GetMouseY();
+                settings->tmpText = (char*)calloc(200,sizeof(char));
+                settings->placing_text=2;
+            }
+        }
+        else if (settings->placing_text==2) {
+            DrawText(settings->tmpText,settings->tmpx,settings->tmpy,STD_FONT_SIZE,FIGURE_COLOR);
+            char character = GetCharPressed();
+            if (IsKeyReleased(KEY_ENTER))
+            {
+                appendText(settings,interface);
+                settings->placing_text = 0;
+                settings->numTexts++;
+                settings->dragging_deactivated=false;
+            }
+            if (character >= 32 && character <= 126)
+            {
+                // valid letter
+                char temp[200];
+                snprintf(temp, 200, "%s%c", settings->tmpText, character);
+                strncpy(settings->tmpText, temp, 200);
+            }
+            else if (IsKeyReleased(KEY_BACKSPACE))
+            {
+                settings->tmpText[strlen(settings->tmpText) - 1] = '\0';
+            }
             // sto accumulando lettere in attesa di un invio, se c'è l'invio aggiungo le cose
         }
     }
@@ -858,6 +949,13 @@ void DrawGUI(settings_t *settings, interface_t *interface)
         DrawLink(interface->links[i], settings, interface->nodes);
     for (int i = 0; i < settings->numnodes; i++)
         DrawNode(&(interface->nodes[i]), settings, true);
+    for (int i = 0; i < settings->numTexts; i++)
+        DrawTextWrapped(interface->texts[i]);
+    
+    if(settings->numOptions) {
+        DrawRectangle(0, 0, WIDTH, HEIGHT, CLITERAL(Color){252, 245, 229,150});
+        int optionHeight = min((HEIGHT-500)/settings->numOptions,100);
+        for (int i = 0; i<settings->numOptions; i++) {
 
     if (settings->numOptions)
     {
