@@ -3,7 +3,8 @@
 
 void DrawButton(button_t *pulsante, settings_t *settings)
 {
-    if(!settings->isSimulating || pulsante->always_show){
+    if (!settings->isSimulating || pulsante->always_show)
+    {
         bool hovering;
         if (
             (GetMouseX() >= pulsante->x && GetMouseX() <= (pulsante->x + pulsante->width)) &&
@@ -27,7 +28,7 @@ void DrawButton(button_t *pulsante, settings_t *settings)
         }
         else
             hovering = false;
-    
+
         DrawRectangleLines(pulsante->x, pulsante->y, pulsante->width, pulsante->height, hovering ? YELLOW : GRAY); // lo creo con colore diverso se ci sto o meno hoverando
 
         if (pulsante->edges == NULL)
@@ -293,21 +294,21 @@ void DrawNode(node_t *node, settings_t *settings, bool true_node)
         DrawLineEx((Vector2){nodex + 15, nodey + 15}, (Vector2){nodex + 15, nodey + 18}, 2, FIGURE_COLOR);
 
         break;
-    /*case the_Internet_t:
-            //DrawRectangle(nodex-20, nodey-20, 40, 40, BLACK);
-            DrawLineEx((Vector2){nodex - 15, nodey + 10}, (Vector2){nodex + 14, nodey + 10}, 2, FIGURE_COLOR);
-            DrawRing((Vector2){nodex-15,nodey+7}, 2, 4, 180, 360, 0, FIGURE_COLOR);
-            DrawRing((Vector2){nodex+14,nodey+6}, 3, 5, 210, 0, 0, FIGURE_COLOR);
-            DrawRing((Vector2){nodex-9,nodey+1}, 4, 6, 160, 300, 0, FIGURE_COLOR);
-            DrawRing((Vector2){nodex+2,nodey-1}, 9,11 , 76, 267, 0, FIGURE_COLOR);
-        break;*/
-        case the_Internet_t:
-            //DrawRectangle(nodex-20, nodey-20, 40, 40, BLACK);
-            DrawLineEx((Vector2){nodex - 15, nodey + 10}, (Vector2){nodex + 14, nodey + 10}, 2, FIGURE_COLOR);
-            DrawRing((Vector2){nodex-15,nodey+7}, 2, 4, 180, 360, 0, FIGURE_COLOR);
-            DrawRing((Vector2){nodex+14,nodey+6}, 3, 5, 210, 0, 0, FIGURE_COLOR);
-            DrawRing((Vector2){nodex-9,nodey+1}, 4, 6, 160, 300, 0, FIGURE_COLOR);
-            DrawRing((Vector2){nodex+2,nodey-1}, 9,11 , 76, 267, 0, FIGURE_COLOR);
+        /*case the_Internet_t:
+                //DrawRectangle(nodex-20, nodey-20, 40, 40, BLACK);
+                DrawLineEx((Vector2){nodex - 15, nodey + 10}, (Vector2){nodex + 14, nodey + 10}, 2, FIGURE_COLOR);
+                DrawRing((Vector2){nodex-15,nodey+7}, 2, 4, 180, 360, 0, FIGURE_COLOR);
+                DrawRing((Vector2){nodex+14,nodey+6}, 3, 5, 210, 0, 0, FIGURE_COLOR);
+                DrawRing((Vector2){nodex-9,nodey+1}, 4, 6, 160, 300, 0, FIGURE_COLOR);
+                DrawRing((Vector2){nodex+2,nodey-1}, 9,11 , 76, 267, 0, FIGURE_COLOR);
+            break;*/
+    case the_Internet_t:
+        // DrawRectangle(nodex-20, nodey-20, 40, 40, BLACK);
+        DrawLineEx((Vector2){nodex - 15, nodey + 10}, (Vector2){nodex + 14, nodey + 10}, 2, FIGURE_COLOR);
+        DrawRing((Vector2){nodex - 15, nodey + 7}, 2, 4, 180, 360, 0, FIGURE_COLOR);
+        DrawRing((Vector2){nodex + 14, nodey + 6}, 3, 5, 210, 0, 0, FIGURE_COLOR);
+        DrawRing((Vector2){nodex - 9, nodey + 1}, 4, 6, 160, 300, 0, FIGURE_COLOR);
+        DrawRing((Vector2){nodex + 2, nodey - 1}, 9, 11, 76, 267, 0, FIGURE_COLOR);
         break;
     }
     DrawText(node->name, nodex - 20, nodey + 40, STD_FONT_SIZE, GRAY);
@@ -317,7 +318,7 @@ void DrawNode(node_t *node, settings_t *settings, bool true_node)
         GetMouseX() <= node->x + 20 &&
         GetMouseX() >= node->x - 20 &&
         GetMouseY() <= node->y + 20 &&
-        GetMouseY() >= node->y - 20) // sono nell'area del vero nodo
+        GetMouseY() >= node->y - 20) // sono nell'area del vero node
     {
         if (
             IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && // tasto sinistro
@@ -366,13 +367,15 @@ void DrawNode(node_t *node, settings_t *settings, bool true_node)
             }
             else
             {
-                if (node->type == external_interface_t || node->type == external_natted_interface_t) {
+                if (node->type == external_interface_t || node->type == external_natted_interface_t)
+                {
                     populateInterfaceOptionsWrapper(settings);
                 }
-                else {
+                else
+                {
                     if (settings->openProjectName == NULL)
                     {
-                        logWarning("Save the project first!","");
+                        logWarning("Save the project first!", "");
                     }
                     else
                     {
@@ -390,7 +393,7 @@ void DrawNode(node_t *node, settings_t *settings, bool true_node)
                             waitpid(a, NULL, 0);
                         }
                         else
-                            logWarning("Wasn't able to open project configs","sorry");
+                            logWarning("Wasn't able to open project configs", "sorry");
                     }
                 }
             }
@@ -441,12 +444,12 @@ void getName(settings_t *settings)
 
 char *identify(int num)
 {
-    return (char[10][10]){"s", "r", "h", "e", "en","I"}[num]; // hub, switch, router, host, external interface, external natted interface, Internet
+    return (char[10][10]){"s", "r", "h", "e", "en", "I"}[num]; // hub, switch, router, host, external interface, external natted interface, Internet
 }
 
 char *identifyType(int num)
 {
-    return (char[30][30]){"switch", "rrouter", "host", "external interface", "external natted interface","internet"}[num]; // hub, switch, router, host, external interface, external natted interface, Internet
+    return (char[30][30]){"switch", "rrouter", "host", "external interface", "external natted interface", "internet"}[num]; // hub, switch, router, host, external interface, external natted interface, Internet
 }
 
 void appendNode(interface_t *interface, node_t newnode, settings_t *settings)
@@ -507,21 +510,22 @@ link_t *getInverseLink(interface_t *interface, settings_t *settings)
         if (positions[0].x == -1 || positions[0].y == -1 || positions[1].x == -1 || positions[1].y == -1) // maybe yes, maybe no
             return NULL;
 
-        if(isNearLink(positions))
+        if (isNearLink(positions))
             return &interface->links[i];
-
     }
     return NULL;
 }
 
-rectangle_t * getInverseRectangle(interface_t * interface,settings_t * settings) {
-    for (int i = settings->numrectangles-1;i>=0;i--) {
-        if(
-            min(interface->rectangles[i].x,interface->rectangles[i].x1) <= GetMouseX() &&
-            min(interface->rectangles[i].y,interface->rectangles[i].y1) <= GetMouseY() &&
-            max(interface->rectangles[i].x,interface->rectangles[i].x1) >= GetMouseX() &&
-            max(interface->rectangles[i].y,interface->rectangles[i].y1) >= GetMouseY()
-            ) return &interface->rectangles[i];
+rectangle_t *getInverseRectangle(interface_t *interface, settings_t *settings)
+{
+    for (int i = settings->numrectangles - 1; i >= 0; i--)
+    {
+        if (
+            min(interface->rectangles[i].x, interface->rectangles[i].x1) <= GetMouseX() &&
+            min(interface->rectangles[i].y, interface->rectangles[i].y1) <= GetMouseY() &&
+            max(interface->rectangles[i].x, interface->rectangles[i].x1) >= GetMouseX() &&
+            max(interface->rectangles[i].y, interface->rectangles[i].y1) >= GetMouseY())
+            return &interface->rectangles[i];
     }
     return NULL;
 }
@@ -569,26 +573,31 @@ void addRectangle(interface_t *interface, settings_t *settings)
     interface->rectangles[settings->numrectangles].b = rand() % 256;
 }
 
-void export(settings_t * settings,interface_t * interface) {
-    logInfo("Ready to export","as DoneScript.ds");
-    FILE *ptr = fopen("DoneScript.ds","w");
-    for(int i = 0;i<settings->numnodes;i++) {
-        fprintf(ptr,"create %s at %d %d as %s\n",identifyType(interface->nodes[i].type), interface->nodes[i].x,interface->nodes[i].y,interface->nodes[i].name);
+void export(settings_t *settings, interface_t *interface)
+{
+    logInfo("Ready to export", "as DoneScript.ds");
+    FILE *ptr = fopen("DoneScript.ds", "w");
+    for (int i = 0; i < settings->numnodes; i++)
+    {
+        fprintf(ptr, "create %s at %d %d as %s\n", identifyType(interface->nodes[i].type), interface->nodes[i].x, interface->nodes[i].y, interface->nodes[i].name);
     }
-    for(int i = 0; i< settings->numlink;i++) {
-        fprintf(ptr,"link %s and %s\n",interface->links[i].node1,interface->links[i].node2);
+    for (int i = 0; i < settings->numlink; i++)
+    {
+        fprintf(ptr, "link %s and %s\n", interface->links[i].node1, interface->links[i].node2);
     }
-    for(int i = 0; i<settings->numrectangles;i++) {
-        fprintf(ptr,"draw rectangle between %d %d and %d %d with color %d %d %d\n",interface->rectangles[i].x,interface->rectangles[i].y,interface->rectangles[i].x1,interface->rectangles[i].y1,interface->rectangles[i].r,interface->rectangles[i].g,interface->rectangles[i].b);
+    for (int i = 0; i < settings->numrectangles; i++)
+    {
+        fprintf(ptr, "draw rectangle between %d %d and %d %d with color %d %d %d\n", interface->rectangles[i].x, interface->rectangles[i].y, interface->rectangles[i].x1, interface->rectangles[i].y1, interface->rectangles[i].r, interface->rectangles[i].g, interface->rectangles[i].b);
     }
     fclose(ptr);
-    logSuccess("Exporting as DoneScript","you can find it as DoneScript.ds");
+    logSuccess("Exporting as DoneScript", "you can find it as DoneScript.ds");
 }
 
 void DrawGUI(settings_t *settings, interface_t *interface)
 {
 
-    if(settings->isSimulating) DrawMessageAtAngle("Simulation in progress...");
+    if (settings->isSimulating)
+        DrawMessageAtAngle("Simulation in progress...");
 
     // 1. piazzo i buttons
     for (int i = 0; i < NUMbuttons; i++)
@@ -597,7 +606,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
     // 2. se premo esc disattivo dragging e placing TODO bugged
     if (IsKeyReleased(KEY_ESCAPE))
     {
-        logInfo("Escape key pressed","");
+        logInfo("Escape key pressed", "");
         settings->moving_node = false;
         settings->placing_node = false;
         settings->drawing_rectangle = false;
@@ -606,47 +615,48 @@ void DrawGUI(settings_t *settings, interface_t *interface)
         settings->deletingNodes = 0;
         settings->gettingName = 0;
         settings->resetName = 1;
-        logSuccess("All effects successfully deactivated","esc worked correctly");
+        logSuccess("All effects successfully deactivated", "esc worked correctly");
     }
 
     // 3. se sto spostando cose
     if (settings->moving_node)
     {
         // giusto per sicurezza, disattivo il placing se sto piazzando cose
-        //settings->placing_node = false;
-        // disegno un nodo "fantasma" dove sto muovendo il mouse
+        // settings->placing_node = false;
+        // disegno un node "fantasma" dove sto muovendo il mouse
         DrawNode(&(node_t){settings->node_name, settings->node_type, GetMouseX(), GetMouseY()}, settings, false);
         // se sto premendo (rilasciando, tbh) il tasto sinistro del mouse
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
         {
-            // smetto di spostare il nodo
+            // smetto di spostare il node
             settings->moving_node = false;
             // ne imposto le posizioni
             setNode(settings->node_name, interface->nodes, settings);
-            logSuccess("Correctly moved node","");
+            logSuccess("Correctly moved node", "");
         }
-        else DrawMessageAtAngle("Select a new position for the node");
+        else
+            DrawMessageAtAngle("Select a new position for the node");
     }
 
     // 4. altrimenti, se sto posizionando qualcosa di nuovo
     else if (settings->placing_node)
     {
-        // creo il name del nuovo nodo
+        // creo il name del nuovo node
         char name[50];
         snprintf(name, 50, "%s-%d", identify(settings->node_type), settings->absoluteCount);
-        // disegno un nodo "fantasma" dove sto muovendo il mouse
+        // disegno un node "fantasma" dove sto muovendo il mouse
         DrawNode(&(node_t){name, settings->node_type, GetMouseX(), GetMouseY()}, settings, false);
         // se premo il mouse
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
         {
             // allora non lo sto più piazzando
             settings->placing_node = false;
-            // aggiungo il nodo alla lista
+            // aggiungo il node alla lista
             appendNode(interface, (node_t){name, settings->node_type, GetMouseX(), GetMouseY()}, settings);
             // e aumento il numero di nodes
             settings->numnodes++;
             settings->absoluteCount++;
-            logSuccess("Correctly created node","");
+            logSuccess("Correctly created node", "");
         }
         else
             DrawMessageAtAngle("Choose the position for this new node");
@@ -655,7 +665,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
     // 5. altrimenti, se sto posizionando un link
     else if (settings->placing_link)
     {
-        // se ho già selezionato il primo nodo
+        // se ho già selezionato il primo node
         if (settings->placing_link == 1 && IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && isSomethingUnder(GetMouseX(), GetMouseY(), interface->nodes, settings))
         {
             // printf("%s\n",getInversePos(GetMouseX(),GetMouseY(),interface->nodes,settings));
@@ -679,7 +689,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             // aumento il numero di link
             settings->numlink++;
             settings->dragging_deactivated = false;
-            logSuccess("Correctly linked nodes","");
+            logSuccess("Correctly linked nodes", "");
         }
         else if (settings->placing_link == 2)
         {
@@ -699,7 +709,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                 settings->posX = GetMouseX();
                 settings->posY = GetMouseY();
                 settings->drawing_rectangle = 2;
-                logInfo("Saved first point","now select the opposite");
+                logInfo("Saved first point", "now select the opposite");
             }
             else
             {
@@ -716,7 +726,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                 settings->drawing_rectangle = 0;
                 addRectangle(interface, settings);
                 settings->numrectangles += 1;
-                logSuccess("Rectangle successfully placed","");
+                logSuccess("Rectangle successfully placed", "");
             }
             else
             {
@@ -733,22 +743,36 @@ void DrawGUI(settings_t *settings, interface_t *interface)
     {
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
         {
-            node_t *nodo = getInversePos(GetMouseX(), GetMouseY(), interface->nodes, settings);
+            node_t *node = getInversePos(GetMouseX(), GetMouseY(), interface->nodes, settings);
+
             char *stringa = (char *)calloc(200, sizeof(char));
-            if (nodo)
+            if (node)
             {
-                //settings->numlink = 0;
-                strncpy(stringa, nodo->name, 200);
+
+                for (int i = 0; i < settings->numBindings; i++)
+                { // checking if bindings preferences were specified for the node. If so, delete them
+                    if (!strcmp(settings->interfaceBindings[i].bindingInterfaceName, node->name))
+                    {
+                        settings->interfaceBindings[i].bindingInterfaceName = strdup(settings->interfaceBindings[settings->numBindings].bindingInterfaceName);
+                        settings->interfaceBindings[i].deviceName = settings->interfaceBindings[settings->numBindings].deviceName;
+                        settings->numBindings--;
+                        settings->interfaceBindings = (binding_t *)realloc(settings->interfaceBindings, settings->numBindings * sizeof(binding_t));
+                        logSuccess("Deleted binding", "");
+                        break;
+                    }
+                }
+
+                strncpy(stringa, node->name, 200);
 
                 /* char a = false; <= we will never forget you */
 
                 settings->numnodes--;
 
-                nodo->name = strdup(interface->nodes[settings->numnodes].name);
-                nodo->x = interface->nodes[settings->numnodes].x;
-                nodo->y = interface->nodes[settings->numnodes].y;
-                nodo->type = interface->nodes[settings->numnodes].type;
-                logSuccess("Deleted node","");
+                node->name = strdup(interface->nodes[settings->numnodes].name);
+                node->x = interface->nodes[settings->numnodes].x;
+                node->y = interface->nodes[settings->numnodes].y;
+                node->type = interface->nodes[settings->numnodes].type;
+                logSuccess("Deleted node", "");
 
                 for (int i = 0; i < settings->numlink; i++)
                 {
@@ -760,7 +784,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                         interface->links[i].node2 = strdup(interface->links[settings->numlink].node2);
                         interface->links[i].node1_type = interface->links[settings->numlink].node1_type;
                         interface->links[i].node2_type = interface->links[settings->numlink].node2_type;
-                        logInfo("Deleted related link","");
+                        logInfo("Deleted related link", "");
                     }
                 }
 
@@ -777,12 +801,14 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                     link->node2 = strdup(interface->links[settings->numlink].node2);
                     link->node1_type = interface->links[settings->numlink].node1_type;
                     link->node2_type = interface->links[settings->numlink].node2_type;
-                    logSuccess("Deleted link","");
+                    logSuccess("Deleted link", "");
                 }
-                else {
+                else
+                {
                     // maybe deleting a rectangle
-                    rectangle_t *rectangle = getInverseRectangle(interface,settings);
-                    if (rectangle) {
+                    rectangle_t *rectangle = getInverseRectangle(interface, settings);
+                    if (rectangle)
+                    {
                         settings->numrectangles--;
                         rectangle->x = interface->rectangles[settings->numrectangles].x;
                         rectangle->x1 = interface->rectangles[settings->numrectangles].x1;
@@ -791,7 +817,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                         rectangle->r = interface->rectangles[settings->numrectangles].r;
                         rectangle->g = interface->rectangles[settings->numrectangles].g;
                         rectangle->b = interface->rectangles[settings->numrectangles].b;
-                        logSuccess("Deleted rectangle","");
+                        logSuccess("Deleted rectangle", "");
                     }
                 }
             }
@@ -799,11 +825,14 @@ void DrawGUI(settings_t *settings, interface_t *interface)
         else
             DrawMessageAtAngle("Select the node, the link or the rectangle to delete");
     }
-    else if (settings->placing_text){
-        if(settings->placing_text==1) {
+    else if (settings->placing_text)
+    {
+        if (settings->placing_text == 1)
+        {
             // devo setuppare le strutture
         }
-        else if (settings->placing_text==2) {
+        else if (settings->placing_text == 2)
+        {
             // sto accumulando lettere in attesa di un invio, se c'è l'invio aggiungo le cose
         }
     }
@@ -829,54 +858,54 @@ void DrawGUI(settings_t *settings, interface_t *interface)
         DrawLink(interface->links[i], settings, interface->nodes);
     for (int i = 0; i < settings->numnodes; i++)
         DrawNode(&(interface->nodes[i]), settings, true);
-    
 
-    if(settings->numOptions) {
-        
-        settings->chosenNode = NULL;
-        if(!settings->chosenNode && getInversePos(GetMouseX(), GetMouseY(), interface->nodes, settings)){
-                settings->chosenNode = strdup(getInversePos(GetMouseX(), GetMouseY(), interface->nodes, settings)->name);
+    if (settings->numOptions)
+    {
+
+        if (getInversePos(GetMouseX(), GetMouseY(), interface->nodes, settings) && !settings->chosenNode)
+        {
+            settings->chosenNode = strdup(getInversePos(GetMouseX(), GetMouseY(), interface->nodes, settings)->name);
         }
 
-        DrawRectangle(0, 0, WIDTH, HEIGHT, CLITERAL(Color){252, 245, 229,150});
-        int optionHeight = min((HEIGHT-500)/settings->numOptions,100);
-        for (int i = 0; i<settings->numOptions; i++) {
+        DrawRectangle(0, 0, WIDTH, HEIGHT, CLITERAL(Color){252, 245, 229, 150});
+        int optionHeight = min((HEIGHT - 500) / settings->numOptions, 100);
+        for (int i = 0; i < settings->numOptions; i++)
+        {
 
-            bool cond = (
-                        i==settings->chosenOption ||
-                        (
-                            GetMouseX()>WIDTH/2-300 &&
-                            GetMouseX()<WIDTH/2+300 &&
-                            GetMouseY()>250+i*optionHeight &&
-                            GetMouseY()<250+(i+1)*optionHeight
-                        )
-                     );
+            bool cond = (i == settings->chosenOption ||
+                         (GetMouseX() > WIDTH / 2 - 300 &&
+                          GetMouseX() < WIDTH / 2 + 300 &&
+                          GetMouseY() > 250 + i * optionHeight &&
+                          GetMouseY() < 250 + (i + 1) * optionHeight));
 
-            DrawRectangleLines(WIDTH/2-300,250+i*optionHeight,600,optionHeight,cond?RED:BLUE);
-            DrawText(settings->options[i],WIDTH/2-250,250+i*optionHeight+optionHeight/2,STD_FONT_SIZE,BLACK);
-            if (cond) settings->chosenOption = i;
-            //printf("%d\n",subcond);
+            DrawRectangleLines(WIDTH / 2 - 300, 250 + i * optionHeight, 600, optionHeight, cond ? RED : BLUE);
+            DrawText(settings->options[i], WIDTH / 2 - 250, 250 + i * optionHeight + optionHeight / 2, STD_FONT_SIZE, BLACK);
+            if (cond)
+                settings->chosenOption = i;
+            // printf("%d\n",subcond);
         }
-        if(
+        if (
             IsKeyReleased(KEY_ENTER) ||
-            (
-                IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && 
-                GetMouseX()>WIDTH/2-300 &&
-                GetMouseX()<WIDTH/2+300 &&
-                GetMouseY()>250 &&
-                GetMouseY()<250+(settings->numOptions)*optionHeight
-            )
-        ) {
-            if(settings->chosenNode){
+            (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) &&
+             GetMouseX() > WIDTH / 2 - 300 &&
+             GetMouseX() < WIDTH / 2 + 300 &&
+             GetMouseY() > 250 &&
+             GetMouseY() < 250 + (settings->numOptions) * optionHeight))
+        {
+            if (settings->chosenNode)
+            {
                 trackChosenInterfBinding(settings);
                 settings->chosenNode = NULL;
             }
         }
-        if(IsKeyReleased(KEY_UP)) settings->chosenOption = max(0,settings->chosenOption-1);
-        if(IsKeyReleased(KEY_DOWN)) settings->chosenOption = min(settings->numOptions-1,settings->chosenOption+1);
+        if (IsKeyReleased(KEY_UP))
+            settings->chosenOption = max(0, settings->chosenOption - 1);
+        if (IsKeyReleased(KEY_DOWN))
+            settings->chosenOption = min(settings->numOptions - 1, settings->chosenOption + 1);
     }
-    if(settings->exportDoneScript){
-        export(settings,interface);
+    if (settings->exportDoneScript)
+    {
+        export(settings, interface);
         settings->exportDoneScript = false;
     }
     /*TODO for testing
