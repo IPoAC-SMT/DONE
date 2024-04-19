@@ -215,7 +215,7 @@ void start(settings_t *settings)
     }
     logSuccess("Done!", "");
 
-    for(int i = 0; i < settings->numBindings; i++)
+    for (int i = 0; i < settings->numBindings; i++)
     {
         logInfo("Binding interface", "%s to %s", settings->interfaceBindings[i].deviceName, settings->interfaceBindings[i].bindingInterfaceName);
     }
@@ -260,7 +260,7 @@ void clearCanvas(settings_t *settings)
             free(interface->nodes);
         if (settings->numrectangles)
             free(interface->rectangles);
-        if(settings->numTexts)
+        if (settings->numTexts)
             free(interface->texts);
     }
     logSuccess("Canvas cleared", "");
@@ -338,9 +338,10 @@ void openProject(settings_t *settings)
             fscanf(file, "%d %d\n%d %d\n%d %d %d\n", &rectangles[i].x, &rectangles[i].y, &rectangles[i].x1, &rectangles[i].y1, (int *)&rectangles[i].r, (int *)&rectangles[i].g, (int *)&rectangles[i].b);
         }
 
-        for(int i = 0; i < numtextboxes; i++){
+        for (int i = 0; i < numtextboxes; i++)
+        {
             // reading all textboxes
-            fgets(othername,200,file);
+            fgets(othername, 200, file);
             fscanf(file, "%d %d\n", &textboxes[i].x, &textboxes[i].y);
             textboxes[i].text = (char *)malloc(strlen(othername) * sizeof(char));
             strcpy(textboxes[i].text, othername);
@@ -415,13 +416,12 @@ void saveProject(settings_t *settings)
             fprintf(file, "%d %d\n%d %d\n%d %d %d\n", current_rect.x, current_rect.y, current_rect.x1, current_rect.y1, current_rect.r, current_rect.g, current_rect.b); // data for every link
         }
 
-        
-        for(int i = 0; i < settings->numTexts; i++){
+        for (int i = 0; i < settings->numTexts; i++)
+        {
             // saving every textbox
             text_t current_text = gui->texts[i];
             fprintf(file, "%s\n%d %d\n", current_text.text, current_text.x, current_text.y);
         }
-        
 
         fclose(file);
 
@@ -453,7 +453,7 @@ void saveProject(settings_t *settings)
 
             fclose(file);
 
-            logSuccess("File successfully saved.","");
+            logSuccess("File successfully saved.", "");
         }
         else
         {
@@ -476,16 +476,17 @@ void populateInterfaceOptionsWrapper(settings_t *settings)
 void trackChosenInterfBinding(settings_t *settings)
 {
     __uint8_t found = 0;
-    for(int i = 0; i < settings->numBindings && !found; i++) // looking if the interface setting was already specified, and if so, updating the binding interface name
+    for (int i = 0; i < settings->numBindings && !found; i++) // looking if the interface setting was already specified, and if so, updating the binding interface name
     {
-        if(!strcmp(settings->chosenNode, settings->interfaceBindings[i].deviceName))
+        if (!strcmp(settings->chosenNode, settings->interfaceBindings[i].deviceName))
         {
             strcpy(settings->interfaceBindings[i].bindingInterfaceName, settings->options[settings->chosenOption]);
             found = 1;
         }
     }
 
-    if(!found){
+    if (!found)
+    {
         settings->interfaceBindings = (binding_t *)realloc(settings->interfaceBindings, (settings->numBindings + 1) * sizeof(binding_t));
         settings->interfaceBindings[settings->numBindings].deviceName = (char *)malloc((strlen(settings->chosenNode) + 1) * sizeof(char));
         strcpy(settings->interfaceBindings[settings->numBindings].deviceName, settings->chosenNode);
@@ -495,7 +496,7 @@ void trackChosenInterfBinding(settings_t *settings)
     }
 
     settings->numOptions = 0;
-    for(int i = 0; i < settings->numOptions; i++)
+    for (int i = 0; i < settings->numOptions; i++)
     {
         free(settings->options[i]);
     }

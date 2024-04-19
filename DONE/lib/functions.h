@@ -7,14 +7,14 @@ void placehost(settings_t *settings);
 void placeexternalinterface(settings_t *settings);
 void placeexternalnattedinterface(settings_t *settings);
 void placeInternet(settings_t *settings);
-void placeText(settings_t*settings);
+void placeText(settings_t *settings);
 void deleteNode(settings_t *settings);
 
-void exportDoneScript(settings_t*settings);
+void exportDoneScript(settings_t *settings);
 
 void placeRectangle(settings_t *settings);
 
-void quit(settings_t*settings);
+void quit(settings_t *settings);
 
 void initEnvironment();
 void start(settings_t *settings);

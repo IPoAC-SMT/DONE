@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct {
+typedef struct
+{
     char *deviceName;
     char *bindingInterfaceName;
 } binding_t;
@@ -29,7 +30,7 @@ typedef struct
     /* end things for rectangles */
     char *openProjectName;
     /*for file opening*/
-    char * filename;
+    char *filename;
     char gettingName;
     char resetName;
     char deletingNodes;
@@ -39,13 +40,12 @@ typedef struct
     int numOptions;
     int chosenOption;
     char *chosenNode;
-    char ** options;
-    binding_t * interfaceBindings;
+    char **options;
+    binding_t *interfaceBindings;
     int numBindings;
     char exportDoneScript;
     int numTexts;
-    int tmpx,tmpy;
-    char * tmpText;
+    int tmpx, tmpy;
+    char *tmpText;
     char placing_text;
 } settings_t;
-

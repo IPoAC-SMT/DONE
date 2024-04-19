@@ -14,14 +14,14 @@ int main(int argc, char **argv)
             execvp(args[0], args);
         }
         else if (a > 0)
-{
-            logInfo("CLI running in other window","");
+        {
+            logInfo("CLI running in other window", "");
             waitpid(a, NULL, 0);
             return 0;
         }
         else
         {
-            logError("tried to spawn the CLI but failed.","so sad :(");
+            logError("tried to spawn the CLI but failed.", "so sad :(");
             return -1;
         }
     }
@@ -31,28 +31,28 @@ int main(int argc, char **argv)
     initEnvironment(); // set up signal handling, create netns dir if not present
 
     interface_t *interface = init_interface((button_t[NUMbuttons]){
-        {24, 214, 50, 50, placeswitch, "Place a switch", 0, NULL, "switch",false},
-        {24, 274, 50, 50, placerouter, c ? "Place an RFC1149-compatible \"router\"" : "Place a router", 0, NULL, c ? "IPoAC" : "router",false},
-        {24, 334, 50, 50, placehost, "Place a host", 0, NULL, "host",false},
-        {24, 394, 50, 50, placeexternalinterface, "Place an external interface", 0, NULL, "externalinterface",false},
-        {24, 454, 50, 50, placeexternalnattedinterface, "Place an external NATted interface", 0, NULL, "externalnattedinterface",false},
-        {24, 514, 50, 50, placeInternet, "Place the Internet", 0, NULL, "internet",false},
-        {24, 154, 50, 50, placelink, "Link two nodes together", 0, NULL, "link",false},
-        {144, 24, 50, 50, start, "Start simulation!", 0, NULL, "start",true}, // first of the horizontal row
-        {204, 24, 50, 50, stop, "Stop simulation", 0, NULL, "stop",true},     // second of the horizontal row
-        {84, 24, 50, 50, prepareToOpenProject, "Open a file", 0, NULL, "openProject",true},
-        {24, 24, 50, 50, prepareToSaveProject, "Save project", 0, NULL, "saveProject",true},
-        {400, 24, 50, 50, exportDoneScript, "Export DoneScript", 0, NULL, "saveProject",true},
-        {480, 24, 50, 50, placeText, "Place a Text", 0, NULL, "saveProject",true},
-        {549, 24, 50, 50, clearCanvas, "Clear Canvas", 0, NULL, "clearCanvas",false},
-        {334, 24, 50, 50, deleteNode, "Delete a node or a link by clicking on it", 0, NULL, "deleteNode",false},
-        {874, 24, 50, 50, quit, "Quit", 0, NULL, "quit",true},
-        {24, 580, 50, 50, placeRectangle, "Draw a Rectangle", 0, NULL, "rectangle",false}},
-    NULL, NULL, NULL,NULL);
+        {24, 214, 50, 50, placeswitch, "Place a switch", 0, NULL, "switch", false},
+        {24, 274, 50, 50, placerouter, c ? "Place an RFC1149-compatible \"router\"" : "Place a router", 0, NULL, c ? "IPoAC" : "router", false},
+        {24, 334, 50, 50, placehost, "Place a host", 0, NULL, "host", false},
+        {24, 394, 50, 50, placeexternalinterface, "Place an external interface", 0, NULL, "externalinterface", false},
+        {24, 454, 50, 50, placeexternalnattedinterface, "Place an external NATted interface", 0, NULL, "externalnattedinterface", false},
+        {24, 514, 50, 50, placeInternet, "Place the Internet", 0, NULL, "internet", false},
+        {24, 154, 50, 50, placelink, "Link two nodes together", 0, NULL, "link", false},
+        {144, 24, 50, 50, start, "Start simulation!", 0, NULL, "start", true}, // first of the horizontal row
+        {204, 24, 50, 50, stop, "Stop simulation", 0, NULL, "stop", true},     // second of the horizontal row
+        {84, 24, 50, 50, prepareToOpenProject, "Open a file", 0, NULL, "openProject", true},
+        {24, 24, 50, 50, prepareToSaveProject, "Save project", 0, NULL, "saveProject", true},
+        {400, 24, 50, 50, exportDoneScript, "Export DoneScript", 0, NULL, "saveProject", true},
+        {24, 634, 50, 50, placeText, "Place a Text", 0, NULL, "placeText", true},
+        {549, 24, 50, 50, clearCanvas, "Clear Canvas", 0, NULL, "clearCanvas", false},
+        {334, 24, 50, 50, deleteNode, "Delete a node or a link by clicking on it", 0, NULL, "deleteNode", false},
+        {874, 24, 50, 50, quit, "Quit", 0, NULL, "quit", true},
+        {24, 574, 50, 50, placeRectangle, "Draw a Rectangle", 0, NULL, "rectangle", false}},
+    NULL, NULL, NULL, NULL);
 
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE);    // Window configuration flags
-    int screenWidth = WIDTH,screenHeight = HEIGHT;
-    InitWindow(screenWidth/*WIDTH*/, screenHeight/*HEIGHT*/, TITLE);
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE); // Window configuration flags
+    int screenWidth = WIDTH, screenHeight = HEIGHT;
+    InitWindow(screenWidth /*WIDTH*/, screenHeight /*HEIGHT*/, TITLE);
     SetTargetFPS(30);
 
     // Load icon image
@@ -60,16 +60,15 @@ int main(int argc, char **argv)
     // Set icon
     SetWindowIcon(icon);
 
-      // Unload image
+    // Unload image
     UnloadImage(icon);
-
 
     SetExitKey(KEY_NULL);
 
-    settings_t settings = {0, 0, 0, "", 0, 0, 0, 0, "", 0, 0, (void *)interface, 0, 0, 0, 0, 0, NULL, 0, 0, 0, c, 0,0,0,NULL,NULL,NULL,0,0,0,0,0,NULL,0};
+    settings_t settings = {0, 0, 0, "", 0, 0, 0, 0, "", 0, 0, (void *)interface, 0, 0, 0, 0, 0, NULL, 0, 0, 0, c, 0, 0, 0, NULL, NULL, NULL, 0, 0, 0, 0, 0, NULL, 0};
 
     system("clear");
-    
+
     while (!WindowShouldClose())
     {
         BeginDrawing();
@@ -78,8 +77,10 @@ int main(int argc, char **argv)
         DrawGUI(&settings, interface);
 
         EndDrawing();
-    
     }
+
+    if (settings.openProjectName)
+        free(settings.openProjectName);
 
     return 0;
 }
