@@ -34,7 +34,10 @@ for <varname> in (host|router|switch|external interface|external natted interfac
 do
     // you can write here any instruction, even other loops! wonderful, isn't it?
 done
-
+for <varname> in <min> <max> step <step>
+do
+    // whatever you want
+done
 ```
 
 

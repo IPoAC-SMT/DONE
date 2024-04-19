@@ -1,0 +1,4 @@
+for var_i in 1 90 step 2
+do
+    create host at 600 600 as host-var_i
+done

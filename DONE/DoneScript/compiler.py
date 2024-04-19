@@ -189,8 +189,19 @@ def parseFor(lines:[],i:int):
                 tmpLines.append(lines[k].replace(varname,name))
             parse(tmpLines)
     else:
-        pass #TODO
-    
+        [start,end,_,step] = [q.strip() for q in type.split(" ",3)]
+        [start,end,step] = [int(i) for i in [start,end,step]]
+        names = [str(q) for q in range(start,end,step)]
+        for name in names:
+            tmpLines = []
+            for k in range(i+2,j):
+                tmpLines.append(lines[k].replace(varname,name))
+            parse(tmpLines)
+            print("done "+name)
+            if name=="89":
+                print(structures["nodes"])
+
+    return None,j
 
 def parse(lines:[]):
     global structures
@@ -218,7 +229,7 @@ def parse(lines:[]):
             err = parseAddText(lines[i])
         elif lines[i].startswith("for"):
             #print("for detected")
-            err = parseFor(lines,i);
+            err,i = parseFor(lines,i);
         elif lines[i].startswith("do"):
             continue
         elif err:
@@ -231,27 +242,19 @@ def parse(lines:[]):
     #print(commands)
 
 if __name__ == "__main__":
-    """if len(sys.argv) < 2:
-        name = input("give me the name of the file > ")
-    else:
-        name = sys.argv[1]
 
-    if exists("./DoneScript/sources/"+name):
 
-        with open("./DoneScript/sources/"+name,"r") as program:
-            lines = [i.strip().lower() for i in program.readlines()]
-            parse(lines)
-            with open("./DoneScript/compiled/"+name[:-3]+".done","w") as f:
-                f.write(serialize())
-            with open("./DoneScript/compiled/"+name[:-3]+".done.conf","w") as f:
-                if commands:
-                    f.write(serializeCommands())
-    else:
-        print("ERROR: file not available in specified location")
-    """
 
     directory = os.fsencode("./DoneScript/sources/")
     for file in os.listdir(directory):
+        variables = []
+        structures = {
+                "links" :  [],
+                "nodes" : [],
+                "rectangles": [],
+                "texts":[]
+            }
+        commands = []
         name = os.fsdecode(file)
         print(name)
         with open("./DoneScript/sources/"+name,"r") as program:
@@ -261,7 +264,7 @@ if __name__ == "__main__":
                 f.write(serialize())
             with open("./DoneScript/compiled/"+name[:-3]+".done.conf","w") as f:
                 if commands:
-                    f.write(serializeCommands())
+                    f.write(serializeCommands())    
 
 
 
