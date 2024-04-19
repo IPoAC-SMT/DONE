@@ -133,7 +133,7 @@ int addExternalInterface(char *name, char *interface)
 
     if (name != NULL && strlen(name) <= MAX_NAME_SIZE && interface != NULL && strlen(interface) <= MAX_NAME_SIZE)
     {
-        snprintf(command, MAX_COMMAND_SIZE, "sudo docker run -id --cap-add=NET_ADMIN --name %s --network bridge node:1.0.0 /bin/bash", name);
+        snprintf(command, MAX_COMMAND_SIZE, "sudo docker run -id --cap-add=NET_ADMIN --name %s --network %s node:1.0.0 /bin/bash", name, interface);
 
         if (!system(command))
         { // once the node is created, adding the node's namespace to the netns folder
@@ -432,60 +432,32 @@ int openSwitchShell()
 
 interfaces *getNetInterfaces()
 {
-    struct ifaddrs *ifap, *ifa;
-    interfaces *res = (interfaces *)calloc(1, sizeof(interfaces));
-    int i = 0;
-    if (getifaddrs(&ifap) == -1)
-    {
-        perror("getifaddrs");
+    interfaces *interfaces = (interfaces *) calloc(1, sizeof(interfaces));
+    interfaces->interfaces = 0;
+
+    char command[] = "docker network ls | awk 'NR > 1 {print $2}'";
+    char buffer[20];
+    interfaces->interfaces_name = (char **) calloc(20, sizeof(char *));
+
+    // Open the command for reading
+    FILE* fp = popen(command, "r");
+    if (fp == NULL) {
+        perror("Failed to execute command");
         return NULL;
     }
 
-    for (ifa = ifap; ifa != NULL; ifa = ifa->ifa_next)
-    {
-        if (ifa->ifa_addr && (ifa->ifa_addr->sa_family == AF_INET || ifa->ifa_addr->sa_family == AF_INET6))
-        {
-            res->interfaces++; // counting the available interfaces (maybe duplicates)
-        }
-    } 
-
-    char **temp = (char **)calloc(res->interfaces, sizeof(char *)); // the last element is NULL
-    for (i = 0; i < res->interfaces; i++)
-    {
-        temp[i] = (char *)calloc(MAX_INTERFACE_SIZE, sizeof(char));
+    // Read the output line by line and store in the networks array
+    while (fgets(buffer, sizeof(buffer), fp) != NULL) {
+        // Remove trailing newline
+        buffer[strcspn(buffer, "\n")] = 0;
+        interfaces->interfaces_name[interfaces->interfaces] = strdup(buffer);
+        interfaces->interfaces++;
     }
 
-    for(i = 0, ifa = ifap; ifa != NULL; ifa = ifa->ifa_next)
-    {
-        if (ifa->ifa_addr && (ifa->ifa_addr->sa_family == AF_INET || ifa->ifa_addr->sa_family == AF_INET6))
-        {
-            strcpy(temp[i], ifa->ifa_name);
-            i++;
-        }
-    }
+    // Close the pipe
+    pclose(fp);
 
-    int real_interfaces = 0;
-    res->interfaces_name = (char **)calloc(res->interfaces, sizeof(char *));
-    for (i = 0; i < res->interfaces; i++)
-    {
-        int duplicate = 0;
-        for(int j = 0; j < i && !duplicate; j++)
-        {
-            if(strcmp(temp[i], temp[j]) == 0)
-            {
-                duplicate = 1;
-            }
-        }
-        if(!duplicate){
-            res->interfaces_name[real_interfaces] = (char *)calloc(MAX_INTERFACE_SIZE, sizeof(char));
-            strcpy(res->interfaces_name[real_interfaces], temp[i]);
-            real_interfaces++;
-        }
-    }
-
-    res->interfaces = real_interfaces;
-
-    return res;
+    return interfaces;
 }
 
 void printNetInterfaces(interfaces *interfaces)

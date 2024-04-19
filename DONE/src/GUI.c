@@ -859,7 +859,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                 GetMouseY()>250 &&
                 GetMouseY()<250+(settings->numOptions)*optionHeight
             )
-        ) printf("selezionato %d\n",settings->chosenOption); //TODO tiz cambialo con la tua chiamata a funzione.
+        ) trackChosenInterfBinding(settings);
         /*
          * NOTA: fai la free della settings->options e setta a 0 sia chosenOption che numOptions
         */

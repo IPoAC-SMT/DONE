@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+typedef struct {
+    char *deviceName;
+    char *bindingInterfaceName;
+} binding_t;
+
 typedef struct
 {
     int absoluteCount;
@@ -34,6 +39,8 @@ typedef struct
     int numOptions;
     int chosenOption;
     char ** options;
+    binding_t * interfaceBindings;
+    int numBindings;
     char exportDoneScript;
     int numTexts;
     int tmpx,tmpy;

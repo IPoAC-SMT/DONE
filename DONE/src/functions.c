@@ -9,7 +9,8 @@ void helloworld(settings_t *settings)
     printf("%d\n", settings->numlink);
 }*/
 
-void exportDoneScript(settings_t *settings){
+void exportDoneScript(settings_t *settings)
+{
     settings->exportDoneScript = 1;
 }
 
@@ -158,7 +159,7 @@ void start(settings_t *settings)
     if (settings->isSimulating || settings->numnodes == 0)
         return;
     settings->isSimulating = 42;
-    startSimulation((interface_t *)settings->GUIdata, settings->numnodes, settings->numlink);
+    startSimulation((interface_t *)settings->GUIdata, settings->numnodes, settings->numlink, settings->numBindings, settings->interfaceBindings);
 
     if (settings->openProjectName)
     { // if a project is open, we need to eventually load configs
@@ -188,14 +189,16 @@ void start(settings_t *settings)
                         if (nodeName[0] == 's')
                         {
                             logInfo("sending to switch:", "%s", buf);
-                            if(sendSwitchCommand(buf)){
+                            if (sendSwitchCommand(buf))
+                            {
                                 logError("An error was found in the config", "");
                             }
                         }
                         else
                         {
                             logInfo("sending command to node", "%s", buf); // sending the command to the logical controller
-                            if(sendNodeCommand(nodeName, buf)){
+                            if (sendNodeCommand(nodeName, buf))
+                            {
                                 logError("An error was found in the config", "");
                             }
                         }
@@ -216,6 +219,11 @@ void start(settings_t *settings)
         }
     }
     logSuccess("Done!", "");
+
+    for(int i = 0; i < settings->numBindings; i++)
+    {
+        logInfo("Binding interface", "%s to %s", settings->interfaceBindings[i].deviceName, settings->interfaceBindings[i].bindingInterfaceName);
+    }
 }
 
 void quit(settings_t *settings)
@@ -303,8 +311,6 @@ void openProject(settings_t *settings)
         char name[50]; // buffer
         char othername[50];
         int type, type2;
-
-        // sem_wait(settings->dio_melanzana);
 
         for (int i = 0; i < numnodes; i++)
         { // reading all nodes
@@ -440,7 +446,36 @@ void saveProject(settings_t *settings)
     }
 }
 
-
-void populateInterfaceOptionsWrapper(settings_t *settings){
+void populateInterfaceOptionsWrapper(settings_t *settings)
+{
     populateInterfaceOptions(settings);
+}
+
+void trackChosenInterfBinding(settings_t *settings)
+{
+    __uint8_t found = 0;
+    for(int i = 0; i < settings->numBindings && !found; i++) // looking if the interface setting was already specified, and if so, updating the binding interface name
+    {
+        if(!strcmp("e-0", settings->interfaceBindings[i].deviceName))
+        {
+            strcpy(settings->interfaceBindings[i].bindingInterfaceName, settings->options[settings->chosenOption]);
+            found = 1;
+        }
+    }
+
+    if(!found){
+        settings->interfaceBindings = (binding_t *)realloc(settings->interfaceBindings, (settings->numBindings + 1) * sizeof(binding_t));
+        settings->interfaceBindings[settings->numBindings].deviceName = (char *)malloc(strlen("antani") * sizeof(char));
+        strcpy(settings->interfaceBindings[settings->numBindings].deviceName, "e-0");
+        settings->interfaceBindings[settings->numBindings].bindingInterfaceName = (char *)malloc(strlen(settings->options[settings->chosenOption]) * sizeof(char));
+        strcpy(settings->interfaceBindings[settings->numBindings].bindingInterfaceName, settings->options[settings->chosenOption]);
+        settings->numBindings++;
+    }
+
+    settings->numOptions = 0;
+    for(int i = 0; i < settings->numOptions; i++)
+    {
+        free(settings->options[i]);
+    }
+    free(settings->options);
 }

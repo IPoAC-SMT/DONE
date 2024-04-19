@@ -31,7 +31,7 @@ void forcedCLIExit()
 
 // functions that interact with data collected by the GUI and pass it to the lower level (docker)
 
-void startSimulation(interface_t *simulation, int nodes_num, int links_num)
+void startSimulation(interface_t *simulation, int nodes_num, int links_num, int numBindings, binding_t *bindings)
 {
     interfaces *availableInterfaces = getNetInterfaces();
 
@@ -45,13 +45,16 @@ void startSimulation(interface_t *simulation, int nodes_num, int links_num)
     lastNodesNum = nodes_num;
     lastLinksNum = links_num;
 
-    logInfo("Starting simulation","");
+    logInfo("Starting simulation", "");
 
     // actually sending data to docker
+    u_int8_t bindingFound;
 
     for (int i = 0; i < nodes_num; i++)
     { // handling nodes
         node_t *current_node = &simdata.nodes[i];
+
+        bindingFound = 0;
 
         switch (current_node->type)
         { // handling every node type differently depending on node type
@@ -64,11 +67,18 @@ void startSimulation(interface_t *simulation, int nodes_num, int links_num)
         case router_t:
             addNode(current_node->name, 'r');
             break;
-        case external_interface_t:
-            addExternalInterface(current_node->name, availableInterfaces->interfaces_name[1]);
-            break;
         case external_natted_interface_t:
-            addExternalInterface(current_node->name, availableInterfaces->interfaces_name[1]);
+        case external_interface_t:
+            for (int j = 0; j < numBindings && !bindingFound; j++)
+            {
+                if (!strcmp(current_node->name, bindings[j].bindingInterfaceName))
+                {
+                    addExternalInterface(current_node->name, bindings[j].deviceName);
+                    bindingFound = 1;
+                }
+            }
+            if (!bindingFound)
+                addExternalInterface(current_node->name, availableInterfaces->interfaces_name[1]);
             break;
         case the_Internet_t:
             break;
@@ -131,7 +141,7 @@ void stopSimulation(interface_t *simulation, int nodes_num, int links_num)
     simdata.nodes_num = nodes_num;
     simdata.links_num = links_num;
 
-    logInfo("Stopping simulation","");
+    logInfo("Stopping simulation", "");
 
     for (int i = 0; i < nodes_num; i++)
     { // handling nodes is enough, all links between them will be deleted automatically
@@ -151,14 +161,15 @@ void stopSimulation(interface_t *simulation, int nodes_num, int links_num)
     logSuccess("Simulation successfully terminated", "");
 }
 
-void populateInterfaceOptions(settings_t *settings){
+void populateInterfaceOptions(settings_t *settings)
+{
 
     interfaces *res = getNetInterfaces();
     settings->numOptions = res->interfaces;
     settings->options = res->interfaces_name;
 
-    for(int i = 0; i < res->interfaces; i++){
+    for (int i = 0; i < res->interfaces; i++)
+    {
         logInfo("Interface found", res->interfaces_name[i]);
     }
-
 }

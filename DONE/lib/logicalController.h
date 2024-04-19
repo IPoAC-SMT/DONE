@@ -13,7 +13,7 @@ typedef struct
 
 void initEnv();
 void forcedCLIExit();
-void startSimulation(interface_t *simulation, int nodes_num, int links_num);
+void startSimulation(interface_t *simulation, int nodes_num, int links_num, int numBindings, binding_t *bindings);
 void openSwitchShellWrapper();
 void openNodeShellWrapper(char *node_name);
 int sendNodeCommand(char *name, char *command);
