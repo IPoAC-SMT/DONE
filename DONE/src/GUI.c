@@ -596,6 +596,9 @@ void export(settings_t * settings,interface_t * interface) {
     for(int i = 0; i<settings->numrectangles;i++) {
         fprintf(ptr,"draw rectangle between %d %d and %d %d with color %d %d %d\n",interface->rectangles[i].x,interface->rectangles[i].y,interface->rectangles[i].x1,interface->rectangles[i].y1,interface->rectangles[i].r,interface->rectangles[i].g,interface->rectangles[i].b);
     }
+    for(int i=0;i<settings->numTexts;i++){
+        fprintf(ptr,"add text \"%s\" at %d %d\n",interface->texts[i].text,interface->texts[i].x,interface->texts[i].y);
+    }
     fclose(ptr);
     logSuccess("Exporting as DoneScript","you can find it as DoneScript.ds");
 }
