@@ -17,7 +17,7 @@ DoneScript is the official scripting language for DONE.
 
 All DoneScript files should be named without spaces and with the extension `.ds`.
 
-Instructions are the following, where `shortname` is a string shorter than 10 chars, `x`, `y`, `r`, `g` and`b` are integers, `varname` is a shortname that begins with `var`. `command` can be any valid linux command.
+Instructions are the following, where `shortname` is a string shorter than 20 chars, `x`, `y`, `r`, `g` and`b` are integers, `varname` is a shortname that begins with `var`. `command` can be any valid linux command.
 
 ```
 create (host|router|switch|external interface|external natted interface|internet) at <x> <y> as <shortname>

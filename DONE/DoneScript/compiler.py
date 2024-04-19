@@ -90,8 +90,8 @@ def parseCreate(instruction:str): # to be called only when no variables in names
             return "ERROR: invalid x = "+str(x)
         elif y<0 or y>1000:
             return "ERROR: invalid y = "+str(y)
-        elif len(name)>10:
-            return "ERROR: name length can't be >10 (name "+str(name)+")"
+        elif len(name)>20:
+            return "ERROR: name length can't be >20 (name "+str(name)+")"
         elif isName(name):
             return "ERROR: not a valid name or variable value: '"+type+"'"
         elif type not in ["switch","router","host","external interface","external natted interface","internet"]:
@@ -192,14 +192,16 @@ def parseFor(lines:[],i:int):
         [start,end,_,step] = [q.strip() for q in type.split(" ",3)]
         [start,end,step] = [int(i) for i in [start,end,step]]
         names = [str(q) for q in range(start,end,step)]
+        print(names)
         for name in names:
             tmpLines = []
             for k in range(i+2,j):
                 tmpLines.append(lines[k].replace(varname,name))
+            print(tmpLines)
             parse(tmpLines)
-            print("done "+name)
-            if name=="89":
-                print(structures["nodes"])
+            #print("done "+name)
+            #if name=="89":
+            #    print(structures["nodes"])
 
     return None,j
 
