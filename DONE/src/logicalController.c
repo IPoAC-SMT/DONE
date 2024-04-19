@@ -71,14 +71,14 @@ void startSimulation(interface_t *simulation, int nodes_num, int links_num, int 
         case external_interface_t:
             for (int j = 0; j < numBindings && !bindingFound; j++)
             {
-                if (!strcmp(current_node->name, bindings[j].bindingInterfaceName))
+                if (!strcmp(current_node->name, bindings[j].deviceName))
                 {
-                    addExternalInterface(current_node->name, bindings[j].deviceName);
+                    addExternalInterface(current_node->name, bindings[j].bindingInterfaceName);
                     bindingFound = 1;
                 }
             }
             if (!bindingFound)
-                addExternalInterface(current_node->name, availableInterfaces->interfaces_name[1]);
+                addExternalInterface(current_node->name, availableInterfaces->interfaces_name[0]);
             break;
         case the_Internet_t:
             break;

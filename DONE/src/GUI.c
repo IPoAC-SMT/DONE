@@ -830,7 +830,14 @@ void DrawGUI(settings_t *settings, interface_t *interface)
     for (int i = 0; i < settings->numnodes; i++)
         DrawNode(&(interface->nodes[i]), settings, true);
     
+
     if(settings->numOptions) {
+        
+        settings->chosenNode = NULL;
+        if(!settings->chosenNode && getInversePos(GetMouseX(), GetMouseY(), interface->nodes, settings)){
+                settings->chosenNode = strdup(getInversePos(GetMouseX(), GetMouseY(), interface->nodes, settings)->name);
+        }
+
         DrawRectangle(0, 0, WIDTH, HEIGHT, CLITERAL(Color){252, 245, 229,150});
         int optionHeight = min((HEIGHT-500)/settings->numOptions,100);
         for (int i = 0; i<settings->numOptions; i++) {
@@ -859,10 +866,12 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                 GetMouseY()>250 &&
                 GetMouseY()<250+(settings->numOptions)*optionHeight
             )
-        ) trackChosenInterfBinding(settings);
-        /*
-         * NOTA: fai la free della settings->options e setta a 0 sia chosenOption che numOptions
-        */
+        ) {
+            if(settings->chosenNode){
+                trackChosenInterfBinding(settings);
+                settings->chosenNode = NULL;
+            }
+        }
         if(IsKeyReleased(KEY_UP)) settings->chosenOption = max(0,settings->chosenOption-1);
         if(IsKeyReleased(KEY_DOWN)) settings->chosenOption = min(settings->numOptions-1,settings->chosenOption+1);
     }

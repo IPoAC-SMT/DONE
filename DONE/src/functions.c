@@ -3,11 +3,6 @@
 #include <string.h>
 
 #define MAX_FILENAME 50
-/*
-void helloworld(settings_t *settings)
-{
-    printf("%d\n", settings->numlink);
-}*/
 
 void exportDoneScript(settings_t *settings)
 {
@@ -456,7 +451,7 @@ void trackChosenInterfBinding(settings_t *settings)
     __uint8_t found = 0;
     for(int i = 0; i < settings->numBindings && !found; i++) // looking if the interface setting was already specified, and if so, updating the binding interface name
     {
-        if(!strcmp("e-0", settings->interfaceBindings[i].deviceName))
+        if(!strcmp(settings->chosenNode, settings->interfaceBindings[i].deviceName))
         {
             strcpy(settings->interfaceBindings[i].bindingInterfaceName, settings->options[settings->chosenOption]);
             found = 1;
@@ -465,8 +460,8 @@ void trackChosenInterfBinding(settings_t *settings)
 
     if(!found){
         settings->interfaceBindings = (binding_t *)realloc(settings->interfaceBindings, (settings->numBindings + 1) * sizeof(binding_t));
-        settings->interfaceBindings[settings->numBindings].deviceName = (char *)malloc(strlen("antani") * sizeof(char));
-        strcpy(settings->interfaceBindings[settings->numBindings].deviceName, "e-0");
+        settings->interfaceBindings[settings->numBindings].deviceName = (char *)malloc((strlen(settings->chosenNode) + 1) * sizeof(char));
+        strcpy(settings->interfaceBindings[settings->numBindings].deviceName, settings->chosenNode);
         settings->interfaceBindings[settings->numBindings].bindingInterfaceName = (char *)malloc(strlen(settings->options[settings->chosenOption]) * sizeof(char));
         strcpy(settings->interfaceBindings[settings->numBindings].bindingInterfaceName, settings->options[settings->chosenOption]);
         settings->numBindings++;

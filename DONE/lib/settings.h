@@ -38,6 +38,7 @@ typedef struct
     /*for multiple choices*/
     int numOptions;
     int chosenOption;
+    char *chosenNode;
     char ** options;
     binding_t * interfaceBindings;
     int numBindings;

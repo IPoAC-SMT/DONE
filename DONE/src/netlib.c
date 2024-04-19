@@ -432,12 +432,12 @@ int openSwitchShell()
 
 interfaces *getNetInterfaces()
 {
-    interfaces *interfaces = (interfaces *) calloc(1, sizeof(interfaces));
-    interfaces->interfaces = 0;
+    interfaces *interface = (interfaces *) calloc(1, sizeof(interfaces));
+    interface->interfaces = 0;
 
     char command[] = "docker network ls | awk 'NR > 1 {print $2}'";
     char buffer[20];
-    interfaces->interfaces_name = (char **) calloc(20, sizeof(char *));
+    interface->interfaces_name = (char **) calloc(20, sizeof(char *));
 
     // Open the command for reading
     FILE* fp = popen(command, "r");
@@ -450,14 +450,14 @@ interfaces *getNetInterfaces()
     while (fgets(buffer, sizeof(buffer), fp) != NULL) {
         // Remove trailing newline
         buffer[strcspn(buffer, "\n")] = 0;
-        interfaces->interfaces_name[interfaces->interfaces] = strdup(buffer);
-        interfaces->interfaces++;
+        interface->interfaces_name[interface->interfaces] = strdup(buffer);
+        interface->interfaces++;
     }
 
     // Close the pipe
     pclose(fp);
 
-    return interfaces;
+    return interface;
 }
 
 void printNetInterfaces(interfaces *interfaces)
