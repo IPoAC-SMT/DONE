@@ -23,13 +23,13 @@ void DrawButton(button_t *pulsante, settings_t *settings)
             else
             {
                 hovering = true;
-                DrawText(pulsante->alt_text, GetMouseX() + 20, GetMouseY() + 20, STD_FONT_SIZE, GRAY);
+                DrawText(pulsante->alt_text, GetMouseX() + 20, GetMouseY() + 20, STD_FONT_SIZE, FIGURE_COLOR);
             }
         }
         else
             hovering = false;
 
-        DrawRectangleLines(pulsante->x, pulsante->y, pulsante->width, pulsante->height, hovering ? YELLOW : GRAY); // lo creo con colore diverso se ci sto o meno hoverando
+        DrawRectangleLines(pulsante->x, pulsante->y, pulsante->width, pulsante->height, hovering ? YELLOW : FIGURE_COLOR); // lo creo con colore diverso se ci sto o meno hoverando
 
         if (pulsante->edges == NULL)
         {
@@ -52,7 +52,7 @@ void DrawButton(button_t *pulsante, settings_t *settings)
 
         for (int i = 0; i < pulsante->numEdges; i++)
         {
-            DrawLineEx((Vector2){pulsante->edges[i][0] + pulsante->x, pulsante->edges[i][1] + pulsante->y}, (Vector2){pulsante->edges[i][2] + pulsante->x, pulsante->edges[i][3] + pulsante->y}, hovering ? 3 : 1, hovering ? YELLOW : GRAY);
+            DrawLineEx((Vector2){pulsante->edges[i][0] + pulsante->x, pulsante->edges[i][1] + pulsante->y}, (Vector2){pulsante->edges[i][2] + pulsante->x, pulsante->edges[i][3] + pulsante->y}, hovering ? 3 : 1, hovering ? YELLOW : FIGURE_COLOR);
         }
     }
 }
@@ -311,7 +311,7 @@ void DrawNode(node_t *node, settings_t *settings, bool true_node)
         DrawRing((Vector2){nodex + 2, nodey - 1}, 9, 11, 76, 267, 0, FIGURE_COLOR);
         break;
     }
-    DrawText(node->name, nodex - 20, nodey + 40, STD_FONT_SIZE, GRAY);
+    DrawText(node->name, nodex - 20, nodey + 40, STD_FONT_SIZE, FIGURE_COLOR);
     // se non sto al momento spostando niente e ci clicco con il tasto sinistro allora inizio a draggarlo
     if (
         true_node &&
@@ -438,7 +438,7 @@ void getName(settings_t *settings)
         settings->filename[strlen(settings->filename) - 1] = '\0';
     }
     snprintf(toPrint, 300, "Insert the name of the file: ./saves/%s", settings->filename);
-    DrawText(toPrint, 1100, 20, STD_FONT_SIZE, GRAY);
+    DrawText(toPrint, 1100, 20, STD_FONT_SIZE, FIGURE_COLOR);
     free(toPrint);
 }
 
@@ -576,7 +576,7 @@ bool isSomethingUnder(int x, int y, node_t *nodes, settings_t *settings)
 
 void DrawMessageAtAngle(char *message)
 {
-    DrawText(message, 1900 - STD_FONT_SIZE / 2 * strlen(message), 970, STD_FONT_SIZE, GRAY);
+    DrawText(message, 1900 - STD_FONT_SIZE / 2 * strlen(message), 970, STD_FONT_SIZE, FIGURE_COLOR);
 }
 
 void DrawRectangleWrapper(rectangle_t *rectangle)
