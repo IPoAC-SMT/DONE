@@ -1,6 +1,11 @@
 # DONE
 Docker Orchestrator for Network Emulation
 
+DONE is a simple network emulator, inspired by the IMUNES project. The idea was to start from the IMUNES features and recreate some of them, improving the software reliability, improving the UX and reducing software dependencies.
+
+## Installation
+To install, simply clone the repository to a local folder and navigate to the `DONE` folder to run the `make` commands. 
+
 ## Usage:
 ```
 make clean      # removes objects and executable
@@ -42,4 +47,4 @@ done
 
 
 ## CLI
-The CLI is an interactive instance of python3 with network emulation functions
+The CLI is an interactive instance of python3 with network emulation functions. Directly interact with the underlying network infrastructure by using a simple command line
