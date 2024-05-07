@@ -11,6 +11,14 @@ In order for DONE to properly work, make sure you have the following dependencie
 - [`docker`](https://docs.docker.com/engine/install/) to virtualize nodes and routers;
 - [`openVSwitch`](https://www.openvswitch.org/) to virtualize switches.
 
+<!-- 
+sudo apt install libasound2-dev libx11-dev libxrandr-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev libxcursor-dev libxinerama-dev libwayland-dev libxkbcommon-dev
+cd raylib/src/
+make PLATFORM=PLATFORM_DESKTOP RAYLIB_LIBTYPE=SHARED # To make the dynamic shared version.
+sudo make install RAYLIB_LIBTYPE=SHARED
+
+-->
+
 You also need to make sure you have a C compiler on your machine.
 
 ## Installation
