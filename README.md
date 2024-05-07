@@ -1,12 +1,30 @@
 # DONE
-Docker Orchestrator for Network Emulation
+_Docker Orchestrator for Network Emulation_
 
-DONE is a simple network emulator, inspired by the IMUNES project. The idea was to start from the IMUNES features and recreate some of them, improving the software reliability, improving the UX and reducing software dependencies.
+**DONE** is a simple **network emulator**, inspired by the [IMUNES](https://github.com/imunes/imunes) project. Starting from the features IMUNES offered, we decided to recreate some of them, improving both software reliability and the UX while reducing software dependencies to the bare minimum.
+
+<!-- SCREENSHOTS HERE -->
+
+## Prerequisites
+In order for DONE to properly work, make sure you have the following dependencies installed:
+- [`raylib`](https://github.com/raysan5/raylib) for graphical purposes;
+- [`docker`](https://docs.docker.com/engine/install/) to virtualize nodes and routers;
+- [`openVSwitch`](https://www.openvswitch.org/) to virtualize switches.
+
+You also need to make sure you have a C compiler on your machine.
 
 ## Installation
-To install, simply clone the repository to a local folder and navigate to the `DONE` folder to run the `make` commands. 
+To install DONE, simply clone the repository and navigate to the `DONE` folder, then run the `make` commands from there:
+```
+git clone https://github.com/IPoAC-SMT/DONE.git
+cd DONE/DONE
+make clean
+make
+make exec
+```
 
 ## Usage:
+All the possible `make` options are the following:
 ```
 make clean      # removes objects and executable
 make exec       # if executable exists executes the GUI
@@ -16,9 +34,18 @@ make prod       # compiles and removes the intermediate files
 make compile    # compiles the DoneScript files inside ./DONE/DoneScript/sources/
 make import     # imports the DoneScript compiled files inside ./DONE/saves/
 ```
+### Starting a simulation
+Once you have created your topology, you can run the simulation by pressing on the **Start simulation!** button.
+It is advisable to stop it via the **Stop simulation** button before closing the application, however everything will be deleted even if you do not stop it before exiting, therefore no pending docker containers will remain on your machine.
+
+### Saving configurations to file
+TODO
+
+<!-- -->
+
 
 ## DoneScript
-DoneScript is the official scripting language for DONE.
+`DoneScript` is the official **scripting language** for DONE.
 
 All DoneScript files should be named without spaces and with the extension `.ds`.
 
@@ -46,5 +73,9 @@ done
 ```
 
 
-## CLI
-The CLI is an interactive instance of python3 with network emulation functions. Directly interact with the underlying network infrastructure by using a simple command line
+## Command Line Interface
+The CLI is an instance of `python3` with network emulation functions which offers the possibility to interact with the underlying network infrastructure by using a simple command line instead of the graphical interface.
+To use the CLI instead of the GUI, as said earlier, launch DONE with the following `make` command:
+```
+make cli
+```
