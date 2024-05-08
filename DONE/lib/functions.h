@@ -32,3 +32,5 @@ void clearCanvas(settings_t *settings);
 void populateInterfaceOptionsWrapper(settings_t *settings);
 
 void trackChosenInterfBinding(settings_t *settings);
+
+void getData(settings_t*settings,interface_t*interface);

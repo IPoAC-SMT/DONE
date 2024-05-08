@@ -502,3 +502,30 @@ void trackChosenInterfBinding(settings_t *settings)
     }
     free(settings->options);
 }
+
+int validateIP(settings_t*settings){
+    return 1; // if valid
+    // otherwise
+    return 0;
+}
+
+
+
+void getData(settings_t*settings,interface_t*interface){
+    /*
+        1. if non ho il server addr chiedo all'utente l'ip => settings
+        2. prendo i dati (aka socket ecc)
+        3. trasformo in strutture/file
+    */
+    if(!settings->serverIP || !settings->validIP){
+        // get server IP and validate it, set valid bit at 1
+        // TODO as file names, save in 
+    }
+    else {
+        // everything is fine
+        fetchData()
+    }
+}
+
+
+

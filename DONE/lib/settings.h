@@ -48,4 +48,7 @@ typedef struct
     int tmpx, tmpy;
     char *tmpText;
     char placing_text;
+    char isClient;
+    char *serverIP; // funny solution: uint_8 serverIP[4];
+    char validIP;
 } settings_t;
