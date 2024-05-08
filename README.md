@@ -46,6 +46,9 @@ make import     # imports the DoneScript compiled files inside ./DONE/saves/
 Once you have created your topology, you can run the simulation by pressing on the **Start simulation!** button.
 It is advisable to stop it via the **Stop simulation** button before closing the application, however everything will be deleted even if you do not stop it before exiting, therefore no pending docker containers will remain on your machine.
 
+### Assigning configurations to a machine
+TODO
+
 ### Saving configurations to file
 TODO
 
@@ -54,6 +57,8 @@ TODO
 
 ## DoneScript
 `DoneScript` is the official **scripting language** for DONE.
+It allows you to script topologies and configurations (instead of drawing them with the GUI and manunally filling config files, which is the standard approach) generating all the necessary files for you.
+These files will be fully functional and ready to be opened in DONE for testing and visualisation.
 
 All DoneScript files should be named without spaces and with the extension `.ds`.
 
@@ -79,7 +84,13 @@ do
     // whatever you want
 done
 ```
-
+### How to use it
+1. Create a `.ds` file in the directory `Donescript/sources`
+2. To compile it, run `make compile` (this command will compile all the `.ds` files under the `Donescript/sources` directory
+3. To make your project visible to DONE and therefore openable from the GUI there are two different approaches:
+   - To only import one project: take the `.done` and `.done.conf` you need (the ones with the same name as the `.ds` file you just filled) from the directory `Donescript/compiled` and move them manually in the directory `DONE/DONE/saves`
+   - To import all projects: run `make import`
+5. Open your project in DONE as usual
 
 ## Command Line Interface
 The CLI is an instance of `python3` with network emulation functions which offers the possibility to interact with the underlying network infrastructure by using a simple command line instead of the graphical interface.
