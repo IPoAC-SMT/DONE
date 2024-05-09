@@ -1,5 +1,6 @@
 #include "../lib/logicalController.h"
 #include "../lib/log.h"
+#include "../lib/doneserver.h"
 #include <string.h>
 #include <arpa/inet.h>
 
@@ -542,21 +543,12 @@ int validateIP(settings_t*settings, char *providedIp){
     struct in_addr address;
     if(inet_pton(AF_INET, providedIp, &address)){   // function to check if IP is valid IPv4 address
         // if valid IPv4 saves address into settings
-        settings->serverIP = (uint32_t)address.s_addr;
+        settings->serverIP = strdup(providedIp);
         return 1;
     } else {
         return 0;
     }
 }
-
-void fetchData(settings_t*settings,interface_t*interface){
-    // get data from socket
-    printf("I should get data from sockets\n");
-    // update structs
-    return;
-}
-
-
 
 void getData(settings_t*settings,interface_t*interface){
     /*
@@ -572,6 +564,3 @@ void getData(settings_t*settings,interface_t*interface){
         fetchData(settings,interface);
     }
 }
-
-
-

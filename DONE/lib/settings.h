@@ -50,7 +50,7 @@ typedef struct
     char placing_text;
     char isClient;
     //char *serverIP; // funny solution: uint_8 serverIP[4];
-    uint32_t serverIP;
+    char *serverIP;
     char validIP;
     char* tmpIp;
     char gettingIp;

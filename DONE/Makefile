@@ -1,4 +1,4 @@
-all: main.o  ./obj/functions.o ./obj/GUI.o ./obj/interface.o ./obj/netlib.o ./obj/logicalController.o ./obj/log.o ./obj/netlib.so
+all: main.o  ./obj/doneserver.o ./obj/functions.o ./obj/GUI.o ./obj/interface.o ./obj/netlib.o ./obj/logicalController.o ./obj/log.o ./obj/netlib.so
 	gcc main.o ./obj/*.o -lm -lraylib -o ./bin/executable
 
 ./obj/%.o: src/%.c
