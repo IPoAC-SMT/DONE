@@ -20,7 +20,9 @@ void placeInternet(settings_t *settings)
     settings->placing_node = 1;
     settings->node_type = 5;
     settings->deletingNodes = 0;
+    settings->isClient = 0;
     settings->placing_text = 0;
+    settings->gettingIp = 0;
     logInfo("Ready to place a node", "type the Internet");
 }
 void placeswitch(settings_t *settings)
@@ -30,8 +32,10 @@ void placeswitch(settings_t *settings)
     settings->placing_link = 0;
     settings->drawing_rectangle = 0;
     settings->moving_node = 0;
+    settings->gettingIp = 0;
     settings->placing_node = 1;
     settings->node_type = 0;
+    settings->isClient = 0;
     settings->deletingNodes = 0;
     settings->placing_text = 0;
     logInfo("Ready to place a node", "type switch");
@@ -43,6 +47,8 @@ void placerouter(settings_t *settings)
         return;
     settings->placing_link = 0;
     settings->drawing_rectangle = 0;
+    settings->gettingIp = 0;
+    settings->isClient = 0;
     settings->moving_node = 0;
     settings->placing_node = 1;
     settings->node_type = 1;
@@ -60,6 +66,8 @@ void placehost(settings_t *settings)
     settings->moving_node = 0;
     settings->placing_node = 1;
     settings->node_type = 2;
+    settings->gettingIp = 0;
+    settings->isClient = 0;
     settings->deletingNodes = 0;
     settings->placing_text = 0;
     logInfo("Ready to place a node", "type host");
@@ -72,6 +80,8 @@ void placeexternalinterface(settings_t *settings)
     settings->placing_link = 0;
     settings->drawing_rectangle = 0;
     settings->moving_node = 0;
+    settings->isClient = 0;
+    settings->gettingIp = 0;
     settings->placing_node = 1;
     settings->node_type = 3;
     settings->deletingNodes = 0;
@@ -87,7 +97,9 @@ void deleteNode(settings_t *settings)
     settings->drawing_rectangle = 0;
     settings->moving_node = 0;
     settings->placing_node = 0;
+    settings->gettingIp = 0;
     settings->node_type = 0;
+    settings->isClient = 0;
     settings->deletingNodes = 1;
     settings->placing_text = 0;
     logInfo("Ready to delete a node", "");
@@ -102,6 +114,8 @@ void placeexternalnattedinterface(settings_t *settings)
     settings->moving_node = 0;
     settings->placing_node = 1;
     settings->node_type = 4;
+    settings->gettingIp = 0;
+    settings->isClient = 0;
     settings->deletingNodes = 0;
     settings->placing_text = 0;
     logInfo("Ready to place a node", "type external natted interface");
@@ -115,7 +129,9 @@ void placelink(settings_t *settings)
     settings->moving_node = 0;
     settings->placing_node = 0;
     settings->placing_link = 1;
+    settings->gettingIp = 0;
     settings->deletingNodes = 0;
+    settings->isClient = 0;
     settings->placing_text = 0;
     logInfo("Ready to place a link", "");
 }
@@ -126,10 +142,12 @@ void placeText(settings_t *settings)
         return;
     settings->drawing_rectangle = 0;
     settings->moving_node = 0;
+    settings->gettingIp = 0;
     settings->placing_node = 0;
     settings->placing_link = 0;
     settings->deletingNodes = 0;
     settings->placing_text = -1;
+    settings->isClient = 0;
     logInfo("Ready to place a text", "");
 }
 void placeRectangle(settings_t *settings)
@@ -139,10 +157,26 @@ void placeRectangle(settings_t *settings)
     settings->drawing_rectangle = -1;
     settings->moving_node = 0;
     settings->placing_node = 0;
+    settings->gettingIp = 0;
     settings->placing_link = 0;
     settings->deletingNodes = 0;
     settings->placing_text = 0;
+    settings->isClient = 0;
     logInfo("Ready to place a rectangle", "");
+}
+void becomeClient(settings_t*settings)
+{
+    if (settings->isSimulating)
+        return;
+    settings->drawing_rectangle = 0;
+    settings->moving_node = 0;
+    settings->placing_node = 0;
+    settings->gettingIp = 0;
+    settings->placing_link = 0;
+    settings->deletingNodes = 0;
+    settings->placing_text = 0;
+    settings->isClient = 1;
+    logInfo("Ready to become a client", "");
 }
 void initEnvironment()
 {
@@ -515,7 +549,10 @@ int validateIP(settings_t*settings, char *providedIp){
     }
 }
 
-void fetchData(){
+void fetchData(settings_t*settings,interface_t*interface){
+    // get data from socket
+    printf("I should get data from sockets\n");
+    // update structs
     return;
 }
 
@@ -529,11 +566,10 @@ void getData(settings_t*settings,interface_t*interface){
     */
 
     if(!settings->serverIP){
-        // get server IP and validate it, set valid bit at 1
-        // TODO as file names, save in       
+        settings->gettingIp=1;
+        return;
     } else {
-        // everything is fine
-        fetchData();
+        fetchData(settings,interface);
     }
 }
 

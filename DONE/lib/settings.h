@@ -27,7 +27,6 @@ typedef struct
     /* begin things for rectangles */
     int posX;
     int posY;
-    // TODO there was something else
     /* end things for rectangles */
     char *openProjectName;
     /*for file opening*/
@@ -53,4 +52,6 @@ typedef struct
     //char *serverIP; // funny solution: uint_8 serverIP[4];
     uint32_t serverIP;
     char validIP;
+    char* tmpIp;
+    char gettingIp;
 } settings_t;
