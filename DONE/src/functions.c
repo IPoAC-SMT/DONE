@@ -378,6 +378,7 @@ void openProject(settings_t *settings)
         {
             // reading all textboxes
             fgets(othername, 200, file);
+            othername[strlen(othername)-1] = '\0';
             fscanf(file, "%d %d\n", &textboxes[i].x, &textboxes[i].y);
             textboxes[i].text = (char *)malloc(strlen(othername) * sizeof(char));
             strcpy(textboxes[i].text, othername);

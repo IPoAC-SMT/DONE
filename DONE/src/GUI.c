@@ -1058,11 +1058,11 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                 if (IsKeyReleased(KEY_DOWN))
                     settings->chosenOption = min(settings->numOptions - 1, settings->chosenOption + 1);
             }
-            if (settings->exportDoneScript)
-            {
-                export(settings, interface);
-                settings->exportDoneScript = false;
-            }
         }
+    }
+    if (settings->exportDoneScript)
+    {
+        export(settings, interface);
+        settings->exportDoneScript = false;
     }
 }
