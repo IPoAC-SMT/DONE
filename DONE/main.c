@@ -65,7 +65,7 @@ int main(int argc, char **argv)
 
     SetExitKey(KEY_NULL);
 
-    settings_t settings = {0, 0, 0, "", 0, 0, 0, 0, "", 0, 0, (void *)interface, 0, 0, 0, 0, 0, NULL, 0, 0, 0, c, 0, 0, 0, NULL, NULL, NULL, 0, 0, 0, 0, 0, NULL, 0};
+    settings_t settings = {0, 0, 0, "", 0, 0, 0, 0, "", 0, 0, (void *)interface, 0, 0, 0, 0, 0, NULL, 0, 0, 0, c, 0, 0, 0, NULL, NULL, NULL, 0, 0, 0, 0, 0, NULL, 0,0,NULL,0};
 
     system("clear");
 
@@ -73,6 +73,7 @@ int main(int argc, char **argv)
     {
         BeginDrawing();
         ClearBackground(BACKGROUND_COLOR); // colore di sfondo, per crearne altri si deve usare CLITERAL(Color){R,G,B,A}, numeri interi da 0 a 255
+        if(settings.isClient && !(time(NULL)%5)) getData(&settings,&interface);
 
         DrawGUI(&settings, interface);
 

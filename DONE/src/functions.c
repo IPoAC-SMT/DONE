@@ -1,6 +1,7 @@
 #include "../lib/logicalController.h"
 #include "../lib/log.h"
 #include <string.h>
+#include <arpa/inet.h>
 
 #define MAX_FILENAME 50
 
@@ -502,3 +503,39 @@ void trackChosenInterfBinding(settings_t *settings)
     }
     free(settings->options);
 }
+
+int validateIP(settings_t*settings, char *providedIp){
+    struct in_addr address;
+    if(inet_pton(AF_INET, providedIp, &address)){   // function to check if IP is valid IPv4 address
+        // if valid IPv4 saves address into settings
+        settings->serverIP = (uint32_t)address.s_addr;
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+void fetchData(){
+    return;
+}
+
+
+
+void getData(settings_t*settings,interface_t*interface){
+    /*
+        1. if non ho il server addr chiedo all'utente l'ip => settings
+        2. prendo i dati (aka socket ecc)
+        3. trasformo in strutture/file
+    */
+
+    if(!settings->serverIP){
+        // get server IP and validate it, set valid bit at 1
+        // TODO as file names, save in       
+    } else {
+        // everything is fine
+        fetchData();
+    }
+}
+
+
+

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 typedef struct
 {
@@ -48,4 +49,8 @@ typedef struct
     int tmpx, tmpy;
     char *tmpText;
     char placing_text;
+    char isClient;
+    //char *serverIP; // funny solution: uint_8 serverIP[4];
+    uint32_t serverIP;
+    char validIP;
 } settings_t;
