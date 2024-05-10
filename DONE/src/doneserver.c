@@ -42,3 +42,21 @@ void fetchData(settings_t*settings,interface_t*interface){      // CLIENT CODE
     // update structs
     return;
 }
+
+
+/*
+    - accesso concorrenziali alla struttura dati
+    
+    QUANDO DIVENTA SERVER:
+        ATTIVITÀ ONE-TIME:
+            - apre socket
+        ATTIVITÀ PERIODICHE:
+            - ascolta richieste (potenzialmente multiple in contemporanea -> thread per rispondere)
+            - serve richieste:
+                - formatta dati
+                - impacchetta dati
+                - invia dati al client
+    FINE RUOLO SERVER:
+    - chiude ascolto
+*/
+

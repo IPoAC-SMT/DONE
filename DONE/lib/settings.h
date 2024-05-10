@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include "rw-zem.h"
 
 typedef struct
 {
@@ -10,6 +11,7 @@ typedef struct
 
 typedef struct
 {
+    rwlock_t *settingsLock;
     int absoluteCount;
     char moving_node;
     char node_type;

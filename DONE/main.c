@@ -67,7 +67,8 @@ int main(int argc, char **argv)
 
     SetExitKey(KEY_NULL);
 
-    settings_t settings = {0,0,0,NULL,0,0,0,0,"",NULL,0,(void*)interface,0,0,0,0,NULL,NULL,0,0,0,c,0,0,0,NULL,NULL,NULL,0,0,0,0,0,NULL,0,0,NULL,0,NULL,0};
+    settings_t settings = {NULL,0,0,0,"",0,0,0,0,"","",0,(void*)interface,0,0,0,0,NULL,NULL,0,0,0,c,0,0,0,NULL,NULL,NULL,0,0,0,0,0,NULL,0,0,NULL,0,NULL,0};
+    //rwlock_init(settings.settingsLock);
 
     system("clear");
 
