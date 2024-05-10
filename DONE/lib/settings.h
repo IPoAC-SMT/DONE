@@ -56,4 +56,5 @@ typedef struct
     char validIP;
     char* tmpIp;
     char gettingIp;
+    char isServer;
 } settings_t;

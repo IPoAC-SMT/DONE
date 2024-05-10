@@ -1,9 +1,13 @@
 #include "../lib/rw-zem.h"
 
 void rwlock_init(rwlock_t *rw) {
+    printf("an\n");
     rw->readers = 0;
+    printf("ta\n");
     sem_init(&rw->lock, 0, 1);
+    printf("ni\n");
     sem_init(&rw->writelock, 0, 1);
+    printf("!!\n");
 }
 
 void rwlock_acquire_readlock(rwlock_t *rw) {
