@@ -32,3 +32,9 @@ void clearCanvas(settings_t *settings);
 void populateInterfaceOptionsWrapper(settings_t *settings);
 
 void trackChosenInterfBinding(settings_t *settings);
+
+void getData(settings_t*settings,interface_t*interface);
+int validateIP(settings_t*settings,char*tmpIp);
+
+void becomeClient(settings_t*settings);
+

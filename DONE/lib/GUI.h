@@ -4,12 +4,13 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <time.h>
 
 #include "./interface_t.h"
 
 #include "functions.h"
 
-#define NUMbuttons 17
+#define NUMbuttons 18
 #define NUMLINK 0
 #define NAMELENGTH 50
 #define STD_FONT_SIZE 19

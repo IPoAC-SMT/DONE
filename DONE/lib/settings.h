@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include "rw-zem.h"
 
 typedef struct
 {
@@ -9,6 +11,7 @@ typedef struct
 
 typedef struct
 {
+    rwlock_t *settingsLock;
     int absoluteCount;
     char moving_node;
     char node_type;
@@ -26,7 +29,6 @@ typedef struct
     /* begin things for rectangles */
     int posX;
     int posY;
-    // TODO there was something else
     /* end things for rectangles */
     char *openProjectName;
     /*for file opening*/
@@ -48,4 +50,10 @@ typedef struct
     int tmpx, tmpy;
     char *tmpText;
     char placing_text;
+    char isClient;
+    //char *serverIP; // funny solution: uint_8 serverIP[4];
+    char *serverIP;
+    char validIP;
+    char* tmpIp;
+    char gettingIp;
 } settings_t;

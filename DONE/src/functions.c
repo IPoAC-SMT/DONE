@@ -1,6 +1,8 @@
 #include "../lib/logicalController.h"
 #include "../lib/log.h"
+#include "../lib/doneserver.h"
 #include <string.h>
+#include <arpa/inet.h>
 
 #define MAX_FILENAME 50
 
@@ -19,7 +21,9 @@ void placeInternet(settings_t *settings)
     settings->placing_node = 1;
     settings->node_type = 5;
     settings->deletingNodes = 0;
+    settings->isClient = 0;
     settings->placing_text = 0;
+    settings->gettingIp = 0;
     logInfo("Ready to place a node", "type the Internet");
 }
 void placeswitch(settings_t *settings)
@@ -29,8 +33,10 @@ void placeswitch(settings_t *settings)
     settings->placing_link = 0;
     settings->drawing_rectangle = 0;
     settings->moving_node = 0;
+    settings->gettingIp = 0;
     settings->placing_node = 1;
     settings->node_type = 0;
+    settings->isClient = 0;
     settings->deletingNodes = 0;
     settings->placing_text = 0;
     logInfo("Ready to place a node", "type switch");
@@ -42,6 +48,8 @@ void placerouter(settings_t *settings)
         return;
     settings->placing_link = 0;
     settings->drawing_rectangle = 0;
+    settings->gettingIp = 0;
+    settings->isClient = 0;
     settings->moving_node = 0;
     settings->placing_node = 1;
     settings->node_type = 1;
@@ -59,6 +67,8 @@ void placehost(settings_t *settings)
     settings->moving_node = 0;
     settings->placing_node = 1;
     settings->node_type = 2;
+    settings->gettingIp = 0;
+    settings->isClient = 0;
     settings->deletingNodes = 0;
     settings->placing_text = 0;
     logInfo("Ready to place a node", "type host");
@@ -71,6 +81,8 @@ void placeexternalinterface(settings_t *settings)
     settings->placing_link = 0;
     settings->drawing_rectangle = 0;
     settings->moving_node = 0;
+    settings->isClient = 0;
+    settings->gettingIp = 0;
     settings->placing_node = 1;
     settings->node_type = 3;
     settings->deletingNodes = 0;
@@ -86,7 +98,9 @@ void deleteNode(settings_t *settings)
     settings->drawing_rectangle = 0;
     settings->moving_node = 0;
     settings->placing_node = 0;
+    settings->gettingIp = 0;
     settings->node_type = 0;
+    settings->isClient = 0;
     settings->deletingNodes = 1;
     settings->placing_text = 0;
     logInfo("Ready to delete a node", "");
@@ -101,6 +115,8 @@ void placeexternalnattedinterface(settings_t *settings)
     settings->moving_node = 0;
     settings->placing_node = 1;
     settings->node_type = 4;
+    settings->gettingIp = 0;
+    settings->isClient = 0;
     settings->deletingNodes = 0;
     settings->placing_text = 0;
     logInfo("Ready to place a node", "type external natted interface");
@@ -114,7 +130,9 @@ void placelink(settings_t *settings)
     settings->moving_node = 0;
     settings->placing_node = 0;
     settings->placing_link = 1;
+    settings->gettingIp = 0;
     settings->deletingNodes = 0;
+    settings->isClient = 0;
     settings->placing_text = 0;
     logInfo("Ready to place a link", "");
 }
@@ -125,10 +143,12 @@ void placeText(settings_t *settings)
         return;
     settings->drawing_rectangle = 0;
     settings->moving_node = 0;
+    settings->gettingIp = 0;
     settings->placing_node = 0;
     settings->placing_link = 0;
     settings->deletingNodes = 0;
     settings->placing_text = -1;
+    settings->isClient = 0;
     logInfo("Ready to place a text", "");
 }
 void placeRectangle(settings_t *settings)
@@ -138,11 +158,28 @@ void placeRectangle(settings_t *settings)
     settings->drawing_rectangle = -1;
     settings->moving_node = 0;
     settings->placing_node = 0;
+    settings->gettingIp = 0;
     settings->placing_link = 0;
     settings->deletingNodes = 0;
     settings->placing_text = 0;
+    settings->isClient = 0;
     logInfo("Ready to place a rectangle", "");
 }
+void becomeClient(settings_t*settings)
+{
+    if (settings->isSimulating)
+        return;
+    settings->drawing_rectangle = 0;
+    settings->moving_node = 0;
+    settings->placing_node = 0;
+    settings->gettingIp = 0;
+    settings->placing_link = 0;
+    settings->deletingNodes = 0;
+    settings->placing_text = 0;
+    settings->isClient = !settings->isClient;
+    settings->isClient?logInfo("Ready to become a client", ""):logInfo("Client stopped","");
+}
+
 void initEnvironment()
 {
     initEnv();
@@ -342,6 +379,7 @@ void openProject(settings_t *settings)
         {
             // reading all textboxes
             fgets(othername, 200, file);
+            othername[strlen(othername)-1] = '\0';
             fscanf(file, "%d %d\n", &textboxes[i].x, &textboxes[i].y);
             textboxes[i].text = (char *)malloc(strlen(othername) * sizeof(char));
             strcpy(textboxes[i].text, othername);
@@ -501,4 +539,30 @@ void trackChosenInterfBinding(settings_t *settings)
         free(settings->options[i]);
     }
     free(settings->options);
+}
+
+int validateIP(settings_t*settings, char *providedIp){
+    struct in_addr address;
+    if(inet_pton(AF_INET, providedIp, &address)){   // function to check if IP is valid IPv4 address
+        // if valid IPv4 saves address into settings
+        settings->serverIP = strdup(providedIp);
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+void getData(settings_t*settings,interface_t*interface){
+    /*
+        1. if non ho il server addr chiedo all'utente l'ip => settings
+        2. prendo i dati (aka socket ecc)
+        3. trasformo in strutture/file
+    */
+
+    if(!settings->serverIP){
+        settings->gettingIp=1;
+        return;
+    } else {
+        fetchData(settings,interface);
+    }
 }

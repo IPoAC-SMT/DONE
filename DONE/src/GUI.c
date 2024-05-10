@@ -3,7 +3,7 @@
 
 void DrawButton(button_t *pulsante, settings_t *settings)
 {
-    if (!settings->isSimulating || pulsante->always_show)
+    if ((!settings->isSimulating && !settings->isClient) || pulsante->always_show)
     {
         bool hovering;
         if (
@@ -19,6 +19,7 @@ void DrawButton(button_t *pulsante, settings_t *settings)
                 settings->deletingNodes = 0;
                 hovering = false;
                 pulsante->pressed(settings);
+                logInfo("dio canarino","");
             }
             else
             {
@@ -441,6 +442,42 @@ void getName(settings_t *settings)
     DrawText(toPrint, 1100, 20, STD_FONT_SIZE, FIGURE_COLOR);
     free(toPrint);
 }
+
+void getServerIp(settings_t *settings,interface_t*interface) // TODO change whole, add tmpIp, gettingIp to settings
+{
+    char *toPrint = (char *)calloc(300, sizeof(char));
+    char character = GetCharPressed();
+    if (!settings->tmpIp){
+        settings->tmpIp = (char*)calloc(NAMELENGTH,sizeof(char));
+    }
+    if (IsKeyReleased(KEY_ENTER))
+    {
+        if (validateIP(settings,settings->tmpIp)) {
+            getData(settings,interface); // submit
+            settings->tmpIp = NULL;
+            settings->gettingIp = 0;
+        }
+        else {
+            settings->tmpIp = NULL; 
+        }
+    }
+    if (character >= 32 && character <= 126)
+    {
+        // valid letter
+        char temp[200];
+        snprintf(temp, 200, "%s%c", settings->tmpIp, character);
+        strncpy(settings->tmpIp, temp, 200);
+    }
+    else if (IsKeyReleased(KEY_BACKSPACE))
+    {
+        settings->tmpIp[strlen(settings->tmpIp) - 1] = '\0';
+    }
+    snprintf(toPrint, 300, "Insert the server IP: %s", settings->tmpIp);
+    DrawText(toPrint, 1100, 20, STD_FONT_SIZE, FIGURE_COLOR);
+    free(toPrint);
+}
+
+
 
 char *identify(int num)
 {
@@ -955,6 +992,10 @@ void DrawGUI(settings_t *settings, interface_t *interface)
         }
         getName(settings);
     }
+    else if (settings->gettingIp)
+    {
+        getServerIp(settings,interface);
+    }
 
     // posiziono i rettangoli
     for (int i = 0; i < settings->numrectangles; i++)
@@ -971,7 +1012,6 @@ void DrawGUI(settings_t *settings, interface_t *interface)
     if (settings->numOptions)
     {
         DrawRectangle(0, 0, WIDTH, HEIGHT, CLITERAL(Color){252, 245, 229, 150});
-        int optionHeight = min((HEIGHT - 500) / settings->numOptions, 100);
         for (int i = 0; i < settings->numOptions; i++)
         {
 
@@ -1019,11 +1059,11 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                 if (IsKeyReleased(KEY_DOWN))
                     settings->chosenOption = min(settings->numOptions - 1, settings->chosenOption + 1);
             }
-            if (settings->exportDoneScript)
-            {
-                export(settings, interface);
-                settings->exportDoneScript = false;
-            }
         }
+    }
+    if (settings->exportDoneScript)
+    {
+        export(settings, interface);
+        settings->exportDoneScript = false;
     }
 }

@@ -1,0 +1,1 @@
+void fetchData(settings_t*settings,interface_t*interface);
