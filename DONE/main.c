@@ -38,7 +38,7 @@ int main(int argc, char **argv)
         {24, 454, 50, 50, placeexternalnattedinterface, "Place an external NATted interface", 0, NULL, "externalnattedinterface", false},
         {24, 514, 50, 50, placeInternet, "Place the Internet", 0, NULL, "internet", false},
         {24, 154, 50, 50, placelink, "Link two nodes together", 0, NULL, "link", false},
-        {144, 24, 50, 50, start, "Start simulation!", 0, NULL, "start", true}, // first of the horizontal row
+        {144, 24, 50, 50, start, "Start simulation!", 0, NULL, "start", false}, // first of the horizontal row
         {204, 24, 50, 50, stop, "Stop simulation", 0, NULL, "stop", true},     // second of the horizontal row
         {84, 24, 50, 50, prepareToOpenProject, "Open a file", 0, NULL, "openProject", false},
         {24, 24, 50, 50, prepareToSaveProject, "Save project", 0, NULL, "saveProject", false},
