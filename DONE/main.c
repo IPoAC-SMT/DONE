@@ -40,9 +40,9 @@ int main(int argc, char **argv)
         {24, 154, 50, 50, placelink, "Link two nodes together", 0, NULL, "link", false},
         {144, 24, 50, 50, start, "Start simulation!", 0, NULL, "start", true}, // first of the horizontal row
         {204, 24, 50, 50, stop, "Stop simulation", 0, NULL, "stop", true},     // second of the horizontal row
-        {84, 24, 50, 50, prepareToOpenProject, "Open a file", 0, NULL, "openProject", true},
-        {24, 24, 50, 50, prepareToSaveProject, "Save project", 0, NULL, "saveProject", true},
-        {400, 24, 50, 50, exportDoneScript, "Export DoneScript", 0, NULL, "saveProject", true},
+        {84, 24, 50, 50, prepareToOpenProject, "Open a file", 0, NULL, "openProject", false},
+        {24, 24, 50, 50, prepareToSaveProject, "Save project", 0, NULL, "saveProject", false},
+        {400, 24, 50, 50, exportDoneScript, "Export DoneScript", 0, NULL, "saveProject", false},
         {24, 634, 50, 50, placeText, "Place a Text", 0, NULL, "placeText", false},
         {549, 24, 50, 50, clearCanvas, "Clear Canvas", 0, NULL, "clearCanvas", false},
         {334, 24, 50, 50, deleteNode, "Delete a node or a link by clicking on it", 0, NULL, "deleteNode", false},
