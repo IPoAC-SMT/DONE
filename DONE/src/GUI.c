@@ -3,7 +3,7 @@
 
 void DrawButton(button_t *pulsante, settings_t *settings)
 {
-    if (!settings->isSimulating || pulsante->always_show)
+    if ((!settings->isSimulating && !settings->isClient) || pulsante->always_show)
     {
         bool hovering;
         if (

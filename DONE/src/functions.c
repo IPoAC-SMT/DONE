@@ -176,9 +176,10 @@ void becomeClient(settings_t*settings)
     settings->placing_link = 0;
     settings->deletingNodes = 0;
     settings->placing_text = 0;
-    settings->isClient = 1;
-    logInfo("Ready to become a client", "");
+    settings->isClient = !settings->isClient;
+    settings->isClient?logInfo("Ready to become a client", ""):logInfo("Client stopped","");
 }
+
 void initEnvironment()
 {
     initEnv();

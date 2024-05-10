@@ -43,12 +43,12 @@ int main(int argc, char **argv)
         {84, 24, 50, 50, prepareToOpenProject, "Open a file", 0, NULL, "openProject", true},
         {24, 24, 50, 50, prepareToSaveProject, "Save project", 0, NULL, "saveProject", true},
         {400, 24, 50, 50, exportDoneScript, "Export DoneScript", 0, NULL, "saveProject", true},
-        {24, 634, 50, 50, placeText, "Place a Text", 0, NULL, "placeText", true},
+        {24, 634, 50, 50, placeText, "Place a Text", 0, NULL, "placeText", false},
         {549, 24, 50, 50, clearCanvas, "Clear Canvas", 0, NULL, "clearCanvas", false},
         {334, 24, 50, 50, deleteNode, "Delete a node or a link by clicking on it", 0, NULL, "deleteNode", false},
         {874, 24, 50, 50, quit, "Quit", 0, NULL, "quit", true},
         {24, 574, 50, 50, placeRectangle, "Draw a Rectangle", 0, NULL, "rectangle", false},
-        {874, 154, 50, 50, becomeClient, "Become client!", 0, NULL, "externalnattedinterface", false},
+        {874, 154, 50, 50, becomeClient, "Start or stop client!", 0, NULL, "externalnattedinterface", true},
         },
     NULL, NULL, NULL, NULL);
 
