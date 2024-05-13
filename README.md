@@ -1,8 +1,9 @@
-# DONE
+# DONE - Docker Orchestrator for Network Emulation 🐳
+![BANNER](https://github.com/IPoAC-SMT/DONE/assets/119054272/b0d4161b-ea38-4292-a987-6625e3d7a1b1)
 
 **DONE** (_Docker Orchestrator for Network Emulation_) is a simple **network emulator**, inspired by the [IMUNES](https://github.com/imunes/imunes) project. Starting from the features IMUNES offered, we decided to recreate some of them, improving both software reliability and the UX while reducing software dependencies to the bare minimum.
 
-<!-- SCREENSHOTS HERE -->
+## Some screenshots
 ![done-screenshot](https://github.com/IPoAC-SMT/DONE/assets/119054272/7d5a1efb-13ac-4474-8583-6932b9b48a83)
 
 ## Prerequisites
@@ -10,16 +11,22 @@ In order for DONE to properly work, make sure you have the following dependencie
 - [`raylib`](https://github.com/raysan5/raylib) for graphical purposes;
 - [`docker`](https://docs.docker.com/engine/install/) to virtualize nodes and routers;
 - [`openVSwitch`](https://www.openvswitch.org/) to virtualize switches.
+You also need to make sure you have a C compiler on your machine, and the `make` utility.
 
-<!-- 
+### Installing openVSwitch on Debian/Ubuntu
+To install openVSwtitch on Debian/Ubuntu, run the following comamnd:
+```
+sudo apt install openvswitch-switch
+```
+
+### Installing raylib on Debian/Ubuntu
+To install raylib on Debian/Ubuntu, run the following commands:
+```
 sudo apt install libasound2-dev libx11-dev libxrandr-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev libxcursor-dev libxinerama-dev libwayland-dev libxkbcommon-dev
 cd raylib/src/
 make PLATFORM=PLATFORM_DESKTOP RAYLIB_LIBTYPE=SHARED # To make the dynamic shared version.
 sudo make install RAYLIB_LIBTYPE=SHARED
-
--->
-
-You also need to make sure you have a C compiler on your machine.
+```
 
 ## Installation
 To install DONE, simply clone the repository and navigate to the `DONE` folder, then run the `make` commands from there:
@@ -47,13 +54,26 @@ Once you have created your topology, you can run the simulation by pressing on t
 It is advisable to stop it via the **Stop simulation** button before closing the application, however everything will be deleted even if you do not stop it before exiting, therefore no pending docker containers will remain on your machine.
 
 ### Assigning configurations to a machine
-TODO
+When the experiment is running, click on the machine you desire to run commands onto with the right mouse button and its terminal will pop up.
 
 ### Saving configurations to file
-TODO
+Once the simulation is stopped and the project saved, clicking with the right mouse button on a machine will open its config file.
 
-<!-- -->
+To assign configs to a machine, just write each command below the name of said machine, ending each command with a semicolon `;`.
+Here is an example:
 
+```
+h-0:
+ip addr add 10.0.0.2/24 dev sveth-h-0-s-1;
+ip route add default via 10.0.0.1;
+
+r-2:
+ip addr add 10.0.0.1/24 dev sveth-r-2-s-1;
+iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -j MASQUERADE;
+```
+An important note regarding the **names** when referring to **interfaces** in config files:
+- if it is a **node** connected to a **switch**, the name of the interface starts with `sveth-` followed by the name of the node, a hyphen `-` and the name of the switch it is connected to (ex. `sveth-h-0-s-1` in the previous config file)
+- if it is a **node** connected to a **node**, the name of the interface is `veth-` followed by the name of the node, a hyphen `-` and the name of the other node (ex. `veth-h-1-h-2`)
 
 ## DoneScript
 `DoneScript` is the official **scripting language** for DONE.
