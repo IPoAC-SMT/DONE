@@ -19,7 +19,6 @@ void DrawButton(button_t *pulsante, settings_t *settings)
                 settings->deletingNodes = 0;
                 hovering = false;
                 pulsante->pressed(settings);
-                logInfo("dio canarino","");
             }
             else
             {
