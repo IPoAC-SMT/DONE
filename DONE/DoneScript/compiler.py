@@ -49,7 +49,7 @@ def serializeCommands():
         output = output + item["name"] + ":\n"
         for command in commands:
             if command["to"] == item["name"]:
-                output = output+command["command"]+"\n"
+                output = output+command["command"]+";\n"
         output = output + "\n"
     return output
 
