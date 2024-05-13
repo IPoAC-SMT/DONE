@@ -204,7 +204,7 @@ void start(settings_t *settings)
         FILE *file = fopen(config_filename, "r");
         if (file != NULL)
         {
-            char command[1024];
+            char command[1024] = {0};
             char buf[200]; // buffer for reading the file
             char *nodeName;
 
@@ -232,21 +232,21 @@ void start(settings_t *settings)
                         {
                             if (nodeName[0] == 's')
                             {
-                                logInfo("sending to switch:", "%s", buf);
-                                if (sendSwitchCommand(buf))
+                                logInfo("sending to switch:", "%s", command);
+                                if (sendSwitchCommand(command))
                                 {
                                     logError("An error was found in the config", "");
                                 }
                             }
                             else
                             {
-                                logInfo("sending command to node", "%s", buf); // sending the command to the logical controller
-                                if (sendNodeCommand(nodeName, buf))
+                                logInfo("sending command to node", "%s", command); // sending the command to the logical controller
+                                if (sendNodeCommand(nodeName, command))
                                 {
                                     logError("An error was found in the config", "");
                                 }
                             }
-                            command[0] = 0; // resetting command buffer
+                            memcpy(command, "", 1024);
                         }
                     } while (buf[0] != '\n');
                 }
