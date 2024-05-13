@@ -46,7 +46,13 @@ int addNode(char *name, char type)
     if (name != NULL && strlen(name) <= MAX_NAME_SIZE && (type == 'h' || type == 'r'))
     {
 
-        snprintf(command, MAX_COMMAND_SIZE, "sudo docker run -id --hostname %s --cap-add=NET_ADMIN --name %s --network none node:1.0.0 /bin/bash > /dev/null", name, name);
+        snprintf(command, MAX_COMMAND_SIZE, "sudo docker run ");
+        if(type == 'r'){
+            strcat(command, "--privileged ");
+        }
+        char final[MAX_COMMAND_SIZE];
+        snprintf(final, MAX_COMMAND_SIZE, "-id --hostname %s --cap-add=NET_ADMIN --name %s --network none node:1.0.0 /bin/bash > /dev/null", name, name);
+        strcat(command, final);
 
         if (!system(command))
         { // once the node is created, adding the node's namespace to the netns folder
