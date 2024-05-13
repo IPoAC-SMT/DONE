@@ -11,6 +11,7 @@ In order for DONE to properly work, make sure you have the following dependencie
 - [`raylib`](https://github.com/raysan5/raylib) for graphical purposes;
 - [`docker`](https://docs.docker.com/engine/install/) to virtualize nodes and routers;
 - [`openVSwitch`](https://www.openvswitch.org/) to virtualize switches.
+
 You also need to make sure you have a C compiler on your machine, and the `make` utility.
 
 ### Installing openVSwitch on Debian/Ubuntu
