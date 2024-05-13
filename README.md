@@ -1,5 +1,5 @@
 # DONE - Docker Orchestrator for Network Emulation 🐳
-![BANNER](https://github.com/IPoAC-SMT/DONE/assets/119054272/b0d4161b-ea38-4292-a987-6625e3d7a1b1)
+![banner](https://github.com/IPoAC-SMT/DONE/assets/63679072/ae308a9f-fb14-4afa-8707-32f90fc7ee29)
 
 **DONE** (_Docker Orchestrator for Network Emulation_) is a simple **network emulator**, inspired by the [IMUNES](https://github.com/imunes/imunes) project. Starting from the features IMUNES offered, we decided to recreate some of them, improving both software reliability and the UX while reducing software dependencies to the bare minimum.
 
