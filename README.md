@@ -32,7 +32,9 @@ sudo make install RAYLIB_LIBTYPE=SHARED
 To install DONE, simply clone the repository and navigate to the `DONE` folder, then run the `make` commands from there:
 ```
 git clone https://github.com/IPoAC-SMT/DONE.git
-cd DONE/DONE
+cd DONE/Docker
+docker build -t node:1.0.0 .
+cd ../DONE
 make clean
 make
 make exec
