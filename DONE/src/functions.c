@@ -165,7 +165,7 @@ void placeRectangle(settings_t *settings)
     settings->isClient = 0;
     logInfo("Ready to place a rectangle", "");
 }
-void becomeClient(settings_t*settings)
+void becomeClient(settings_t *settings)
 {
     if (settings->isSimulating)
         return;
@@ -177,7 +177,7 @@ void becomeClient(settings_t*settings)
     settings->deletingNodes = 0;
     settings->placing_text = 0;
     settings->isClient = !settings->isClient;
-    settings->isClient?logInfo("Ready to become a client", ""):logInfo("Client stopped","");
+    settings->isClient ? logInfo("Ready to become a client", "") : logInfo("Client stopped", "");
 }
 
 void initEnvironment()
@@ -204,6 +204,7 @@ void start(settings_t *settings)
         FILE *file = fopen(config_filename, "r");
         if (file != NULL)
         {
+            char command[1024];
             char buf[200]; // buffer for reading the file
             char *nodeName;
 
@@ -214,27 +215,40 @@ void start(settings_t *settings)
                 {
                     do
                     {
-                        if (!fgets(buf, 200, file))
-                            break; // if i reached the end of the commands for this node, break and go to the next one
-                        else if (buf[0] == '\n')
-                            break; // if i reached the end of the commands for this node, break and go to the next one
-                        if (nodeName[0] == 's')
+                        while (fgets(buf, 200, file))
                         {
-                            logInfo("sending to switch:", "%s", buf);
-                            if (sendSwitchCommand(buf))
-                            {
-                                logError("An error was found in the config", "");
-                            }
+                            if (buf[0] == '\n')
+                                break;
+                            buf[strlen(buf)] = 0;
+                            if (!strlen(command))
+                                strcpy(command, buf);
+                            else
+                                strcat(command, buf);
+                            if (strchr(buf, ';') != NULL)
+                                break;
                         }
-                        else
+
+                        if (strlen(command))
                         {
-                            logInfo("sending command to node", "%s", buf); // sending the command to the logical controller
-                            if (sendNodeCommand(nodeName, buf))
+                            if (nodeName[0] == 's')
                             {
-                                logError("An error was found in the config", "");
+                                logInfo("sending to switch:", "%s", buf);
+                                if (sendSwitchCommand(buf))
+                                {
+                                    logError("An error was found in the config", "");
+                                }
                             }
+                            else
+                            {
+                                logInfo("sending command to node", "%s", buf); // sending the command to the logical controller
+                                if (sendNodeCommand(nodeName, buf))
+                                {
+                                    logError("An error was found in the config", "");
+                                }
+                            }
+                            command[0] = 0; // resetting command buffer
                         }
-                    } while (1);
+                    } while (buf[0] != '\n');
                 }
                 else
                 {
@@ -379,7 +393,7 @@ void openProject(settings_t *settings)
         {
             // reading all textboxes
             fgets(othername, 200, file);
-            othername[strlen(othername)-1] = '\0';
+            othername[strlen(othername) - 1] = '\0';
             fscanf(file, "%d %d\n", &textboxes[i].x, &textboxes[i].y);
             textboxes[i].text = (char *)malloc(strlen(othername) * sizeof(char));
             strcpy(textboxes[i].text, othername);
@@ -541,28 +555,36 @@ void trackChosenInterfBinding(settings_t *settings)
     free(settings->options);
 }
 
-int validateIP(settings_t*settings, char *providedIp){
+int validateIP(settings_t *settings, char *providedIp)
+{
     struct in_addr address;
-    if(inet_pton(AF_INET, providedIp, &address)){   // function to check if IP is valid IPv4 address
+    if (inet_pton(AF_INET, providedIp, &address))
+    { // function to check if IP is valid IPv4 address
         // if valid IPv4 saves address into settings
         settings->serverIP = strdup(providedIp);
         return 1;
-    } else {
+    }
+    else
+    {
         return 0;
     }
 }
 
-void getData(settings_t*settings,interface_t*interface){
+void getData(settings_t *settings, interface_t *interface)
+{
     /*
         1. if non ho il server addr chiedo all'utente l'ip => settings
         2. prendo i dati (aka socket ecc)
         3. trasformo in strutture/file
     */
 
-    if(!settings->serverIP){
-        settings->gettingIp=1;
+    if (!settings->serverIP)
+    {
+        settings->gettingIp = 1;
         return;
-    } else {
-        fetchData(settings,interface);
+    }
+    else
+    {
+        fetchData(settings, interface);
     }
 }
