@@ -15,7 +15,7 @@ In order for DONE to properly work, make sure you have the following dependencie
 You also need to make sure you have a C compiler on your machine, and the `make` utility.
 
 ### Installing openVSwitch on Debian/Ubuntu
-To install openVSwitch on Debian/Ubuntu, run the following comamnd:
+To install openVSwitch on Debian/Ubuntu, run the following command:
 ```
 sudo apt install openvswitch-switch
 ```
