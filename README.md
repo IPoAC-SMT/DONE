@@ -91,9 +91,19 @@ Instructions are the following, where `shortname` is a string shorter than 20 ch
 
 ```
 create (host|router|switch|external interface|external natted interface|internet) at <x> <y> as <shortname>
+
 link <shortname> and <shortname>
+
 draw rectangle between <x> <y> and <x> <y> with color <r> <g> <b>
+
 send command to <shortname> <command>
+send command to <shortname> begin script
+a
+very
+long
+instruction
+end script
+
 add text "a very long string I want to add" at <x> <y>
 
 // you can comment things out, and it ignores empty lines as the ones around it

@@ -145,15 +145,25 @@ def parseRectangle(instruction:str):
     except:
         return "ERROR: format invalid"
 
-def parseCommand(instruction:str):
+def parseCommand(lines:[],i:int):
     try:
         global commands
         global structures
+        instruction = lines[i]
         [to,command] = instruction.strip().split("to ")[1].strip().split(" ",1)
         if not isName(to):
             return "ERROR: not a valid name: '"+to+"'"
+        elif "begin script" in command:
+            tmpcommand = ""
+            i += 1
+            while not "end script" in lines[i]:
+                tmpcommand+="\n"+lines[i]
+                i+=1
+            commands.append({"to":to,"command":tmpcommand[1:]})
+            return None, i+1
         else:
             commands.append({"to":to,"command":command})
+            return None, i+1
     except:
         return "ERROR: format invalid"
 
@@ -208,31 +218,48 @@ def parseFor(lines:[],i:int):
 def parse(lines:[]):
     global structures
     global commands
-    for i in range(len(lines)):
-        #print(line)
+    i = 0
+    while i < len(lines):
+        #print(i,lines[i])
         if lines[i] == "":
+            i+=1
             #print("found an empty line")
             continue
-        if lines[i].startswith("//"):
+        elif lines[i].startswith("//"):
+            i+=1
             #print("found a comment")
             continue
-        if lines[i].startswith("create "):
+        elif lines[i].startswith("end script"):
+            i+=1
+            #print("found a end script")
+            continue
+        elif lines[i].startswith("print"):
+            print(lines[i].split(" ",1)[1])
+            i+=1
+        elif lines[i].startswith("create "):
             #print("found a create")
             err = parseCreate(lines[i])
+            i+=1
         elif lines[i].startswith("link"):
             #print("found a link")
             #print(lines[i])
             err = parseLink(lines[i])
+            i+=1
         elif lines[i].startswith("draw rectangle between"):
             err = parseRectangle(lines[i])
+            i+=1
         elif lines[i].startswith("send command to"):
-            err = parseCommand(lines[i])
+            #print(parseCommand(lines,i))
+            err,i = parseCommand(lines,i)
+            #print(i)
         elif lines[i].startswith("add text"):
             err = parseAddText(lines[i])
+            i+=1
         elif lines[i].startswith("for"):
             #print("for detected")
             err,i = parseFor(lines,i);
         elif lines[i].startswith("do"):
+            i+=1
             continue
         elif err:
             print(err)

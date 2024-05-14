@@ -1,7 +1,0 @@
-for var_i in 25 1900 step 50
-do
-    for var_j in 25 1800 step 50
-    do
-        create host at var_i var_j as host-var_i-var_j
-    done
-done
