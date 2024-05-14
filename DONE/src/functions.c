@@ -186,6 +186,17 @@ void initEnvironment()
     logSuccess("Environment initialized successfully", "");
 }
 
+component_type_t getType(char *nodeName, settings_t *settings)
+{
+    for (int i = 0; i < settings->numnodes; i++)
+    {
+        if (!strcmp(((interface_t *)settings->GUIdata)->nodes[i].name, nodeName))
+        {
+            return ((interface_t *)settings->GUIdata)->nodes[i].type;
+        }
+    }
+}
+
 void start(settings_t *settings)
 { // sending data to logical controller, that starts the simulation
     if (settings->isSimulating || settings->numnodes == 0)
@@ -217,7 +228,7 @@ void start(settings_t *settings)
                     {
                         while (fgets(buf, 200, file))
                         {
-                            if (buf[0] == '\n')
+                            if (buf[0] == '\n' && !strlen(command))
                                 break;
                             buf[strlen(buf)] = 0;
                             if (!strlen(command))
@@ -230,7 +241,8 @@ void start(settings_t *settings)
 
                         if (strlen(command))
                         {
-                            if (nodeName[0] == 's')
+                            component_type_t type = getType(nodeName, settings);
+                            if (type == switch_t)
                             {
                                 logInfo("sending to switch:", "%s", command);
                                 if (sendSwitchCommand(command))
