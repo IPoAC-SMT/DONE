@@ -163,10 +163,11 @@ void stopSimulation(interface_t *simulation, int nodes_num, int links_num)
 
 void populateInterfaceOptions(settings_t *settings)
 {
-
+    getWriteLock(settings);
     interfaces *res = getNetInterfaces();
     settings->numOptions = res->interfaces;
     settings->options = res->interfaces_name;
+    releaseWriteLock(settings);
 
     for (int i = 0; i < res->interfaces; i++)
     {

@@ -1,6 +1,7 @@
 #include "../lib/logicalController.h"
 #include "../lib/log.h"
 #include "../lib/doneserver.h"
+#include "../lib/functions.h"
 #include <string.h>
 #include <arpa/inet.h>
 
@@ -13,7 +14,7 @@ void exportDoneScript(settings_t *settings)
 
 void placeInternet(settings_t *settings)
 {
-    if (settings->isSimulating)
+    if (settings->isSimulating || settings->isClient)
         return;
     settings->placing_link = 0;
     settings->drawing_rectangle = 0;
@@ -28,7 +29,7 @@ void placeInternet(settings_t *settings)
 }
 void placeswitch(settings_t *settings)
 {
-    if (settings->isSimulating)
+    if (settings->isSimulating || settings->isClient)
         return;
     settings->placing_link = 0;
     settings->drawing_rectangle = 0;
@@ -44,7 +45,7 @@ void placeswitch(settings_t *settings)
 
 void placerouter(settings_t *settings)
 {
-    if (settings->isSimulating)
+    if (settings->isSimulating || settings->isClient)
         return;
     settings->placing_link = 0;
     settings->drawing_rectangle = 0;
@@ -60,7 +61,7 @@ void placerouter(settings_t *settings)
 
 void placehost(settings_t *settings)
 {
-    if (settings->isSimulating)
+    if (settings->isSimulating || settings->isClient)
         return;
     settings->placing_link = 0;
     settings->drawing_rectangle = 0;
@@ -76,7 +77,7 @@ void placehost(settings_t *settings)
 
 void placeexternalinterface(settings_t *settings)
 {
-    if (settings->isSimulating)
+    if (settings->isSimulating || settings->isClient)
         return;
     settings->placing_link = 0;
     settings->drawing_rectangle = 0;
@@ -92,7 +93,7 @@ void placeexternalinterface(settings_t *settings)
 
 void deleteNode(settings_t *settings)
 {
-    if (settings->isSimulating)
+    if (settings->isSimulating || settings->isClient)
         return;
     settings->placing_link = 0;
     settings->drawing_rectangle = 0;
@@ -108,7 +109,7 @@ void deleteNode(settings_t *settings)
 
 void placeexternalnattedinterface(settings_t *settings)
 {
-    if (settings->isSimulating)
+    if (settings->isSimulating || settings->isClient)
         return;
     settings->placing_link = 0;
     settings->drawing_rectangle = 0;
@@ -124,7 +125,7 @@ void placeexternalnattedinterface(settings_t *settings)
 
 void placelink(settings_t *settings)
 {
-    if (settings->isSimulating)
+    if (settings->isSimulating || settings->isClient)
         return;
     settings->drawing_rectangle = 0;
     settings->moving_node = 0;
@@ -139,7 +140,7 @@ void placelink(settings_t *settings)
 
 void placeText(settings_t *settings)
 {
-    if (settings->isSimulating)
+    if (settings->isSimulating || settings->isClient)
         return;
     settings->drawing_rectangle = 0;
     settings->moving_node = 0;
@@ -153,7 +154,7 @@ void placeText(settings_t *settings)
 }
 void placeRectangle(settings_t *settings)
 {
-    if (settings->isSimulating)
+    if (settings->isSimulating || settings->isClient)
         return;
     settings->drawing_rectangle = -1;
     settings->moving_node = 0;
@@ -195,6 +196,7 @@ component_type_t getType(char *nodeName, settings_t *settings)
             return ((interface_t *)settings->GUIdata)->nodes[i].type;
         }
     }
+    return (component_type_t)NULL;
 }
 
 void start(settings_t *settings)
@@ -312,6 +314,7 @@ void clearCanvas(settings_t *settings)
         return;
     if (settings->numlink > 0 || settings->numnodes > 0 || settings->numrectangles > 0 || settings->numTexts > 0)
     {
+        getWriteLock(settings);
         settings->numnodes = 0;
         settings->numlink = 0;
         settings->numrectangles = 0;
@@ -325,6 +328,7 @@ void clearCanvas(settings_t *settings)
             free(interface->rectangles);
         if (settings->numTexts)
             free(interface->texts);
+        releaseWriteLock(settings);
     }
     logSuccess("Canvas cleared", "");
 }
@@ -364,7 +368,7 @@ void openProject(settings_t *settings)
     {
         settings->openProjectName = filename; // updating the project name
 
-        fscanf(file, "%d\n%d\n%d\n%d\n", &numnodes, &numlinks, &numrectangles, &numtextboxes);
+        fscanf(file, "%d\n%d\n%d\n%d\n", &numnodes, &numlinks, &numrectangles, &numtextboxes);   
 
         nodes = (node_t *)malloc(numnodes * sizeof(node_t));
         links = (link_t *)malloc(numlinks * sizeof(link_t));
@@ -413,6 +417,7 @@ void openProject(settings_t *settings)
 
         // updating settings to hold the collected data
 
+        getWriteLock(settings);
         interface_t *gui = settings->GUIdata;
         gui->nodes = nodes;
         gui->links = links;
@@ -423,6 +428,7 @@ void openProject(settings_t *settings)
         settings->numrectangles = numrectangles;
         settings->numTexts = numtextboxes;
         settings->absoluteCount = numnodes;
+        releaseWriteLock(settings);
         logSuccess("Loaded project", "");
     }
     else
@@ -540,6 +546,7 @@ void populateInterfaceOptionsWrapper(settings_t *settings)
 void trackChosenInterfBinding(settings_t *settings)
 {
     __uint8_t found = 0;
+    getWriteLock(settings);
     for (int i = 0; i < settings->numBindings && !found; i++) // looking if the interface setting was already specified, and if so, updating the binding interface name
     {
         if (!strcmp(settings->chosenNode, settings->interfaceBindings[i].deviceName))
@@ -565,6 +572,7 @@ void trackChosenInterfBinding(settings_t *settings)
         free(settings->options[i]);
     }
     free(settings->options);
+    releaseWriteLock(settings);
 }
 
 int validateIP(settings_t *settings, char *providedIp)
@@ -599,4 +607,24 @@ void getData(settings_t *settings, interface_t *interface)
     {
         fetchData(settings, interface);
     }
+}
+
+void getWriteLock(settings_t *settings){
+    if(settings->isServer == 1){
+        rwlock_acquire_writelock(settings->settingsLock);
+    }
+}
+
+void releaseWriteLock(settings_t *settings){
+    if(settings->isServer){
+        rwlock_release_writelock(settings->settingsLock);
+    }
+}
+
+void getReadLock(settings_t *settings){
+    rwlock_acquire_readlock(settings->settingsLock);
+}
+
+void releaseReadLock(settings_t *settings){
+    rwlock_release_readlock(settings->settingsLock);
 }

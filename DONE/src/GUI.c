@@ -490,7 +490,7 @@ char *identify(int num)
 
 char *identifyType(int num)
 {
-    return (char[30][30]){"switch", "rrouter", "host", "external interface", "external natted interface", "internet"}[num]; // hub, switch, router, host, external interface, external natted interface, Internet
+    return (char[30][30]){"switch", "router", "host", "external interface", "external natted interface", "internet"}[num]; // hub, switch, router, host, external interface, external natted interface, Internet
 }
 
 void appendText(settings_t *settings, interface_t *interface)
@@ -788,7 +788,9 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             // smetto di spostare il node
             settings->moving_node = false;
             // ne imposto le posizioni
+            getWriteLock(settings);
             setNode(settings->node_name, interface->nodes, settings);
+            releaseWriteLock(settings);
             logSuccess("Correctly moved node", "");
         }
         else
@@ -809,10 +811,12 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             // allora non lo sto più piazzando
             settings->placing_node = false;
             // aggiungo il node alla lista
+            getWriteLock(settings);
             appendNode(interface, (node_t){name, settings->node_type, GetMouseX(), GetMouseY()}, settings);
             // e aumento il numero di nodes
             settings->numnodes++;
             settings->absoluteCount++;
+            releaseWriteLock(settings);
             logSuccess("Correctly created node", "");
         }
         else
@@ -842,9 +846,11 @@ void DrawGUI(settings_t *settings, interface_t *interface)
         {
             settings->placing_link = 3;
             // funny modified function that now returns link_t with the extra needed info too
+            getWriteLock(settings);
             appendLink(interface, settings, (link_t){settings->first_place, getInversePos(GetMouseX(), GetMouseY(), interface->nodes, settings)->name, (component_type_t)settings->first_place_nodetype, getInversePos(GetMouseX(), GetMouseY(), interface->nodes, settings)->type});
             // aumento il numero di link
             settings->numlink++;
+            releaseWriteLock(settings);
             settings->dragging_deactivated = false;
             logSuccess("Correctly linked nodes", "");
         }
@@ -881,8 +887,10 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             {
                 settings->dragging_deactivated = false;
                 settings->drawing_rectangle = 0;
+                getWriteLock(settings);
                 addRectangle(interface, settings);
                 settings->numrectangles += 1;
+                releaseWriteLock(settings);
                 logSuccess("Rectangle successfully placed", "");
             }
             else
@@ -905,6 +913,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             char *stringa = (char *)calloc(200, sizeof(char));
             if (node)
             {
+                getWriteLock(settings);
 
                 for (int i = 0; i < settings->numBindings; i++)
                 { // checking if bindings preferences were specified for the node. If so, delete them
@@ -944,6 +953,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                         logInfo("Deleted related link", "");
                     }
                 }
+                releaseWriteLock(settings);
 
                 free(stringa);
             }
@@ -952,12 +962,14 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                 link_t *link = getInverseLink(interface, settings);
                 if (link)
                 {
+                    getWriteLock(settings);
                     settings->numlink--;
 
                     link->node1 = strdup(interface->links[settings->numlink].node1);
                     link->node2 = strdup(interface->links[settings->numlink].node2);
                     link->node1_type = interface->links[settings->numlink].node1_type;
                     link->node2_type = interface->links[settings->numlink].node2_type;
+                    releaseWriteLock(settings);
                     logSuccess("Deleted link", "");
                 }
                 else
@@ -966,6 +978,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                     rectangle_t *rectangle = getInverseRectangle(interface, settings);
                     if (rectangle)
                     {
+                        getWriteLock(settings);
                         settings->numrectangles--;
                         rectangle->x = interface->rectangles[settings->numrectangles].x;
                         rectangle->x1 = interface->rectangles[settings->numrectangles].x1;
@@ -974,6 +987,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                         rectangle->r = interface->rectangles[settings->numrectangles].r;
                         rectangle->g = interface->rectangles[settings->numrectangles].g;
                         rectangle->b = interface->rectangles[settings->numrectangles].b;
+                        releaseWriteLock(settings);
                         logSuccess("Deleted rectangle", "");
                     }
                     else
@@ -982,10 +996,12 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                         text_t *text = getInverseText(interface, settings);
                         if (text)
                         {
+                            getWriteLock(settings);
                             settings->numTexts--;
                             text->text = strdup(interface->texts[settings->numTexts].text);
                             text->x = interface->texts[settings->numTexts].x;
                             text->y = interface->texts[settings->numTexts].y;
+                            releaseWriteLock(settings);
                             logSuccess("Deleted text", "");
                         }
                     }
@@ -1018,9 +1034,11 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             char character = GetCharPressed();
             if (IsKeyReleased(KEY_ENTER))
             {
+                getWriteLock(settings);
                 appendText(settings, interface);
                 settings->placing_text = 0;
                 settings->numTexts++;
+                releaseWriteLock(settings);
                 settings->dragging_deactivated = false;
             }
             if (character >= 32 && character <= 126)

@@ -1,6 +1,6 @@
-void helloworld(settings_t *settings);
+//void helloworld(settings_t *settings);
 void placelink(settings_t *settings);
-void placehub(settings_t *settings);
+//void placehub(settings_t *settings);
 void placeswitch(settings_t *settings);
 void placerouter(settings_t *settings);
 void placehost(settings_t *settings);
@@ -38,3 +38,7 @@ int validateIP(settings_t*settings,char*tmpIp);
 
 void becomeClient(settings_t*settings);
 
+void getWriteLock(settings_t *settings);
+void releaseWriteLock(settings_t *settings);
+void getReadLock(settings_t *settings);
+void releaseReadLock(settings_t *settings);
