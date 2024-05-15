@@ -1,6 +1,7 @@
 #include "../lib/logicalController.h"
 #include "../lib/netlib.h"
 #include "../lib/log.h"
+#include "../lib/functions.h"
 
 interface_t *lastSimulation = NULL;
 int lastNodesNum, lastLinksNum;
