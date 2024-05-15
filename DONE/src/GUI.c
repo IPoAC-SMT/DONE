@@ -658,6 +658,58 @@ void export(settings_t *settings, interface_t *interface)
         fprintf(ptr, "add text \"%s\" at %d %d\n", interface->texts[i].text, interface->texts[i].x, interface->texts[i].y);
     }
     if (settings->openProjectName)
+        { // if a project is open, we need to eventually load configs
+
+            char config_filename[50];
+            strcpy(config_filename, settings->openProjectName);
+            strcat(config_filename, ".conf");
+            FILE *file = fopen(config_filename, "r");
+            if (file != NULL)
+            {
+                char command[1024] = {0};
+                char buf[200]; // buffer for reading the file
+                char *nodeName;
+
+                while (fgets(buf, 200, file)) // reading the node name line
+                {
+                    nodeName = strtok(strdup(buf), ":"); // retrieving the node name from the config
+                    if (nodeName != NULL)
+                    {
+                        do
+                        {
+                            while (fgets(buf, 200, file))
+                            {
+                                if (buf[0] == '\n' && !strlen(command))
+                                    break;
+                                buf[strlen(buf)] = 0;
+                                if (!strlen(command))
+                                    strcpy(command, buf);
+                                else
+                                    strcat(command, buf);
+                                if (strchr(buf, ';') != NULL)
+                                    break;
+                            }
+
+                            if (strlen(command)) {
+                                command[strlen(command)-2] = '\0';
+                                fprintf(ptr,"send command to %s begin script\n%s\nend script\n",nodeName,command);
+                                memcpy(command, "", 1024);
+                            }
+                        } while (buf[0] != '\n');
+                    }
+                    else
+                    {
+                        logError("error", "");
+                        fclose(file);
+                        fclose(ptr);
+                        return;
+                    }
+                }
+                logSuccess("Simulation running", "setup finished");
+            }
+        }
+/*
+    if (settings->openProjectName)
     {
         char config_filename[50];
         snprintf(config_filename, 50, "%s.conf", settings->openProjectName);
@@ -682,6 +734,7 @@ void export(settings_t *settings, interface_t *interface)
             }
         }
     }
+    */
     fclose(ptr);
     logSuccess("Exporting as DoneScript", "you can find it as DoneScript.ds");
 }
