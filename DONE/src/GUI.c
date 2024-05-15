@@ -115,13 +115,18 @@ void DrawLink(link_t link, settings_t *settings, node_t *nodes)
     }
 
     DrawLineEx(positions[0], positions[1], /*thick*/ isNearLink(positions) ? 5 : 1, /*Color color*/ RED);
+    if(isNearLink(positions)) {
+        char tmp[100];
+        //snprintf(tmp,99,"%cveth-%s-%s/%cveth-%s-%s",);
+        if(link.node1_type == switch_t || link.node2_type == switch_t){
+            snprintf(tmp, 99, "sveth-%s-%s",(link.node1_type==switch_t?link.node2:link.node1),(link.node1_type==switch_t?link.node1:link.node2));
+        }
+        else {
+            snprintf(tmp,99,"veth-%s-%s/veth-%s-%s",link.node1,link.node2,link.node2,link.node1);
+        }
+        DrawText(tmp,GetMouseX()+10,GetMouseY()-10,STD_FONT_SIZE,FIGURE_COLOR);
+    }
 
-    /*if (d && settings->deletingNodes && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) TODO
-    {
-        settings->moving_node = false;
-        settings->placing_node = false;
-        settings->drawing_rectangle = false;
-    }*/
 }
 
 void DrawFakeLink(settings_t *settings, node_t *nodes)
