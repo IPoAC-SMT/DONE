@@ -195,6 +195,7 @@ component_type_t getType(char *nodeName, settings_t *settings)
             return ((interface_t *)settings->GUIdata)->nodes[i].type;
         }
     }
+    return (component_type_t) NULL;
 }
 
 void start(settings_t *settings)
