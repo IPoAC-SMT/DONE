@@ -7,6 +7,10 @@
 
 #define MAX_FILENAME 50
 
+void * actAsServer(void * vargp){
+    return serverFunction(vargp); 
+}
+
 void exportDoneScript(settings_t *settings)
 {
     settings->exportDoneScript = 1;
@@ -180,6 +184,24 @@ void becomeClient(settings_t *settings)
     settings->isClient = !settings->isClient;
     settings->isClient ? logInfo("Ready to become a client", "") : logInfo("Client stopped", "");
 }
+
+void becomeServer(settings_t *settings)
+{
+    if (settings->isSimulating)
+        return;
+    settings->drawing_rectangle = 0;
+    settings->moving_node = 0;
+    settings->placing_node = 0;
+    settings->gettingIp = 0;
+    settings->placing_link = 0;
+    settings->deletingNodes = 0;
+    settings->placing_text = 0;
+    settings->isClient = 0;
+    settings->isServer = 0;
+    settings->hasToBeServer = 1;
+}
+
+
 
 void initEnvironment()
 {

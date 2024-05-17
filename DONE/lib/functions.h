@@ -37,8 +37,11 @@ void getData(settings_t*settings,interface_t*interface);
 int validateIP(settings_t*settings,char*tmpIp);
 
 void becomeClient(settings_t*settings);
+void becomeServer(settings_t*settings);
 
 void getWriteLock(settings_t *settings);
 void releaseWriteLock(settings_t *settings);
 void getReadLock(settings_t *settings);
 void releaseReadLock(settings_t *settings);
+
+void * actAsServer(void * vargp);

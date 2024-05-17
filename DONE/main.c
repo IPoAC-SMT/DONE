@@ -1,5 +1,7 @@
 #include "./lib/GUI.h"
 #include "./lib/log.h"
+#include <unistd.h> 
+#include <pthread.h> 
 
 #define TITLE "Docker Orchestrator for Network Emulation"
 
@@ -49,6 +51,7 @@ int main(int argc, char **argv)
         {874, 24, 50, 50, quit, "Quit", 0, NULL, "quit", true},
         {24, 574, 50, 50, placeRectangle, "Draw a Rectangle", 0, NULL, "rectangle", false},
         {874, 154, 50, 50, becomeClient, "Start or stop client!", 0, NULL, "externalnattedinterface", true},
+        {874, 274, 50, 50, becomeServer, "Start or stop server!", 0, NULL, "router", true},
         },
     NULL, NULL, NULL, NULL);
 
@@ -67,13 +70,15 @@ int main(int argc, char **argv)
 
     SetExitKey(KEY_NULL);
 
-    settings_t settings = {NULL,0,0,0,"",0,0,0,0,"","",0,(void*)interface,0,0,0,0,NULL,NULL,0,0,0,c,0,0,0,NULL,NULL,NULL,0,0,0,0,0,NULL,0,0,NULL,0,NULL,0,0};
+    settings_t settings = {NULL,0,0,0,"",0,0,0,0,"","",0,(void*)interface,0,0,0,0,NULL,NULL,0,0,0,c,0,0,0,NULL,NULL,NULL,0,0,0,0,0,NULL,0,0,NULL,0,NULL,0,0,0};
     settings.settingsLock = (rwlock_t*)calloc(1,sizeof(rwlock_t));
     rwlock_init(settings.settingsLock);
 
     system("clear");
 
     int framecount = 0;
+
+    pthread_t thread_id;
 
     while (!WindowShouldClose())
     {
@@ -83,6 +88,12 @@ int main(int argc, char **argv)
         if(settings.isClient && !((framecount++)%150)) getData(&settings,interface);
 
         DrawGUI(&settings, interface);
+
+        if(settings.hasToBeServer && !settings.isServer) {
+            settings.isServer = 42;
+            pthread_create(&thread_id,NULL,actAsServer,(void*)&settings);
+        }
+
 
         EndDrawing();
     }
