@@ -320,6 +320,7 @@ void stop(settings_t *settings)
     if (!settings->isSimulating)
         return;
     settings->isSimulating = 0;
+    settings->dragging_deactivated = 0;
     stopSimulation((interface_t *)settings->GUIdata, settings->numnodes, settings->numlink);
 }
 
