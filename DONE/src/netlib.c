@@ -47,7 +47,8 @@ int addNode(char *name, char type)
     {
 
         snprintf(command, MAX_COMMAND_SIZE, "sudo docker run ");
-        if(type == 'r'){
+        if (type == 'r')
+        {
             strcat(command, "--privileged ");
         }
         char final[MAX_COMMAND_SIZE];
@@ -67,16 +68,12 @@ int addNode(char *name, char type)
 
                 if (!system(command))
                 { // if the file creation was succesfull, eventually perfom the last step for routers, by enabling the IP forwarding
-                    if (type == 'r')
+                    snprintf(command, MAX_COMMAND_SIZE, "sudo ip netns exec %s sysctl net.ipv4.ip_forward=%d > /dev/null", pid, type == 'r' ? 1 : 0);
+                    if (!system(command))
                     {
-                        snprintf(command, MAX_COMMAND_SIZE, "sudo ip netns exec %s sysctl net.ipv4.ip_forward=1", pid);
-                        free(pid);
-
-                        if (!system(command))
-                        {
-                            return 0;
-                        }
+                        return 0;
                     }
+                    free(pid);
                     return 0;
                 }
             }
