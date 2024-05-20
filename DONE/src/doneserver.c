@@ -1,5 +1,6 @@
 #include "../lib/interface_t.h"
 #include "../lib/log.h"
+#include "../lib/functions.h"
 #include <string.h>
 #include <sys/socket.h>     // Include socket-related functions
 #include <netinet/in.h>     // Include internet address structures
@@ -69,8 +70,141 @@ void fetchData(settings_t*settings,interface_t*interface){      // CLIENT CODE
 */
 
 char* serialize(void){
-    // TODO
-    return NULL;
+
+    /*  
+    DATA TO SEND:
+    - absoluteCount
+    - numnodes
+    - numlink
+    - numrectangles
+    - numTexts
+    - numBindings
+    - openProjectName
+    - ipoac
+    - interfaceBindings
+    - GUIdata   -> nodes, links, rectangles, texts
+    - config file
+    */
+
+    char *bindings = calloc(4096, sizeof(char));
+    char *nodes = calloc(4096, sizeof(char));
+    char *links = calloc(4096, sizeof(char));
+    char *rectangles = calloc(4096, sizeof(char));
+    char *texts = calloc(8192, sizeof(char));
+
+    //logWarning("I wanna cry","");
+
+    getReadLock(settingsPtr);
+
+    // parsing bindings
+
+    for(int i = 0; i < settingsPtr->numBindings; i++){
+        char tmp[4];
+        sprintf(tmp,"%03d",(int)strlen(settingsPtr->interfaceBindings[i].deviceName));
+        strcat(bindings,tmp);   // strlen of deviceName
+        strncat(bindings,settingsPtr->interfaceBindings[i].deviceName,strlen(settingsPtr->interfaceBindings[i].deviceName));  // deviceName
+        sprintf(tmp,"%03d",(int)strlen(settingsPtr->interfaceBindings[i].bindingInterfaceName));  
+        strcat(bindings,tmp);   // strlen of bindingInterfaceName
+        strncat(bindings,settingsPtr->interfaceBindings[i].bindingInterfaceName,strlen(settingsPtr->interfaceBindings[i].bindingInterfaceName));    // bindingInterfaceName
+    }
+
+    //logWarning("pls help","");
+
+    // parsing nodes
+
+    for(int i = 0; i < settingsPtr->numnodes; i++){
+        char tmp[10];
+        node_t currentNode = ((interface_t *)settingsPtr->GUIdata)->nodes[i];
+        sprintf(tmp,"%03d",(int)strlen(currentNode.name));
+        strcat(nodes,tmp);  // strlen of node name
+        strncat(nodes,currentNode.name,(int)strlen(currentNode.name));   // node name
+        sprintf(tmp,"%01d%04d%04d",currentNode.type,currentNode.x,currentNode.y);  
+        strcat(nodes,tmp);  // node type, x and y
+    }
+
+    //logWarning("tonight i wont sleep","");
+
+    // parsing links
+
+    for(int i = 0; i < settingsPtr->numlink; i++){
+        char tmp[10];
+        link_t currentLink = ((interface_t *)settingsPtr->GUIdata)->links[i];
+        sprintf(tmp,"%03d%03d",(int)strlen(currentLink.node1),(int)strlen(currentLink.node2));
+        strcat(links,tmp);  // node1 name length and node2 name length
+        strncat(links,currentLink.node1,(int)strlen(currentLink.node1));     // node 1 name
+        strncat(links,currentLink.node2,(int)strlen(currentLink.node2));     // node 2 name
+        sprintf(tmp,"%01d%01d",currentLink.node1_type,currentLink.node2_type); 
+        strcat(links,tmp);  // node1 type and node2 type
+    }
+
+    //logWarning("im gonna have nightmares","");
+
+    // parsing rectangles 
+
+    for(int i = 0; i < settingsPtr->numrectangles; i++){
+        char tmp[26];
+        rectangle_t currentRectangle = ((interface_t *)settingsPtr->GUIdata)->rectangles[i];
+        sprintf(tmp,"%04d%04d%04d%04d",currentRectangle.x,currentRectangle.y,currentRectangle.x1,currentRectangle.y1);
+        //logInfo("first","%s",tmp);
+        strcat(rectangles,tmp);     // rectangle x, y, x1, y1
+        sprintf(tmp,"%03u%03u%03u",(unsigned int)currentRectangle.r,(unsigned int)currentRectangle.g,(unsigned int)currentRectangle.b);
+        logInfo("rgb:","%d %d %d",(int)currentRectangle.r,(int)currentRectangle.g,(int)currentRectangle.b);
+        //logInfo("second","%s",tmp);
+        strcat(rectangles,tmp);     // rectangle r, g, b
+    }
+
+    //logInfo("rectangles", "%s", rectangles);
+    //logWarning("pls let me finish coding before 3 am","");
+
+    // parsing texts
+
+    for(int i = 0; i < settingsPtr->numTexts; i++){
+        char tmp[12];
+        text_t currentText = ((interface_t *)settingsPtr->GUIdata)->texts[i];
+        sprintf(tmp,"%04d%04d%03d",currentText.x,currentText.y,(int)strlen(currentText.text));
+        strcat(texts,tmp);  // text x, y, strlen of text
+        strncat(texts,currentText.text,(int)strlen(currentText.text));   // text
+    }
+
+    logInfo("texts", "%s", texts);
+    //logWarning("my soul left my body, see ya (in hell)!","");
+
+    // constructing string to send, pls kill us :')
+
+    char *stringToSend = calloc(65536,sizeof(char));    // %03d prints 3 digits from int and pads them with zeros if needed
+    snprintf(stringToSend, 65536,
+    "%03d%03d%03d%03d%03d%03d%03d%s%01d%s%s%s%s%s",
+    settingsPtr->absoluteCount,
+    settingsPtr->numnodes,
+    settingsPtr->numlink,
+    settingsPtr->numrectangles,
+    settingsPtr->numTexts,
+    settingsPtr->numBindings,
+    settingsPtr->openProjectName ? (int)strlen(settingsPtr->openProjectName) : 0,
+    settingsPtr->openProjectName ? settingsPtr->openProjectName : "",
+    settingsPtr->ipoac != 0 ? 1 : 0,    // converted into 0 or 1 depending on value  
+    bindings,
+    nodes,
+    links,
+    rectangles,
+    texts
+    );
+    
+
+    //logWarning("did it really work?","");
+
+    releaseReadLock(settingsPtr);
+
+    logSuccess("We made it!","");
+
+    
+    return stringToSend;
+}
+
+void sendData(int sock){
+    char *data = serialize();
+    write(sock, data, strlen(data));
+    return; 
 }
 
 void *connection_handler(void *socket_desc) {
@@ -81,9 +215,13 @@ void *connection_handler(void *socket_desc) {
     if ((read_size = recv(sock, message, 2048, 0)) > 0) {
         switch(message[0]){
             case '0': // TODO respond with data
+
+                // CALL FUNCTION TO SEND DATA
                 write(sock,"you pressed 0\n",strlen("you pressed 0\n"));
+                sendData(sock);
                 break;
             case '1': // TODO stop server and send ack
+                // STOP BEING A SERVER
                 write(sock,"you pressed 1\n",strlen("you pressed 1\n"));
                 break;
             default: // what are you saying?

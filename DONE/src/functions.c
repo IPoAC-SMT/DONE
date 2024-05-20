@@ -282,7 +282,7 @@ void start(settings_t *settings)
                                     logError("An error was found in the config", "");
                                 }
                             }
-                            memcpy(command, "", 1024);
+                            memset(command, 0, 1024);
                         }
                     } while (buf[0] != '\n');
                 }

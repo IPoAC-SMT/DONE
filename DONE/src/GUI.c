@@ -698,7 +698,7 @@ void export(settings_t *settings, interface_t *interface)
                             if (strlen(command)) {
                                 command[strlen(command)-2] = '\0';
                                 fprintf(ptr,"send command to %s begin script\n%s\nend script\n",nodeName,command);
-                                memcpy(command, "", 1024);
+                                memset(command, 0, 1024);
                             }
                         } while (buf[0] != '\n');
                     }
