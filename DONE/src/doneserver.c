@@ -46,9 +46,128 @@ void fetchData(settings_t*settings,interface_t*interface){      // CLIENT CODE
 
     send(socketFd, "0",1,0);
 
+    logInfo("data requested","");
+
+    // read data into char * data
+    char * data = (char*)calloc(65536,sizeof(char));
+
+    read(socketFd,data,65536);
+    /*logWarning("data","%s",data);*/
 
 
-    // TODO update structs
+    /*logWarning("Allocation successful","");*/
+
+    // parse data
+    getWriteLock(settings);
+
+    /*logWarning("I'm crying too","");*/
+
+    int length = 0, length1 = 0;
+
+    sscanf(data,"%03d%03d%03d%03d%03d%03d%03d",
+        &settings->absoluteCount,
+        &settings->numnodes,
+        &settings->numlink,
+        &settings->numrectangles,
+        &settings->numTexts,
+        &settings->numBindings,
+        &length
+    );
+    
+    /*logWarning("is the crash here?","%d %d %d %d %d %d %d",
+            settings->absoluteCount,
+            settings->numnodes,
+            settings->numlink,
+            settings->numrectangles,
+            settings->numTexts,
+            settings->numBindings,
+            length
+);*/
+
+    data = data + 21; // mi sposto all'inizio del nome, se presente
+
+    settings->openProjectName = strndup(data,length);
+    sscanf(data+length,"%01c",&settings->ipoac);
+    settings->ipoac-=48;
+    data = data+length+1; // mi sposto oltre nome e flag (IPoAC)
+
+    /*logWarning("no","");*/
+
+    // ora devo leggere i bindings
+    
+    settings->interfaceBindings = (binding_t*)calloc(settings->numBindings,sizeof(binding_t));
+    for(int i = 0; i<settings->numBindings;i++) {
+        sscanf(data,"%03d",&length);
+        data += 3;
+        settings->interfaceBindings[i].deviceName = strndup(data,length);
+        data += length;
+        sscanf(data,"%03d",&length);
+        data +=3;
+        settings->interfaceBindings[i].bindingInterfaceName = strndup(data,length);
+        data += length;
+    }
+
+
+    // leggere nodes
+    interface->nodes = (node_t*) calloc(settings->numnodes,sizeof(node_t));
+    for (int i = 0; i < settings->numnodes;i++) {
+        sscanf(data,"%03d",&length);
+        data += 3;
+        interface->nodes[i].name = strndup(data,length);
+        data += length;
+        sscanf(data,"%01d%04d%04d",&length,&interface->nodes[i].x,&interface->nodes[i].y);
+        interface->nodes[i].type = length;
+        data += 9;
+    }
+
+
+    // leggere links
+    interface->links = (link_t*) calloc(settings->numlink,sizeof(link_t));
+    for (int i = 0; i<settings->numlink;i++) {
+        sscanf(data, "%03d%03d",&length,&length1);
+        data += 6;
+        interface->links[i].node1 = strndup(data,length);
+        data += length;
+        interface->links[i].node2 = strndup(data,length1);
+        data += length1;
+        sscanf(data, "%01d%01d",&length,&length1);
+        interface->links[i].node1_type = (component_type_t)length;
+        interface->links[i].node2_type = (component_type_t)length1;
+        data += 2;
+    }
+
+
+    // leggere rectangles
+    
+    interface->rectangles = (rectangle_t*) calloc(settings->numrectangles,sizeof(rectangle_t));
+    for (int i = 0; i<settings->numrectangles; i++) {
+        sscanf(data,"%04d%04d%04d%04d%03u%03u%03u",
+                &interface->rectangles[i].x,
+                &interface->rectangles[i].y,
+                &interface->rectangles[i].x1,
+                &interface->rectangles[i].y1,
+                &interface->rectangles[i].r,
+                &interface->rectangles[i].g,
+                &interface->rectangles[i].b);
+        data += 25;
+    }
+
+
+    // leggere texts
+
+    interface->texts = (text_t*) calloc(settings->numTexts,sizeof(text_t));
+    for (int i = 0; i < settings->numTexts; i++) {
+        sscanf(data,"%04d%04d%03d",&interface->texts[i].x,&interface->texts[i].y,&length);
+        data += 11;
+        interface->texts[i].text = strndup(data,length);
+        data += length;
+    }
+    
+
+
+    // TODO update file
+    
+    releaseWriteLock(settings);
     return;
 }
 
@@ -217,7 +336,7 @@ void *connection_handler(void *socket_desc) {
             case '0': // TODO respond with data
 
                 // CALL FUNCTION TO SEND DATA
-                write(sock,"you pressed 0\n",strlen("you pressed 0\n"));
+                //write(sock,"you pressed 0\n",strlen("you pressed 0\n"));
                 sendData(sock);
                 break;
             case '1': // TODO stop server and send ack
