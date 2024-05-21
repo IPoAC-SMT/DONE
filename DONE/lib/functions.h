@@ -38,6 +38,7 @@ int validateIP(settings_t*settings,char*tmpIp);
 
 void becomeClient(settings_t*settings);
 void becomeServer(settings_t*settings);
+void askToBecomeServer(settings_t *settings);
 
 void getWriteLock(settings_t *settings);
 void releaseWriteLock(settings_t *settings);

@@ -7,10 +7,84 @@
 #include <arpa/inet.h>      // Include functions for manipulating IP addresses
 #include <unistd.h>
 #include <pthread.h>
+#include <netdb.h>
 
 #define PORT_NUMBER 4242
 
 settings_t * settingsPtr = NULL;
+
+char *getLocalIP(){
+    char *hostbuffer = (char *)calloc(256, sizeof(char));
+    char *IPbuffer;
+    struct hostent *host_entry;
+ 
+    // To retrieve host information
+    host_entry = gethostbyname(hostbuffer);
+ 
+    // To convert an Internet network address into ASCII string
+    IPbuffer = inet_ntoa(*((struct in_addr*)host_entry->h_addr_list[0]));
+
+    free(hostbuffer);
+
+    return IPbuffer;
+}
+
+void switchFromClientToServer(settings_t*settings){
+
+    int socketFd = socket(AF_INET, SOCK_STREAM, 0);  // Create a socket using IPv4 and TCP protocol
+    if(socketFd < 0){
+        logError("Unable to create socket","");
+        return;
+    }
+
+    struct sockaddr_in socketAddress;
+
+    socketAddress.sin_family = AF_INET;                      // Set address family to IPv4
+    inet_pton(AF_INET, settings->serverIP, &socketAddress.sin_addr);    // converting address to binary form
+    socketAddress.sin_port = htons(PORT_NUMBER);              // Set the port number to bind 
+
+    if(connect(socketFd, (struct sockaddr *)&socketAddress, sizeof(socketAddress)) < 0){
+        logError("Error connecting to socket", "");
+        return;
+    }
+
+    logSuccess("Successfully connected to server at", "%s", settings->serverIP);
+
+    char tmp[17];
+    snprintf(tmp,17,"1%s", getLocalIP());
+    logInfo("new IP address of server:","%s",tmp+1);
+
+    send(socketFd,tmp,strlen(tmp),0);
+
+    logInfo("Switch to server mode requested","");
+
+    // read data into char * data
+    char * data = (char*)calloc(17,sizeof(char));
+
+    read(socketFd,data,17);
+
+    int length = 0;
+
+    sscanf(data,"%01d", &length);
+    data += 1;  // move pointer to the next byte
+
+    if(length){     // the server we contacted is not an updated server anymore
+        // parse ip address of next server
+        settings->serverIP = strdup(data);
+        logWarning("That server is not a server anymore, contacting", "%s", data);
+        switchFromClientToServer(settings);     // retry contacting the provided ip
+        return;
+    } else {    // we can become server
+        settings->isClient = 0;
+        settings->serverIP = NULL;
+        settings->nextServer = NULL;
+        settings->isServer = 0;
+        settings->hasToBeServer = 1;        // the main will take it from here
+    }
+     
+    return;
+}
+
 
 void fetchData(settings_t*settings,interface_t*interface){      // CLIENT CODE
 
@@ -63,6 +137,15 @@ void fetchData(settings_t*settings,interface_t*interface){      // CLIENT CODE
     /*logWarning("I'm crying too","");*/
 
     int length = 0, length1 = 0;
+
+    sscanf(data,"%01d", &length);
+    data += 1;  // move pointer to the next byte
+
+    if(length){
+        // parse ip address of next server
+        settings->serverIP = strdup(data);
+        return;
+    }
 
     sscanf(data,"%03d%03d%03d%03d%03d%03d%03d",
         &settings->absoluteCount,
@@ -141,7 +224,7 @@ void fetchData(settings_t*settings,interface_t*interface){      // CLIENT CODE
     
     interface->rectangles = (rectangle_t*) calloc(settings->numrectangles,sizeof(rectangle_t));
     for (int i = 0; i<settings->numrectangles; i++) {
-        sscanf(data,"%04d%04d%04d%04d%03u%03u%03u",
+        sscanf(data,"%04d%04d%04d%04d%03d%03d%03d",
                 &interface->rectangles[i].x,
                 &interface->rectangles[i].y,
                 &interface->rectangles[i].x1,
@@ -150,6 +233,9 @@ void fetchData(settings_t*settings,interface_t*interface){      // CLIENT CODE
                 &interface->rectangles[i].g,
                 &interface->rectangles[i].b);
         data += 25;
+        interface->rectangles[i].r = (interface->rectangles[i].r + 128) % 256;
+        interface->rectangles[i].g = (interface->rectangles[i].g + 128) % 256;
+        interface->rectangles[i].b = (interface->rectangles[i].b + 128) % 256;
     }
 
 
@@ -264,15 +350,11 @@ char* serialize(void){
         char tmp[26];
         rectangle_t currentRectangle = ((interface_t *)settingsPtr->GUIdata)->rectangles[i];
         sprintf(tmp,"%04d%04d%04d%04d",currentRectangle.x,currentRectangle.y,currentRectangle.x1,currentRectangle.y1);
-        //logInfo("first","%s",tmp);
         strcat(rectangles,tmp);     // rectangle x, y, x1, y1
-        sprintf(tmp,"%03u%03u%03u",(unsigned int)currentRectangle.r,(unsigned int)currentRectangle.g,(unsigned int)currentRectangle.b);
-        logInfo("rgb:","%d %d %d",(int)currentRectangle.r,(int)currentRectangle.g,(int)currentRectangle.b);
-        //logInfo("second","%s",tmp);
+        sprintf(tmp,"%03d%03d%03d",currentRectangle.r + 128,currentRectangle.g + 128, currentRectangle.b + 128);        // DON'T LIE TO THE COMPILER
         strcat(rectangles,tmp);     // rectangle r, g, b
     }
 
-    //logInfo("rectangles", "%s", rectangles);
     //logWarning("pls let me finish coding before 3 am","");
 
     // parsing texts
@@ -292,7 +374,7 @@ char* serialize(void){
 
     char *stringToSend = calloc(65536,sizeof(char));    // %03d prints 3 digits from int and pads them with zeros if needed
     snprintf(stringToSend, 65536,
-    "%03d%03d%03d%03d%03d%03d%03d%s%01d%s%s%s%s%s",
+    "0%03d%03d%03d%03d%03d%03d%03d%s%01d%s%s%s%s%s",
     settingsPtr->absoluteCount,
     settingsPtr->numnodes,
     settingsPtr->numlink,
@@ -314,8 +396,7 @@ char* serialize(void){
 
     releaseReadLock(settingsPtr);
 
-    logSuccess("We made it!","");
-
+    logSuccess("Successfully sent data","");
     
     return stringToSend;
 }
@@ -326,6 +407,19 @@ void sendData(int sock){
     return; 
 }
 
+char *parseServerSwitchRequest(char *message){  // if client receives a 0, switch is successful, else it receives the new server ip
+    // we have received the IP address of the new server
+    message += 1;
+    if(!settingsPtr->nextServer){       // the client can become server only if there is no other next server
+        settingsPtr->nextServer = strdup(message);
+        return "0";
+    }
+
+    char *tmp = (char *)calloc(17, sizeof(char));
+    snprintf(tmp, 16, "1%s", settingsPtr->nextServer);  // if we have received a server switch request but we have already passed control to someone else
+    return tmp;
+}
+
 void *connection_handler(void *socket_desc) {
     int sock = *(int*)socket_desc;
     char message[2048];
@@ -333,17 +427,23 @@ void *connection_handler(void *socket_desc) {
 
     if ((read_size = recv(sock, message, 2048, 0)) > 0) {
         switch(message[0]){
-            case '0': // TODO respond with data
-
-                // CALL FUNCTION TO SEND DATA
-                //write(sock,"you pressed 0\n",strlen("you pressed 0\n"));
-                sendData(sock);
+            case '0': // respond with data
+                if(!settingsPtr->nextServer){
+                    logInfo("I am the server, I will grace thee with my beloved bits.","");
+                    sendData(sock);
+                } else {    // they are not the server anymore, so they communicate the new IP address of the server
+                    char tmp[17];
+                    snprintf(tmp, 16, "1%s", settingsPtr->nextServer);
+                    write(sock,tmp,strlen(tmp));
+                }
                 break;
-            case '1': // TODO stop server and send ack
-                // STOP BEING A SERVER
-                write(sock,"you pressed 1\n",strlen("you pressed 1\n"));
+            case '1': // stop server and send ack
+                logInfo("how dare thee try to overthrow my reign?","");
+                char *response = parseServerSwitchRequest(message);
+                write(sock,response,strlen(response));
+                logInfo("response:","%s",response);
                 break;
-            default: // what are you saying?
+            default: // what are you trying to do? go away
                 write(sock,message,strlen(message));
         }
     }
@@ -375,7 +475,6 @@ void* serverFunction(void* settings_void){
     struct sockaddr_in socketAddress;
 
     socketAddress.sin_family = AF_INET;                      // Set address family to IPv4
-    //socketAddress.sin_addr.s_addr = inet_addr(settings->serverIP); // Set the IP address to bind to
     socketAddress.sin_addr.s_addr = INADDR_ANY;
     socketAddress.sin_port = htons(PORT_NUMBER);              // Set the port number to bind 
 
@@ -416,5 +515,3 @@ void* serverFunction(void* settings_void){
 
     return NULL;
 }
-
-

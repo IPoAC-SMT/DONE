@@ -58,4 +58,5 @@ typedef struct
     char gettingIp;
     char isServer;
     char hasToBeServer;
+    char *nextServer;
 } settings_t;

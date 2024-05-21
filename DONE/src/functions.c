@@ -632,6 +632,13 @@ void getData(settings_t *settings, interface_t *interface)
     }
 }
 
+void askToBecomeServer(settings_t *settings){
+    if(!settings->isClient){
+        return;
+    }
+    switchFromClientToServer(settings);
+}
+
 void getWriteLock(settings_t *settings){
     if(settings->isServer == 1){
         rwlock_acquire_writelock(settings->settingsLock);

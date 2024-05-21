@@ -52,6 +52,7 @@ int main(int argc, char **argv)
         {24, 574, 50, 50, placeRectangle, "Draw a Rectangle", 0, NULL, "rectangle", false},
         {874, 154, 50, 50, becomeClient, "Start or stop client!", 0, NULL, "externalnattedinterface", true},
         {874, 274, 50, 50, becomeServer, "Start or stop server!", 0, NULL, "router", true},
+        {874, 400, 50, 50, askToBecomeServer, "Become the server!", 0, NULL, "router", true},
         },
     NULL, NULL, NULL, NULL);
 
@@ -70,7 +71,7 @@ int main(int argc, char **argv)
 
     SetExitKey(KEY_NULL);
 
-    settings_t settings = {NULL,0,0,0,"",0,0,0,0,"","",0,(void*)interface,0,0,0,0,NULL,NULL,0,0,0,c,0,0,0,NULL,NULL,NULL,0,0,0,0,0,NULL,0,0,NULL,0,NULL,0,0,0};
+    settings_t settings = {NULL,0,0,0,"",0,0,0,0,"","",0,(void*)interface,0,0,0,0,NULL,NULL,0,0,0,c,0,0,0,NULL,NULL,NULL,0,0,0,0,0,NULL,0,0,NULL,0,NULL,0,0,0,NULL};
     settings.settingsLock = (rwlock_t*)calloc(1,sizeof(rwlock_t));
     rwlock_init(settings.settingsLock);
 
