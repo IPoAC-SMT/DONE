@@ -58,7 +58,7 @@ void fetchData(settings_t*settings,interface_t*interface){      // CLIENT CODE
     /*logWarning("Allocation successful","");*/
 
     // parse data
-    getWriteLock(settings);
+    //getWriteLock(settings);
 
     /*logWarning("I'm crying too","");*/
 
@@ -167,7 +167,7 @@ void fetchData(settings_t*settings,interface_t*interface){      // CLIENT CODE
 
     // TODO update file
     
-    releaseWriteLock(settings);
+    //releaseWriteLock(settings);
     return;
 }
 
@@ -285,7 +285,7 @@ char* serialize(void){
         strncat(texts,currentText.text,(int)strlen(currentText.text));   // text
     }
 
-    logInfo("texts", "%s", texts);
+    //logInfo("texts", "%s", texts);
     //logWarning("my soul left my body, see ya (in hell)!","");
 
     // constructing string to send, pls kill us :')
