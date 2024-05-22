@@ -136,7 +136,7 @@ void fetchData(settings_t*settings,interface_t*interface){      // CLIENT CODE
 
     /*logWarning("I'm crying too","");*/
 
-    int length = 0, length1 = 0;
+    int length = 0, length1 = 0, length2 = 0;
 
     sscanf(data,"%01d", &length);
     data += 1;  // move pointer to the next byte
@@ -229,13 +229,13 @@ void fetchData(settings_t*settings,interface_t*interface){      // CLIENT CODE
                 &interface->rectangles[i].y,
                 &interface->rectangles[i].x1,
                 &interface->rectangles[i].y1,
-                &interface->rectangles[i].r,
-                &interface->rectangles[i].g,
-                &interface->rectangles[i].b);
+                &length,
+                &length1,
+                &length2);
         data += 25;
-        interface->rectangles[i].r = (interface->rectangles[i].r + 128) % 256;
-        interface->rectangles[i].g = (interface->rectangles[i].g + 128) % 256;
-        interface->rectangles[i].b = (interface->rectangles[i].b + 128) % 256;
+        interface->rectangles[i].r = (length + 128) % 256;
+        interface->rectangles[i].g = (length1 + 128) % 256;
+        interface->rectangles[i].b = (length2 + 128) % 256;
     }
 
 
