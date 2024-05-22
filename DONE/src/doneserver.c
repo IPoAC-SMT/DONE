@@ -17,19 +17,27 @@ char *getLocalIP(){
     char *hostbuffer = (char *)calloc(256, sizeof(char));
     char *IPbuffer;
     struct hostent *host_entry;
- 
+
+    // Get the hostname
+    gethostname(hostbuffer, sizeof(hostbuffer));
+
     // To retrieve host information
     host_entry = gethostbyname(hostbuffer);
+
+    if (host_entry == NULL) {
+        return NULL;
+    }
  
     // To convert an Internet network address into ASCII string
     IPbuffer = inet_ntoa(*((struct in_addr*)host_entry->h_addr_list[0]));
-
     free(hostbuffer);
 
     return IPbuffer;
 }
 
 void switchFromClientToServer(settings_t*settings){
+
+    logInfo("inside client-server switch function","");
 
     int socketFd = socket(AF_INET, SOCK_STREAM, 0);  // Create a socket using IPv4 and TCP protocol
     if(socketFd < 0){
