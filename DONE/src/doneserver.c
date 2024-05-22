@@ -13,6 +13,27 @@
 
 settings_t * settingsPtr = NULL;
 
+int connectToSocket(char *serverIp){
+    int socketFd = socket(AF_INET, SOCK_STREAM, 0);  // Create a socket using IPv4 and TCP protocol
+    if(socketFd < 0){
+        logError("Unable to create socket","");
+        return -1;
+    }
+
+    struct sockaddr_in socketAddress;
+
+    socketAddress.sin_family = AF_INET;                      // Set address family to IPv4
+    inet_pton(AF_INET, serverIp, &socketAddress.sin_addr);    // converting address to binary form
+    socketAddress.sin_port = htons(PORT_NUMBER);              // Set the port number to bind 
+
+    if(connect(socketFd, (struct sockaddr *)&socketAddress, sizeof(socketAddress)) < 0){
+        logError("Error connecting to socket", "");
+        return -1;
+    }
+
+    return socketFd;
+}
+
 char *getLocalIP(){
     char *hostbuffer = (char *)calloc(256, sizeof(char));
     char *IPbuffer;
@@ -36,23 +57,9 @@ char *getLocalIP(){
 }
 
 void switchFromClientToServer(settings_t*settings){
+    int socketFd = connectToSocket(settings->serverIP);
 
-    logInfo("inside client-server switch function","");
-
-    int socketFd = socket(AF_INET, SOCK_STREAM, 0);  // Create a socket using IPv4 and TCP protocol
     if(socketFd < 0){
-        logError("Unable to create socket","");
-        return;
-    }
-
-    struct sockaddr_in socketAddress;
-
-    socketAddress.sin_family = AF_INET;                      // Set address family to IPv4
-    inet_pton(AF_INET, settings->serverIP, &socketAddress.sin_addr);    // converting address to binary form
-    socketAddress.sin_port = htons(PORT_NUMBER);              // Set the port number to bind 
-
-    if(connect(socketFd, (struct sockaddr *)&socketAddress, sizeof(socketAddress)) < 0){
-        logError("Error connecting to socket", "");
         return;
     }
 
@@ -95,32 +102,9 @@ void switchFromClientToServer(settings_t*settings){
 
 
 void fetchData(settings_t*settings,interface_t*interface){      // CLIENT CODE
+    int socketFd = connectToSocket(settings->serverIP);
 
-    // TO TEST CONNECTION: nc -l -p 4242
-    
-    // get data from socket
-    //printf("I should get data from sockets\n");
-
-    int socketFd = socket(AF_INET, SOCK_STREAM, 0);  // Create a socket using IPv4 and TCP protocol
     if(socketFd < 0){
-        logError("Unable to create socket","");
-        return;
-    }
-
-    struct sockaddr_in socketAddress;
-
-    socketAddress.sin_family = AF_INET;                      // Set address family to IPv4
-    //socketAddress.sin_addr.s_addr = inet_addr(settings->serverIP); // Set the IP address to bind to
-    inet_pton(AF_INET, settings->serverIP, &socketAddress.sin_addr);    // converting address to binary form
-    socketAddress.sin_port = htons(PORT_NUMBER);              // Set the port number to bind 
-
-    //printf("server at %s\n", settings->serverIP);
-    //printf("IP address: %lx\n", socketAddress.sin_addr);
-    //printf("PORT: %lx\n", socketAddress.sin_port);
-
-    // connecting to the socket!
-    if(connect(socketFd, (struct sockaddr *)&socketAddress, sizeof(socketAddress)) < 0){
-        logError("Error connecting to socket", "");
         return;
     }
 
@@ -134,16 +118,12 @@ void fetchData(settings_t*settings,interface_t*interface){      // CLIENT CODE
     char * data = (char*)calloc(65536,sizeof(char));
 
     read(socketFd,data,65536);
-    /*logWarning("data","%s",data);*/
-
-
-    /*logWarning("Allocation successful","");*/
 
     // parse data
+
     //getWriteLock(settings);
 
     /*logWarning("I'm crying too","");*/
-
     int length = 0, length1 = 0, length2 = 0;
 
     sscanf(data,"%01d", &length);
@@ -165,24 +145,12 @@ void fetchData(settings_t*settings,interface_t*interface){      // CLIENT CODE
         &length
     );
     
-    /*logWarning("is the crash here?","%d %d %d %d %d %d %d",
-            settings->absoluteCount,
-            settings->numnodes,
-            settings->numlink,
-            settings->numrectangles,
-            settings->numTexts,
-            settings->numBindings,
-            length
-);*/
-
     data = data + 21; // mi sposto all'inizio del nome, se presente
 
     settings->openProjectName = strndup(data,length);
     sscanf(data+length,"%01c",&settings->ipoac);
     settings->ipoac-=48;
     data = data+length+1; // mi sposto oltre nome e flag (IPoAC)
-
-    /*logWarning("no","");*/
 
     // ora devo leggere i bindings
     
@@ -198,7 +166,6 @@ void fetchData(settings_t*settings,interface_t*interface){      // CLIENT CODE
         data += length;
     }
 
-
     // leggere nodes
     interface->nodes = (node_t*) calloc(settings->numnodes,sizeof(node_t));
     for (int i = 0; i < settings->numnodes;i++) {
@@ -210,7 +177,6 @@ void fetchData(settings_t*settings,interface_t*interface){      // CLIENT CODE
         interface->nodes[i].type = length;
         data += 9;
     }
-
 
     // leggere links
     interface->links = (link_t*) calloc(settings->numlink,sizeof(link_t));
@@ -226,7 +192,6 @@ void fetchData(settings_t*settings,interface_t*interface){      // CLIENT CODE
         interface->links[i].node2_type = (component_type_t)length1;
         data += 2;
     }
-
 
     // leggere rectangles
     
@@ -256,8 +221,6 @@ void fetchData(settings_t*settings,interface_t*interface){      // CLIENT CODE
         interface->texts[i].text = strndup(data,length);
         data += length;
     }
-    
-
 
     // TODO update file
     
@@ -265,39 +228,7 @@ void fetchData(settings_t*settings,interface_t*interface){      // CLIENT CODE
     return;
 }
 
-
-/*
-    - accesso concorrenziali alla struttura dati
-    
-    QUANDO DIVENTA SERVER:
-        ATTIVITÀ ONE-TIME:
-            - apre socket
-        ATTIVITÀ PERIODICHE:
-            - ascolta richieste (potenzialmente multiple in contemporanea -> thread per rispondere)
-            - serve richieste:
-                - formatta dati
-                - impacchetta dati
-                - invia dati al client
-    FINE RUOLO SERVER:
-    - chiude ascolto
-*/
-
 char* serialize(void){
-
-    /*  
-    DATA TO SEND:
-    - absoluteCount
-    - numnodes
-    - numlink
-    - numrectangles
-    - numTexts
-    - numBindings
-    - openProjectName
-    - ipoac
-    - interfaceBindings
-    - GUIdata   -> nodes, links, rectangles, texts
-    - config file
-    */
 
     char *bindings = calloc(4096, sizeof(char));
     char *nodes = calloc(4096, sizeof(char));
@@ -375,7 +306,6 @@ char* serialize(void){
         strncat(texts,currentText.text,(int)strlen(currentText.text));   // text
     }
 
-    //logInfo("texts", "%s", texts);
     //logWarning("my soul left my body, see ya (in hell)!","");
 
     // constructing string to send, pls kill us :')
