@@ -187,7 +187,7 @@ void becomeClient(settings_t *settings)
 
 void becomeServer(settings_t *settings)
 {
-    if (settings->isSimulating)
+    if (settings->isSimulating || settings->isClient)
         return;
     settings->drawing_rectangle = 0;
     settings->moving_node = 0;
@@ -326,7 +326,7 @@ void stop(settings_t *settings)
 
 void openShell(settings_t *settings)
 {
-    if (!settings->isSimulating)
+    if (!settings->isSimulating || !settings->isClient )
         return;
     settings->node_type == switch_t ? openSwitchShellWrapper() : openNodeShellWrapper(settings->node_name);
 }
@@ -365,6 +365,7 @@ void prepareToOpenProject(settings_t *settings)
 
 void openProject(settings_t *settings)
 {
+    if(settings->isClient) return;
     if (settings->isSimulating)
     { // if an experiment was running we need to kill the containers
         stop(settings);

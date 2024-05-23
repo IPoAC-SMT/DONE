@@ -372,33 +372,35 @@ void DrawNode(node_t *node, settings_t *settings, bool true_node)
             }
             else
             {
-                if (node->type == external_interface_t || node->type == external_natted_interface_t)
-                {
-                    populateInterfaceOptionsWrapper(settings);
-                }
-                else
-                {
-                    if (settings->openProjectName == NULL)
+                if (!settings->isClient) {
+                    if (node->type == external_interface_t || node->type == external_natted_interface_t)
                     {
-                        logWarning("Save the project first!", "");
+                        populateInterfaceOptionsWrapper(settings);
                     }
                     else
                     {
-                        char temp[200];
-                        snprintf(temp, 200, "%s.conf", settings->openProjectName);
-                        int a = 0;
-                        if ((a = fork()) == 0)
+                        if (settings->openProjectName == NULL)
                         {
-                            char *args[] = {"x-terminal-emulator", "-e", "vim", temp, NULL};
-                            execvp(args[0], args);
-                        }
-                        else if (a > 0)
-                        {
-                            // waitpid
-                            waitpid(a, NULL, 0);
+                            logWarning("Save the project first!", "");
                         }
                         else
-                            logWarning("Wasn't able to open project configs", "sorry");
+                        {
+                            char temp[200];
+                            snprintf(temp, 200, "%s.conf", settings->openProjectName);
+                            int a = 0;
+                            if ((a = fork()) == 0)
+                            {
+                                char *args[] = {"x-terminal-emulator", "-e", "vim", temp, NULL};
+                                execvp(args[0], args);
+                            }
+                            else if (a > 0)
+                            {
+                                // waitpid
+                                waitpid(a, NULL, 0);
+                            }
+                            else
+                                logWarning("Wasn't able to open project configs", "sorry");
+                        }
                     }
                 }
             }

@@ -74,9 +74,9 @@ void switchFromClientToServer(settings_t*settings){
     logInfo("Switch to server mode requested","");
 
     // read data into char * data
-    char * data = (char*)calloc(17,sizeof(char));
+    char * data = (char*)calloc(65536,sizeof(char));
 
-    read(socketFd,data,17);
+    read(socketFd,data,65536);
 
     int length = 0;
 
@@ -89,7 +89,13 @@ void switchFromClientToServer(settings_t*settings){
         logWarning("That server is not a server anymore, contacting", "%s", data);
         switchFromClientToServer(settings);     // retry contacting the provided ip
         return;
-    } else {    // we can become server
+    } else {    // we can become server, file content is in data
+        char tmp[100];
+        snprintf(tmp,99,"%s.conf",settings->openProjectName);
+        //printf("%s",tmp);
+        FILE * ptr = fopen(tmp,"wb");
+        printf("%s\n",data);
+        fwrite(data,sizeof(char),65536,ptr);
         settings->isClient = 0;
         settings->serverIP = NULL;
         settings->nextServer = NULL;
@@ -345,12 +351,34 @@ void sendData(int sock){
     return; 
 }
 
+
+
+char * readConfigFile(){
+    if(settingsPtr->openProjectName){
+        char tmp[100];
+        snprintf(tmp,99,"%s.conf",settingsPtr->openProjectName);
+        FILE *ptr = fopen(tmp,"rb");
+        fseek(ptr,0,SEEK_END); // searching the end of the file
+        size_t size = ftell(ptr);
+        rewind(ptr); // go back to the start
+        char * configs = (char*)calloc(size,sizeof(char));
+        size_t nBytesRead = fread(configs,sizeof(char),size,ptr);
+        if (nBytesRead!=size) return "";
+        fclose(ptr);
+        return configs;
+    }
+    return "";
+}
+
 char *parseServerSwitchRequest(char *message){  // if client receives a 0, switch is successful, else it receives the new server ip
     // we have received the IP address of the new server
     message += 1;
     if(!settingsPtr->nextServer){       // the client can become server only if there is no other next server
         settingsPtr->nextServer = strdup(message);
-        return "0";
+        // TODO check this code
+        char * tmp = (char*)calloc(65536,sizeof(char));
+        snprintf(tmp,65536,"0%s",readConfigFile());
+        return tmp;
     }
 
     char *tmp = (char *)calloc(17, sizeof(char));
