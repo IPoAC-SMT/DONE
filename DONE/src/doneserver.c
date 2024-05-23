@@ -95,7 +95,8 @@ void switchFromClientToServer(settings_t*settings){
         //printf("%s",tmp);
         FILE * ptr = fopen(tmp,"wb");
         printf("%s\n",data);
-        fwrite(data,sizeof(char),strlen(data),ptr);
+        sscanf(data,"%06d",&length);
+        fwrite(data+6,sizeof(char),length,ptr);
         settings->isClient = 0;
         settings->serverIP = NULL;
         settings->nextServer = NULL;
@@ -228,7 +229,6 @@ void fetchData(settings_t*settings,interface_t*interface){      // CLIENT CODE
         data += length;
     }
 
-    // TODO update file
     
     //releaseWriteLock(settings);
     return;
@@ -365,7 +365,9 @@ char * readConfigFile(){
         size_t nBytesRead = fread(configs,sizeof(char),size,ptr);
         if (nBytesRead!=size) return "";
         fclose(ptr);
-        return configs;
+        char * toReturn = (char*)calloc(size+6,sizeof(char));
+        snprintf(toReturn,size+6,"%06d%s",(int)size,configs);
+        return toReturn;
     }
     return "";
 }
@@ -375,7 +377,6 @@ char *parseServerSwitchRequest(char *message){  // if client receives a 0, switc
     message += 1;
     if(!settingsPtr->nextServer){       // the client can become server only if there is no other next server
         settingsPtr->nextServer = strdup(message);
-        // TODO check this code
         char * tmp = (char*)calloc(65536,sizeof(char));
         snprintf(tmp,65536,"0%s",readConfigFile());
         return tmp;
