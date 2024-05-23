@@ -96,7 +96,9 @@ void switchFromClientToServer(settings_t*settings){
         FILE * ptr = fopen(tmp,"wb");
         printf("%s\n",data);
         sscanf(data,"%06d",&length);
-        fwrite(data+6,sizeof(char),length,ptr);
+        fwrite(data+6,sizeof(char),length-1,ptr);
+        fwrite("\n",sizeof(char),1,ptr);
+        fflush(ptr);
         settings->isClient = 0;
         settings->serverIP = NULL;
         settings->nextServer = NULL;
