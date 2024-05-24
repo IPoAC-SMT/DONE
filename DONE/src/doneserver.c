@@ -34,6 +34,19 @@ int connectToSocket(char *serverIp){
     return socketFd;
 }
 
+char * extractPureName(char * stringa){
+    int i;
+    char * tmp;
+    for(i=strlen(stringa)-1;i>0;i--){
+        if (stringa[i] == '/') {
+            tmp = strdup(stringa+i);
+            break;
+        }
+    }
+    tmp[strlen(tmp)-5] = '\0';
+    return tmp;
+}
+
 void synchFile(settings_t * settings){
     // request for the file
     int socketFd = connectToSocket(settings->serverIP);
@@ -62,7 +75,15 @@ void synchFile(settings_t * settings){
     sscanf(data,"%01d", &length);
     data += 1;  // move pointer to the next byte
 
+
     if(length){
+        
+        // TODO extract name without ./saves/ and .done
+        // TODO save it in settings->filename
+        settings->filename = extractPureName(settings->openProjectName);
+        saveProject(settings);
+
+
         // I have a config file, now TODO I need to save it
         char tmp[100];
         snprintf(tmp,99,"%s.conf",settings->openProjectName);
