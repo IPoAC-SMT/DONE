@@ -379,6 +379,8 @@ char *parseServerSwitchRequest(char *message){  // if client receives a 0, switc
     message += 1;
     if(!settingsPtr->nextServer){       // the client can become server only if there is no other next server
         settingsPtr->nextServer = strdup(message);
+        settingsPtr->isClient = 1;
+        settingsPtr->serverIP = strdup(settingsPtr->nextServer);
         char * tmp = (char*)calloc(65536,sizeof(char));
         snprintf(tmp,65536,"0%s",readConfigFile());
         return tmp;

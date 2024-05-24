@@ -326,7 +326,7 @@ void stop(settings_t *settings)
 
 void openShell(settings_t *settings)
 {
-    if (!settings->isSimulating || !settings->isClient )
+    if (!settings->isSimulating || settings->isClient )
         return;
     settings->node_type == switch_t ? openSwitchShellWrapper() : openNodeShellWrapper(settings->node_name);
 }
