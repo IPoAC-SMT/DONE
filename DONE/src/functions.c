@@ -197,8 +197,13 @@ void becomeServer(settings_t *settings)
     settings->deletingNodes = 0;
     settings->placing_text = 0;
     settings->isClient = 0;
-    settings->isServer = 0;
-    settings->hasToBeServer = 1;
+    if (!settings->isServer) {
+        logInfo("Start server command received","");
+        settings->hasToBeServer = 1;}
+    else {
+        logInfo("Stop server command received","");
+        settings->deactivateServer = 1;
+    }
 }
 
 

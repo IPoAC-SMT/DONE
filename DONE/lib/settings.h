@@ -59,4 +59,5 @@ typedef struct
     char isServer;
     char hasToBeServer;
     char *nextServer;
+    char deactivateServer;
 } settings_t;

@@ -464,7 +464,7 @@ void* serverFunction(void* settings_void){
     int client_sock,*new_sock;
     struct sockaddr_in client;
 
-    while((client_sock = accept(socketFd, (struct sockaddr*)&client, (socklen_t*)&c))) {
+    while( !settingsPtr->deactivateServer && (client_sock = accept(socketFd, (struct sockaddr*)&client, (socklen_t*)&c))) {
         logInfo("connection accepted","");
 
         pthread_t answer_thread;
@@ -483,6 +483,11 @@ void* serverFunction(void* settings_void){
         logError("accept failed","");
         return NULL;
     }
+
+    close(socketFd);
+    socketFd = -1;
+    logInfo("socket closed","");
+    settingsPtr->deactivateServer = 0;
 
     return NULL;
 }
