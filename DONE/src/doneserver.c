@@ -8,10 +8,30 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <netdb.h>
+#include <net/if.h>             // Include network interface definitions
+#include <ifaddrs.h>            // Include interface address structure definitions
 
 #define PORT_NUMBER 4242
 
+typedef struct netInterface_t {
+    char* interfaceName;
+    char *IP;
+    netInterface_t *next;
+} netInterface_t;
+
 settings_t * settingsPtr = NULL;
+
+int startsWith(const char *prefix, const char *string){
+    return (strncmp(prefix,string,strlen(prefix)) == 0) ? 1 : 0;
+}
+
+int startsWithInterestingInterfaces(const char *str){
+    return (
+        strncmp("eth",str,strlen("eth")) == 0 ||
+        strncmp("enp",str,strlen("enp")) == 0 ||
+        strncmp("wl",str,strlen("wl")) == 0
+    ) ? 1 : 0;      // returns 1 if at least one or is satisfied, else 0
+}
 
 int connectToSocket(char *serverIp){
     int socketFd = socket(AF_INET, SOCK_STREAM, 0);  // Create a socket using IPv4 and TCP protocol
@@ -102,6 +122,49 @@ void synchFile(settings_t * settings){
     return;
 }
 char *getLocalIP(){
+
+    struct ifaddrs *ifAdddrPtr, *ifAddr; // pointers to interface address structures
+    netInterface_t* current = NULL,*all;
+
+    // Get all network interfaces
+    if (getifaddrs(&ifAdddrPtr) == 0) { 
+        for (ifAddr = ifAdddrPtr; ifAddr != NULL; ifAddr = ifAddr->ifa_next) {  // Iterate through the list of interfaces
+            if (ifAddr->ifa_addr && ifAddr->ifa_addr->sa_family == AF_INET && startsWithInterestingInterfaces(ifAddr->ifa_name)) {  // Check if the address is IPv4
+                //currentInterface->interfaceName = ifAddr->ifa_name;
+                //struct sockaddr_in *ipaddr = (struct sockaddr_in *)ifAddr->ifa_addr;
+                //currentInterface->IP = inet_ntoa(ipaddr->sin_addr); // casting is necessary to turn it into a string
+
+                if(!current) {
+                    current = (netInterface_t*)calloc(1,sizeof(netInterface_t));
+                    all = current;
+                }
+                else if(current->next==NULL) {
+                    current->next = (netInterface_t*)calloc(1,sizeof(netInterface_t));
+                    current = current->next;
+                }
+                current->interfaceName = ifAddr->ifa_name;
+                struct sockaddr_in *ipaddr = (struct sockaddr_in *)ifAddr->ifa_addr;
+                current->IP = inet_ntoa(ipaddr->sin_addr); // casting is necessary to turn it into a string
+                current->next = NULL;
+                printf("Found interface %s with IP address %s\n", current->interfaceName, current->IP);
+            }
+        }
+        freeifaddrs(ifAdddrPtr); // free the memory allocated for the interface list
+    } else {
+        logError("Error while looking for interfaces","");
+    }
+
+    // now looking for the best interface, preferrably ethernet
+
+    char **names = {"enp","eth","wl"};
+    for(int j = 0;j<2;j++){
+        for(netInterface_t *i = all; i ; i = i->next){
+            if(startsWith(names[j],i->interfaceName))  return i->IP;
+        }
+    }
+    return "-1.-1.-1.-1";
+
+    /*
     char *hostbuffer = (char *)calloc(256, sizeof(char));
     char *IPbuffer;
     struct hostent *host_entry;
@@ -121,6 +184,7 @@ char *getLocalIP(){
     free(hostbuffer);
 
     return IPbuffer;
+    */
 }
 
 void switchFromClientToServer(settings_t*settings){
