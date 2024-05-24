@@ -16,7 +16,7 @@
 typedef struct netInterface_t {
     char* interfaceName;
     char *IP;
-    netInterface_t *next;
+    struct netInterface_t *next;
 } netInterface_t;
 
 settings_t * settingsPtr = NULL;
@@ -156,11 +156,14 @@ char *getLocalIP(){
 
     // now looking for the best interface, preferrably ethernet
 
-    char **names = {"enp","eth","wl"};
-    for(int j = 0;j<2;j++){
-        for(netInterface_t *i = all; i ; i = i->next){
-            if(startsWith(names[j],i->interfaceName))  return i->IP;
-        }
+    for(netInterface_t *i = all; i ; i = i->next){
+        if(startsWith("enp",i->interfaceName))  return i->IP;
+    }
+    for(netInterface_t *i = all; i ; i = i->next){
+        if(startsWith("eth",i->interfaceName))  return i->IP;
+    }
+    for(netInterface_t *i = all; i ; i = i->next){
+        if(startsWith("wl",i->interfaceName))  return i->IP;
     }
     return "-1.-1.-1.-1";
 
