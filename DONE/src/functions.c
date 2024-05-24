@@ -183,6 +183,7 @@ void becomeClient(settings_t *settings)
     settings->placing_text = 0;
     settings->isClient = !settings->isClient;
     settings->isClient ? logInfo("Ready to become a client", "") : logInfo("Client stopped", "");
+    if(!settings->isClient) synchFile(settings);
 }
 
 void becomeServer(settings_t *settings)

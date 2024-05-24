@@ -34,6 +34,52 @@ int connectToSocket(char *serverIp){
     return socketFd;
 }
 
+void synchFile(settings_t * settings){
+    // request for the file
+    int socketFd = connectToSocket(settings->serverIP);
+
+    if(socketFd < 0){
+        return;
+    }
+
+    logSuccess("Successfully connected to server at", "%s", settings->serverIP);
+
+    send(socketFd, "2",1,0);
+
+    logInfo("data requested","");
+
+    // read data into char * data
+    char * data = (char*)calloc(65536,sizeof(char));
+
+    read(socketFd,data,65536);
+
+    // parse data
+
+    //getWriteLock(settings);
+
+    int length = 0;
+
+    sscanf(data,"%01d", &length);
+    data += 1;  // move pointer to the next byte
+
+    if(length){
+        // I have a config file, now TODO I need to save it
+        char tmp[100];
+        snprintf(tmp,99,"%s.conf",settings->openProjectName);
+        
+        FILE * ptr = fopen(tmp,"wb");
+        printf("%s\n",data);
+
+        sscanf(data,"%06d",&length);
+        
+        fwrite(data+6,sizeof(char),length-1,ptr);
+        fwrite("\n",sizeof(char),1,ptr);
+        fflush(ptr);
+
+    }
+
+    return;
+}
 char *getLocalIP(){
     char *hostbuffer = (char *)calloc(256, sizeof(char));
     char *IPbuffer;
@@ -391,10 +437,17 @@ char *parseServerSwitchRequest(char *message){  // if client receives a 0, switc
     return tmp;
 }
 
+char * getFile(){
+    char * tmp = (char*) calloc (65536,sizeof(char));
+    snprintf(tmp,65536,"%01d%s",settingsPtr->openProjectName!=NULL?1:0,readConfigFile());
+    return tmp;
+}
+
 void *connection_handler(void *socket_desc) {
     int sock = *(int*)socket_desc;
     char message[2048];
     int read_size;
+    char * response;
 
     if ((read_size = recv(sock, message, 2048, 0)) > 0) {
         switch(message[0]){
@@ -410,9 +463,15 @@ void *connection_handler(void *socket_desc) {
                 break;
             case '1': // stop server and send ack
                 logInfo("how dare thee try to overthrow my reign?","");
-                char *response = parseServerSwitchRequest(message);
+                response = parseServerSwitchRequest(message);
                 write(sock,response,strlen(response));
                 logInfo("response:","%s",response);
+                break;
+            case '2': // stopping client: they want the file
+                logInfo("are you asking me for my configs?","");
+                response = getFile();
+                write(sock,response,strlen(response));
+                logInfo("sending config file content","");
                 break;
             default: // what are you trying to do? go away
                 write(sock,message,strlen(message));
