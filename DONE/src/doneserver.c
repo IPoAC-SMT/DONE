@@ -156,7 +156,9 @@ void switchFromClientToServer(settings_t*settings){
         logWarning("That server is not a server anymore, contacting", "%s", data);
         switchFromClientToServer(settings);     // retry contacting the provided ip
         return;
-    } else {    // we can become server, file content is in data
+    } else {    // we can
+        settings->filename = extractPureName(settings->openProjectName);
+        saveProject(settings);
         char tmp[100];
         snprintf(tmp,99,"%s.conf",settings->openProjectName);
         //printf("%s",tmp);
@@ -448,6 +450,7 @@ char *parseServerSwitchRequest(char *message){  // if client receives a 0, switc
         settingsPtr->nextServer = strdup(message);
         settingsPtr->isClient = 1;
         settingsPtr->serverIP = strdup(settingsPtr->nextServer);
+        printf("%s\n",settingsPtr->serverIP);
         char * tmp = (char*)calloc(65536,sizeof(char));
         snprintf(tmp,65536,"0%s",readConfigFile());
         return tmp;
