@@ -451,7 +451,6 @@ void getName(settings_t *settings)
 
 void getServerIp(settings_t *settings,interface_t*interface) // the bug is not here
 {
-    //printf("entered\n");
     char *toPrint = (char *)calloc(300, sizeof(char));
     char character = GetCharPressed();
     if (!settings->tmpIp){
@@ -468,21 +467,20 @@ void getServerIp(settings_t *settings,interface_t*interface) // the bug is not h
             settings->tmpIp = NULL; 
         }
     }
-    if (character >= 32 && character <= 126)
+    else if (character >= 32 && character <= 126)
     {
         // valid letter
-        char temp[200];
-        snprintf(temp, 200, "%s%c", settings->tmpIp, character);
+        char * temp = (char*)calloc(200,sizeof(char));
+        snprintf(temp, 199, "%s%c", settings->tmpIp, character);
         strncpy(settings->tmpIp, temp, 200);
     }
     else if (IsKeyReleased(KEY_BACKSPACE))
     {
         settings->tmpIp[strlen(settings->tmpIp) - 1] = '\0';
     }
-    snprintf(toPrint, 300, "Insert the server IP: %s", settings->tmpIp);
+    snprintf(toPrint, 299, "Insert the server IP: %s", settings->tmpIp);
     DrawText(toPrint, 1100, 20, STD_FONT_SIZE, FIGURE_COLOR);
-    //printf("exited\n");
-    free(toPrint);
+    //free(toPrint);
 }
 
 
