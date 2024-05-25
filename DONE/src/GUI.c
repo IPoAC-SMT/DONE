@@ -449,17 +449,18 @@ void getName(settings_t *settings)
     free(toPrint);
 }
 
-void getServerIp(settings_t *settings,interface_t*interface) // TODO change whole, add tmpIp, gettingIp to settings
+void getServerIp(settings_t *settings,interface_t*interface) // the bug is not here
 {
+    //printf("entered\n");
     char *toPrint = (char *)calloc(300, sizeof(char));
     char character = GetCharPressed();
     if (!settings->tmpIp){
         settings->tmpIp = (char*)calloc(NAMELENGTH,sizeof(char));
     }
-    if (IsKeyReleased(KEY_ENTER))
+    if (IsKeyPressed(KEY_ENTER))
     {
         if (validateIP(settings,settings->tmpIp)) {
-            getData(settings,interface); // submit
+            //getData(settings,interface); // submit, not really needed
             settings->tmpIp = NULL;
             settings->gettingIp = 0;
         }
@@ -480,6 +481,7 @@ void getServerIp(settings_t *settings,interface_t*interface) // TODO change whol
     }
     snprintf(toPrint, 300, "Insert the server IP: %s", settings->tmpIp);
     DrawText(toPrint, 1100, 20, STD_FONT_SIZE, FIGURE_COLOR);
+    //printf("exited\n");
     free(toPrint);
 }
 
@@ -1057,7 +1059,6 @@ void DrawGUI(settings_t *settings, interface_t *interface)
             // sto accumulando lettere in attesa di un invio, se c'è l'invio aggiungo le cose
         }
     }
-
     if (settings->gettingName)
     {
         if (settings->resetName)

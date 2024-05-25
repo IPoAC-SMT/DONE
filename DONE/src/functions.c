@@ -633,10 +633,7 @@ void getData(settings_t *settings, interface_t *interface)
         settings->gettingIp = 1;
         return;
     }
-    else
-    {
-        fetchData(settings, interface);
-    }
+    fetchData(settings, interface);
 }
 
 void askToBecomeServer(settings_t *settings){

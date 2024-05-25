@@ -98,13 +98,13 @@ void synchFile(settings_t * settings){
 
     if(length){
         
-        // TODO extract name without ./saves/ and .done
-        // TODO save it in settings->filename
+        // extract name without ./saves/ and .done
+        // save it in settings->filename
         settings->filename = extractPureName(settings->openProjectName);
         saveProject(settings);
 
 
-        // I have a config file, now TODO I need to save it
+        // I have a config file, now I need to save it
         char tmp[100];
         snprintf(tmp,99,"%s.conf",settings->openProjectName);
         
@@ -263,7 +263,6 @@ void fetchData(settings_t*settings,interface_t*interface){      // CLIENT CODE
     char * data = (char*)calloc(65536,sizeof(char));
 
     read(socketFd,data,65536);
-
     // parse data
 
     //getWriteLock(settings);
