@@ -6,27 +6,31 @@
 interface_t *lastSimulation = NULL;
 int lastNodesNum, lastLinksNum;
 
+
+// Initialize the environment, modifying how to handle the OS signal, avoiding to leave the simulation running
 void initEnv()
 {
-
-    signal(SIGINT, forcedCLIExit);
-    signal(SIGTERM, forcedCLIExit);
-    signal(SIGQUIT, forcedCLIExit);
-    signal(SIGKILL, forcedCLIExit);
-    signal(SIGSTOP, forcedCLIExit);
-    signal(SIGTSTP, forcedCLIExit);
-    signal(SIGABRT, forcedCLIExit);
-    signal(SIGSEGV, forcedCLIExit);
+    signal(SIGHUP, CLIExit);
+    signal(SIGINT, CLIExit);
+    signal(SIGTERM, CLIExit);
+    signal(SIGQUIT, CLIExit);
+    signal(SIGKILL, CLIExit);
+    signal(SIGSTOP, CLIExit);
+    signal(SIGTSTP, CLIExit);
+    signal(SIGABRT, CLIExit);
+    signal(SIGSEGV, CLIExit);
 
     createNetnsDir();
 }
 
-void forcedCLIExit()
+// Exit the CLI, stopping the simulation if it is running
+void CLIExit()
 {
     if (lastSimulation != NULL)
     {
         stopSimulation(lastSimulation, lastNodesNum, lastLinksNum);
     }
+    logInfo("Exiting, bye!", "");
     exit(0);
 }
 
@@ -112,6 +116,8 @@ void startSimulation(interface_t *simulation, int nodes_num, int links_num, int 
             addCableBetweenNodes(current_link->node1, current_link->node2);
         }
     }
+
+    freeInterfaces(availableInterfaces);
 }
 
 void openNodeShellWrapper(char *node_name)
@@ -162,6 +168,7 @@ void stopSimulation(interface_t *simulation, int nodes_num, int links_num)
     logSuccess("Simulation successfully terminated", "");
 }
 
+// Populate the interface options with the available interfaces. These will be used to populate the dropdown menu in the GUI
 void populateInterfaceOptions(settings_t *settings)
 {
     getWriteLock(settings);

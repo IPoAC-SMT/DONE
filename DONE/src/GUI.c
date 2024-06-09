@@ -115,18 +115,20 @@ void DrawLink(link_t link, settings_t *settings, node_t *nodes)
     }
 
     DrawLineEx(positions[0], positions[1], /*thick*/ isNearLink(positions) ? 5 : 1, /*Color color*/ RED);
-    if(isNearLink(positions)) {
+    if (isNearLink(positions))
+    {
         char tmp[100];
-        //snprintf(tmp,99,"%cveth-%s-%s/%cveth-%s-%s",);
-        if(link.node1_type == switch_t || link.node2_type == switch_t){
-            snprintf(tmp, 99, "sveth-%s-%s",(link.node1_type==switch_t?link.node2:link.node1),(link.node1_type==switch_t?link.node1:link.node2));
+        // snprintf(tmp,99,"%cveth-%s-%s/%cveth-%s-%s",);
+        if (link.node1_type == switch_t || link.node2_type == switch_t)
+        {
+            snprintf(tmp, 99, "sveth-%s-%s", (link.node1_type == switch_t ? link.node2 : link.node1), (link.node1_type == switch_t ? link.node1 : link.node2));
         }
-        else {
-            snprintf(tmp,99,"veth-%s-%s/veth-%s-%s",link.node1,link.node2,link.node2,link.node1);
+        else
+        {
+            snprintf(tmp, 99, "veth-%s-%s/veth-%s-%s", link.node1, link.node2, link.node2, link.node1);
         }
-        DrawText(tmp,GetMouseX()+10,GetMouseY()-10,STD_FONT_SIZE,FIGURE_COLOR);
+        DrawText(tmp, GetMouseX() + 10, GetMouseY() - 10, STD_FONT_SIZE, FIGURE_COLOR);
     }
-
 }
 
 void DrawFakeLink(settings_t *settings, node_t *nodes)
@@ -372,7 +374,8 @@ void DrawNode(node_t *node, settings_t *settings, bool true_node)
             }
             else
             {
-                if (!settings->isClient) {
+                if (!settings->isClient)
+                {
                     if (node->type == external_interface_t || node->type == external_natted_interface_t)
                     {
                         populateInterfaceOptionsWrapper(settings);
@@ -449,28 +452,31 @@ void getName(settings_t *settings)
     free(toPrint);
 }
 
-void getServerIp(settings_t *settings,interface_t*interface) // the bug is not here
+void getServerIp(settings_t *settings, interface_t *interface) // the bug is not here
 {
     char *toPrint = (char *)calloc(300, sizeof(char));
     char character = GetCharPressed();
-    if (!settings->tmpIp){
-        settings->tmpIp = (char*)calloc(NAMELENGTH,sizeof(char));
+    if (!settings->tmpIp)
+    {
+        settings->tmpIp = (char *)calloc(NAMELENGTH, sizeof(char));
     }
     if (IsKeyPressed(KEY_ENTER))
     {
-        if (validateIP(settings,settings->tmpIp)) {
-            //getData(settings,interface); // submit, not really needed
+        if (validateIP(settings, settings->tmpIp))
+        {
+            // getData(settings,interface); // submit, not really needed
             settings->tmpIp = NULL;
             settings->gettingIp = 0;
         }
-        else {
-            settings->tmpIp = NULL; 
+        else
+        {
+            settings->tmpIp = NULL;
         }
     }
     else if (character >= 32 && character <= 126)
     {
         // valid letter
-        char * temp = (char*)calloc(200,sizeof(char));
+        char *temp = (char *)calloc(200, sizeof(char));
         snprintf(temp, 199, "%s%c", settings->tmpIp, character);
         strncpy(settings->tmpIp, temp, 200);
     }
@@ -480,10 +486,8 @@ void getServerIp(settings_t *settings,interface_t*interface) // the bug is not h
     }
     snprintf(toPrint, 299, "Insert the server IP: %s", settings->tmpIp);
     DrawText(toPrint, 1100, 20, STD_FONT_SIZE, FIGURE_COLOR);
-    //free(toPrint);
+    // free(toPrint);
 }
-
-
 
 char *identify(int num)
 {
@@ -665,83 +669,84 @@ void export(settings_t *settings, interface_t *interface)
         fprintf(ptr, "add text \"%s\" at %d %d\n", interface->texts[i].text, interface->texts[i].x, interface->texts[i].y);
     }
     if (settings->openProjectName)
-        { // if a project is open, we need to eventually load configs
+    { // if a project is open, we need to eventually load configs
 
-            char config_filename[50];
-            strcpy(config_filename, settings->openProjectName);
-            strcat(config_filename, ".conf");
-            FILE *file = fopen(config_filename, "r");
-            if (file != NULL)
-            {
-                char command[1024] = {0};
-                char buf[200]; // buffer for reading the file
-                char *nodeName;
-
-                while (fgets(buf, 200, file)) // reading the node name line
-                {
-                    nodeName = strtok(strdup(buf), ":"); // retrieving the node name from the config
-                    if (nodeName != NULL)
-                    {
-                        do
-                        {
-                            while (fgets(buf, 200, file))
-                            {
-                                if (buf[0] == '\n' && !strlen(command))
-                                    break;
-                                buf[strlen(buf)] = 0;
-                                if (!strlen(command))
-                                    strcpy(command, buf);
-                                else
-                                    strcat(command, buf);
-                                if (strchr(buf, ';') != NULL)
-                                    break;
-                            }
-
-                            if (strlen(command)) {
-                                command[strlen(command)-2] = '\0';
-                                fprintf(ptr,"send command to %s begin script\n%s\nend script\n",nodeName,command);
-                                memset(command, 0, 1024);
-                            }
-                        } while (buf[0] != '\n');
-                    }
-                    else
-                    {
-                        logError("error", "");
-                        fclose(file);
-                        fclose(ptr);
-                        return;
-                    }
-                }
-                logSuccess("Simulation running", "setup finished");
-            }
-        }
-/*
-    if (settings->openProjectName)
-    {
         char config_filename[50];
-        snprintf(config_filename, 50, "%s.conf", settings->openProjectName);
+        strcpy(config_filename, settings->openProjectName);
+        strcat(config_filename, ".conf");
         FILE *file = fopen(config_filename, "r");
-        if (file)
+        if (file != NULL)
         {
-            char buf[200];
+            char command[1024] = {0};
+            char buf[200]; // buffer for reading the file
             char *nodeName;
 
-            while (fgets(buf, 200, file))
+            while (fgets(buf, 200, file)) // reading the node name line
             {
-                nodeName = strtok(strdup(buf), ":");
-                if (nodeName)
+                nodeName = strtok(strdup(buf), ":"); // retrieving the node name from the config
+                if (nodeName != NULL)
                 {
                     do
                     {
-                        if (!fgets(buf, 200, file) || buf[0] == '\n')
-                            break;
-                        fprintf(ptr, "send command to %s %s", nodeName, buf);
-                    } while (42);
+                        while (fgets(buf, 200, file))
+                        {
+                            if (buf[0] == '\n' && !strlen(command))
+                                break;
+                            buf[strlen(buf)] = 0;
+                            if (!strlen(command))
+                                strcpy(command, buf);
+                            else
+                                strcat(command, buf);
+                            if (strchr(buf, ';') != NULL)
+                                break;
+                        }
+
+                        if (strlen(command))
+                        {
+                            command[strlen(command) - 2] = '\0';
+                            fprintf(ptr, "send command to %s begin script\n%s\nend script\n", nodeName, command);
+                            memset(command, 0, 1024);
+                        }
+                    } while (buf[0] != '\n');
+                }
+                else
+                {
+                    logError("error", "");
+                    fclose(file);
+                    fclose(ptr);
+                    return;
+                }
+            }
+            logSuccess("Simulation running", "setup finished");
+        }
+    }
+    /*
+        if (settings->openProjectName)
+        {
+            char config_filename[50];
+            snprintf(config_filename, 50, "%s.conf", settings->openProjectName);
+            FILE *file = fopen(config_filename, "r");
+            if (file)
+            {
+                char buf[200];
+                char *nodeName;
+
+                while (fgets(buf, 200, file))
+                {
+                    nodeName = strtok(strdup(buf), ":");
+                    if (nodeName)
+                    {
+                        do
+                        {
+                            if (!fgets(buf, 200, file) || buf[0] == '\n')
+                                break;
+                            fprintf(ptr, "send command to %s %s", nodeName, buf);
+                        } while (42);
+                    }
                 }
             }
         }
-    }
-    */
+        */
     fclose(ptr);
     logSuccess("Exporting as DoneScript", "you can find it as DoneScript.ds");
 }
@@ -1070,7 +1075,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
     }
     else if (settings->gettingIp)
     {
-        getServerIp(settings,interface);
+        getServerIp(settings, interface);
     }
 
     // posiziono i rettangoli

@@ -7,8 +7,9 @@
 
 #define MAX_FILENAME 50
 
-void * actAsServer(void * vargp){
-    return serverFunction(vargp); 
+void *actAsServer(void *vargp)
+{
+    return serverFunction(vargp);
 }
 
 void exportDoneScript(settings_t *settings)
@@ -16,21 +17,8 @@ void exportDoneScript(settings_t *settings)
     settings->exportDoneScript = 1;
 }
 
-void placeInternet(settings_t *settings)
-{
-    if (settings->isSimulating || settings->isClient)
-        return;
-    settings->placing_link = 0;
-    settings->drawing_rectangle = 0;
-    settings->moving_node = 0;
-    settings->placing_node = 1;
-    settings->node_type = 5;
-    settings->deletingNodes = 0;
-    settings->isClient = 0;
-    settings->placing_text = 0;
-    settings->gettingIp = 0;
-    logInfo("Ready to place a node", "type the Internet");
-}
+// --- receiving from the GUI the instruction to place or remove a node/link ---
+
 void placeswitch(settings_t *settings)
 {
     if (settings->isSimulating || settings->isClient)
@@ -183,7 +171,8 @@ void becomeClient(settings_t *settings)
     settings->placing_text = 0;
     settings->isClient = !settings->isClient;
     settings->isClient ? logInfo("Ready to become a client", "") : logInfo("Client stopped", "");
-    if(!settings->isClient) synchFile(settings);
+    if (!settings->isClient)
+        synchFile(settings);
 }
 
 void becomeServer(settings_t *settings)
@@ -198,16 +187,17 @@ void becomeServer(settings_t *settings)
     settings->deletingNodes = 0;
     settings->placing_text = 0;
     settings->isClient = 0;
-    if (!settings->isServer) {
-        logInfo("Start server command received","");
-        settings->hasToBeServer = 1;}
-    else {
-        logInfo("Stop server command received","");
+    if (!settings->isServer)
+    {
+        logInfo("Start server command received", "");
+        settings->hasToBeServer = 1;
+    }
+    else
+    {
+        logInfo("Stop server command received", "");
         settings->deactivateServer = 1;
     }
 }
-
-
 
 void initEnvironment()
 {
@@ -215,6 +205,7 @@ void initEnvironment()
     logSuccess("Environment initialized successfully", "");
 }
 
+// get the device type the user clicked on
 component_type_t getType(char *nodeName, settings_t *settings)
 {
     for (int i = 0; i < settings->numnodes; i++)
@@ -227,6 +218,7 @@ component_type_t getType(char *nodeName, settings_t *settings)
     return (component_type_t)NULL;
 }
 
+// start the simulation
 void start(settings_t *settings)
 { // sending data to logical controller, that starts the simulation
     if (settings->isSimulating || settings->numnodes == 0)
@@ -271,6 +263,7 @@ void start(settings_t *settings)
 
                         if (strlen(command))
                         {
+                            command[strlen(command) - 1] = 0; // just removing the '\n' at the end of the command
                             component_type_t type = getType(nodeName, settings);
                             if (type == switch_t)
                             {
@@ -318,7 +311,7 @@ void quit(settings_t *settings)
 {
     if (settings->isSimulating)
         logInfo("be careful: it was simulating.", "Now we are stopping the simulation. You're welcome");
-    forcedCLIExit();
+    CLIExit();
 }
 
 void stop(settings_t *settings)
@@ -330,13 +323,15 @@ void stop(settings_t *settings)
     stopSimulation((interface_t *)settings->GUIdata, settings->numnodes, settings->numlink);
 }
 
+// the user requested to open a node/switch shell
 void openShell(settings_t *settings)
 {
-    if (!settings->isSimulating || settings->isClient )
+    if (!settings->isSimulating || settings->isClient)
         return;
     settings->node_type == switch_t ? openSwitchShellWrapper() : openNodeShellWrapper(settings->node_name);
 }
 
+// delete the entire topology
 void clearCanvas(settings_t *settings)
 {
     if (settings->isSimulating)
@@ -362,6 +357,7 @@ void clearCanvas(settings_t *settings)
     logSuccess("Canvas cleared", "");
 }
 
+// the user requested from the GUI to open a new project, so the GUI will ask for the project name
 void prepareToOpenProject(settings_t *settings)
 {
     settings->resetName = 1;
@@ -369,9 +365,11 @@ void prepareToOpenProject(settings_t *settings)
     logInfo("Ready to read project name from GUI", "");
 }
 
+// try to open the given file
 void openProject(settings_t *settings)
 {
-    if(settings->isClient) return;
+    if (settings->isClient)
+        return;
     if (settings->isSimulating)
     { // if an experiment was running we need to kill the containers
         stop(settings);
@@ -396,9 +394,10 @@ void openProject(settings_t *settings)
 
     if (file != NULL)
     {
-        settings->openProjectName = filename; // updating the project name
+        settings->openProjectName = strdup(filename); // updating the project name
+        free(filename);
 
-        fscanf(file, "%d\n%d\n%d\n%d\n", &numnodes, &numlinks, &numrectangles, &numtextboxes);   
+        fscanf(file, "%d\n%d\n%d\n%d\n", &numnodes, &numlinks, &numrectangles, &numtextboxes);
 
         nodes = (node_t *)malloc(numnodes * sizeof(node_t));
         links = (link_t *)malloc(numlinks * sizeof(link_t));
@@ -463,16 +462,19 @@ void openProject(settings_t *settings)
     }
     else
     {
+        settings->openProjectName = NULL; // updating the project name, since there has been an error while opening it
         logWarning("There was an error while opening the file.", "Perhaps the path is wrong?");
     }
 }
 
+// the user requested to specify the name of the project to save
 void prepareToSaveProject(settings_t *settings)
 {
     settings->resetName = 1;
     settings->gettingName = 2;
 }
 
+// actually write topology to file
 void saveProject(settings_t *settings)
 {
     if (settings->isSimulating)
@@ -568,11 +570,13 @@ void saveProject(settings_t *settings)
     }
 }
 
+// the user requested to open the available docker networks dialog
 void populateInterfaceOptionsWrapper(settings_t *settings)
 {
     populateInterfaceOptions(settings);
 }
 
+// recording the docker network user choice
 void trackChosenInterfBinding(settings_t *settings)
 {
     __uint8_t found = 0;
@@ -623,9 +627,9 @@ int validateIP(settings_t *settings, char *providedIp)
 void getData(settings_t *settings, interface_t *interface)
 {
     /*
-        1. if non ho il server addr chiedo all'utente l'ip => settings
-        2. prendo i dati (aka socket ecc)
-        3. trasformo in strutture/file
+        1. if i dont have the server addr ask for the ip to the user => settings
+        2. get data (aka socket ecc)
+        3. transform in structs/file
     */
 
     if (!settings->serverIP)
@@ -636,29 +640,54 @@ void getData(settings_t *settings, interface_t *interface)
     fetchData(settings, interface);
 }
 
-void askToBecomeServer(settings_t *settings){
-    if(!settings->isClient){
+void askToBecomeServer(settings_t *settings)
+{
+    if (!settings->isClient)
+    {
         return;
     }
     switchFromClientToServer(settings);
 }
 
-void getWriteLock(settings_t *settings){
-    if(settings->isServer == 1){
+void getWriteLock(settings_t *settings)
+{
+    if (settings->isServer == 1)
+    {
         rwlock_acquire_writelock(settings->settingsLock);
     }
 }
 
-void releaseWriteLock(settings_t *settings){
-    if(settings->isServer){
+void releaseWriteLock(settings_t *settings)
+{
+    if (settings->isServer)
+    {
         rwlock_release_writelock(settings->settingsLock);
     }
 }
 
-void getReadLock(settings_t *settings){
+void getReadLock(settings_t *settings)
+{
     rwlock_acquire_readlock(settings->settingsLock);
 }
 
-void releaseReadLock(settings_t *settings){
+void releaseReadLock(settings_t *settings)
+{
     rwlock_release_readlock(settings->settingsLock);
 }
+
+
+/*void placeInternet(settings_t *settings)
+{
+    if (settings->isSimulating || settings->isClient)
+        return;
+    settings->placing_link = 0;
+    settings->drawing_rectangle = 0;
+    settings->moving_node = 0;
+    settings->placing_node = 1;
+    settings->node_type = 5;
+    settings->deletingNodes = 0;
+    settings->isClient = 0;
+    settings->placing_text = 0;
+    settings->gettingIp = 0;
+    logInfo("Ready to place a node", "type the Internet");
+}*/

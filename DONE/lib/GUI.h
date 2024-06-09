@@ -10,7 +10,7 @@
 
 #include "functions.h"
 
-#define NUMbuttons 20
+#define NUMbuttons 19
 #define NUMLINK 0
 #define NAMELENGTH 50
 #define STD_FONT_SIZE 19

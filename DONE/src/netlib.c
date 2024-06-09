@@ -34,6 +34,7 @@ char *getContainerPID(char *name)
         pid[strlen(pid) - 1] = '\0'; // removing the newline character
         return pid;
     }
+    free(pid);
     return NULL;
 }
 
@@ -43,16 +44,16 @@ int addNode(char *name, char type)
 {
     char command[MAX_COMMAND_SIZE];
 
-    if (name != NULL && strlen(name) <= MAX_NAME_SIZE && (type == 'h' || type == 'r'))
+    if (name != NULL && strlen(name) <= MAX_NAME_SIZE && (type == 'h' || type == 'r')) // checking if parameters are acceptable
     {
 
         snprintf(command, MAX_COMMAND_SIZE, "sudo docker run ");
-        if (type == 'r')
+        if (type == 'r') // if the node is a router, it needs to be privileged to run quagga software
         {
             strcat(command, "--privileged ");
         }
         char final[MAX_COMMAND_SIZE];
-        snprintf(final, MAX_COMMAND_SIZE, "-id --hostname %s --cap-add=NET_ADMIN --name %s --network none node:1.0.0 /bin/bash > /dev/null", name, name);
+        snprintf(final, MAX_COMMAND_SIZE, "-id --hostname %s --cap-add=NET_ADMIN --name %s --network none node:1.0.0 /bin/bash > /dev/null", name, name); // NET_ADD is needed to manage the interfaces, even for hosts, that are not routers, so not privileged
         strcat(command, final);
 
         if (!system(command))
@@ -64,10 +65,11 @@ int addNode(char *name, char type)
 
             if (pid != NULL)
             {
+                // adding container's namespace reference to the netns folder, so that it can be used by ip netns exec
                 snprintf(command, MAX_COMMAND_SIZE, "sudo ln -s /proc/%s/ns/net /var/run/netns/%s", pid, pid);
 
                 if (!system(command))
-                { // if the file creation was succesfull, eventually perfom the last step for routers, by enabling the IP forwarding
+                { // if the file creation was succesfull, eventually perform the last step for routers, by enabling the IP forwarding
                     snprintf(command, MAX_COMMAND_SIZE, "sudo ip netns exec %s sysctl net.ipv4.ip_forward=%d > /dev/null", pid, type == 'r' ? 1 : 0);
                     if (!system(command))
                     {
@@ -89,10 +91,12 @@ int delNode(char *name)
 
     if (name != NULL && strlen(name) <= MAX_NAME_SIZE)
     {
+        // removing the container's namespace from the netns folder
         snprintf(command, MAX_COMMAND_SIZE, "sudo docker inspect -f '{{.State.Pid}}' %s | xargs -I {} sudo rm /var/run/netns/{}", name);
 
         if (!system(command))
         {
+            // killing and removing the container
             snprintf(command, MAX_COMMAND_SIZE, "sudo docker kill %s > /dev/null && sudo docker rm %s > /dev/null", name, name);
 
             return system(command);
@@ -108,6 +112,7 @@ int addSwitch(char *name)
 
     if (name != NULL && strlen(name) <= MAX_NAME_SIZE)
     {
+        // creating the bridge
         snprintf(command, MAX_COMMAND_SIZE, "sudo ovs-vsctl add-br %s", name);
 
         return system(command);
@@ -122,6 +127,7 @@ int delSwitch(char *name)
 
     if (name != NULL && strlen(name) <= MAX_NAME_SIZE)
     {
+        // deleting the bridge
         snprintf(command, MAX_COMMAND_SIZE, "sudo ovs-vsctl del-br %s", name);
 
         return system(command);
@@ -136,6 +142,7 @@ int addExternalInterface(char *name, char *interface)
 
     if (name != NULL && strlen(name) <= MAX_NAME_SIZE && interface != NULL && strlen(interface) <= MAX_NAME_SIZE)
     {
+        // creating the container
         snprintf(command, MAX_COMMAND_SIZE, "sudo docker run -id --cap-add=NET_ADMIN --name %s --network %s node:1.0.0 /bin/bash", name, interface);
 
         if (!system(command))
@@ -180,11 +187,13 @@ int addCableBetweenNodes(char *firstNode, char *secondNode)
     if (firstNode != NULL && strlen(firstNode) <= MAX_NAME_SIZE && secondNode != NULL && strlen(secondNode) <= MAX_NAME_SIZE)
     {
 
-        // creating the connector's name
+        // creating the connector's name. This is the name of the first connector, which will be "inserted" in the first node
         snprintf(endpoint1, MAX_NAME_SIZE + 10, "veth-%s-%s", firstNode, secondNode);
 
+        // and then the second connector, which will be "inserted" in the second node
         snprintf(endpoint2, MAX_NAME_SIZE + 10, "veth-%s-%s", secondNode, firstNode);
 
+        // creating the cable
         snprintf(command, MAX_COMMAND_SIZE, "sudo ip link add %s type veth peer name %s", endpoint1, endpoint2);
 
         if (!system(command))
@@ -255,6 +264,7 @@ int addCableBetweenNodeAndSwitch(char *nodeName, char *switchName)
 
         snprintf(switchEndpoint, MAX_NAME_SIZE + 10, "veth-%s-%s", nodeName, switchName);
 
+        // creating the cable
         snprintf(command, MAX_COMMAND_SIZE, "sudo ip link add %s type veth peer name %s", hostEndpoint, switchEndpoint);
 
         if (!system(command))
@@ -414,7 +424,23 @@ int openNodeShell(char *name)
         pid_t pid = fork();
         if (pid == 0)
         {
+
+            // Child process
+            // Set the XDG_RUNTIME_DIR environment variable
+            char xdg_runtime_dir[256];
+            snprintf(xdg_runtime_dir, sizeof(xdg_runtime_dir), "/run/user/%d", getuid());
+            setenv("XDG_RUNTIME_DIR", xdg_runtime_dir, 1);
+
             execvp(command[0], command);
+        }
+        else if (pid > 0)
+        {
+            logInfo("Shell opened for", name);
+            return 0;
+        }
+        else
+        {
+            logError("Failed to open shell for", name);
         }
     }
     return -1;
@@ -428,11 +454,29 @@ int openSwitchShell()
     pid_t pid = fork();
     if (pid == 0)
     {
+
+        // Child process
+        // Set the XDG_RUNTIME_DIR environment variable
+        char xdg_runtime_dir[256];
+        snprintf(xdg_runtime_dir, sizeof(xdg_runtime_dir), "/run/user/%d", getuid());
+        setenv("XDG_RUNTIME_DIR", xdg_runtime_dir, 1);
+
         execvp(command[0], command);
+    }
+    else if (pid > 0)
+    {
+        logInfo("Shell opened for switch", "");
+        return 0;
+    }
+    else
+    {
+        logError("Failed to open shell for switch", "");
     }
     return -1;
 }
 
+// Getting all the possible docker network from the system
+// This is used to support the external interfaces, that are also connected to a specific docker network, enabling the topology to communicate with other real docker networks.
 interfaces *getNetInterfaces()
 {
     interfaces *interface = (interfaces *)calloc(1, sizeof(interfaces));
@@ -453,7 +497,7 @@ interfaces *getNetInterfaces()
     // Read the output line by line and store in the networks array
     while (fgets(buffer, sizeof(buffer), fp) != NULL)
     {
-        // Remove trailing newline
+        // Remove trailing newline and storing the network name in the interface struct
         buffer[strcspn(buffer, "\n")] = 0;
         interface->interfaces_name[interface->interfaces] = strdup(buffer);
         interface->interfaces++;
@@ -465,14 +509,7 @@ interfaces *getNetInterfaces()
     return interface;
 }
 
-void printNetInterfaces(interfaces *interfaces)
-{
-    for (int i = 0; i < interfaces->interfaces; i++)
-    {
-        printf("%s\n", interfaces->interfaces_name[i]);
-    }
-}
-
+// freeing the struct that was populated. Called at the end of "startSimulation"
 void freeInterfaces(interfaces *interfaces)
 {
     for (int i = 0; i < interfaces->interfaces; i++)
@@ -481,4 +518,13 @@ void freeInterfaces(interfaces *interfaces)
     }
     free(interfaces->interfaces_name);
     free(interfaces);
+}
+
+// just a debug function
+void printNetInterfaces(interfaces *interfaces)
+{
+    for (int i = 0; i < interfaces->interfaces; i++)
+    {
+        printf("%s\n", interfaces->interfaces_name[i]);
+    }
 }
