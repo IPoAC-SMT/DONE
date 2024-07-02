@@ -129,6 +129,8 @@ void synchFile(settings_t *settings)
         fflush(ptr);
     }
 
+    //close(socketFd);
+
     return;
 }
 char *getLocalIP()
@@ -249,6 +251,7 @@ void switchFromClientToServer(settings_t *settings)
         settings->serverIP = strdup(data);
         logWarning("That server is not a server anymore, contacting", "%s", data);
         switchFromClientToServer(settings); // retry contacting the provided ip
+        //close(socketFd);
         return;
     }
     else
@@ -270,6 +273,8 @@ void switchFromClientToServer(settings_t *settings)
         settings->isServer = 0;
         settings->hasToBeServer = 1; // the main will take it from here
     }
+
+    //close(socketFd);
 
     return;
 }
@@ -399,6 +404,8 @@ void fetchData(settings_t *settings, interface_t *interface)
         interface->texts[i].text = strndup(data, length);
         data += length;
     }
+
+    close(socketFd);
 
     // releaseWriteLock(settings);
     return;
