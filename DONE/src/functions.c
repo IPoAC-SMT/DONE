@@ -288,7 +288,7 @@ void start(settings_t *settings)
                 else
                 {
                     logError("error", "");
-                    fclose(file);
+                    //fclose(file);
                     return;
                 }
             }
@@ -379,7 +379,7 @@ void openProject(settings_t *settings)
 
     if (settings->openProjectName)
     {
-        free(settings->openProjectName); // freeing the old project name
+        //free(settings->openProjectName); // freeing the old project name
     }
 
     char *filename = (char *)calloc(MAX_FILENAME, sizeof(char));
@@ -395,7 +395,7 @@ void openProject(settings_t *settings)
     if (file != NULL)
     {
         settings->openProjectName = strdup(filename); // updating the project name
-        free(filename);
+        //free(filename);
 
         fscanf(file, "%d\n%d\n%d\n%d\n", &numnodes, &numlinks, &numrectangles, &numtextboxes);
 
@@ -484,7 +484,7 @@ void saveProject(settings_t *settings)
 
     if (settings->openProjectName)
     {
-        // free(settings->openProjectName); // freeing the old project name
+        //free(settings->openProjectName); // freeing the old project name
     }
 
     char *filename = (char *)calloc(MAX_FILENAME, sizeof(char));
@@ -525,7 +525,7 @@ void saveProject(settings_t *settings)
             fprintf(file, "%s\n%d %d\n", current_text.text, current_text.x, current_text.y);
         }
 
-        fclose(file);
+        //fclose(file);
 
         // creating the config file template
         char *config_filename = (char *)calloc(strlen(filename) + 5, sizeof(char));
@@ -536,13 +536,13 @@ void saveProject(settings_t *settings)
         if (file != NULL)
         {
 
-            fclose(file);
+            //fclose(file);
             file = fopen(config_filename, "r");
 
             fseek(file, 0, SEEK_END);
             if (!ftell(file)) // if the file is empty
             {
-                fclose(file);
+                //fclose(file);
                 file = fopen(config_filename, "w");
                 for (int i = 0; i < settings->numnodes; i++)
                 { // saving every node
@@ -553,7 +553,7 @@ void saveProject(settings_t *settings)
 
             system("chmod 666 ./saves/*"); // temporary fix, i'd like to cry (Access control skill issues)
 
-            fclose(file);
+            //fclose(file);
 
             logSuccess("File successfully saved.", "");
         }
