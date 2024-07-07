@@ -78,3 +78,6 @@ echo 'options {
 };' > /etc/bind/named.conf.options
 
 systemctl start named
+
+h-18:
+systemctl start apache2
