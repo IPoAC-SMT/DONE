@@ -635,17 +635,21 @@ void DrawRectangleWrapper(rectangle_t *rectangle)
 
 void addRectangle(interface_t *interface, settings_t *settings)
 {
-    if (settings->numrectangles == 0)
+    if (settings->numrectangles == 0){
         interface->rectangles = (rectangle_t *)calloc(1, sizeof(rectangle_t));
-    else
-        interface->rectangles = (rectangle_t *)realloc(interface->rectangles, (settings->numrectangles + 1) * sizeof(rectangle_t));
-    interface->rectangles[settings->numrectangles].x = settings->posX;
-    interface->rectangles[settings->numrectangles].y = settings->posY;
-    interface->rectangles[settings->numrectangles].x1 = GetMouseX();
-    interface->rectangles[settings->numrectangles].y1 = GetMouseY();
-    interface->rectangles[settings->numrectangles].r = rand() % 256;
-    interface->rectangles[settings->numrectangles].g = rand() % 256;
-    interface->rectangles[settings->numrectangles].b = rand() % 256;
+    }else
+        rectangle_t *backup_rectangles = interface->rectangles;
+        interface->rectangles = (rectangle_t *)calloc(settings->numrectangles + 1, sizeof(rectangle_t));
+        for(int i = 0; i < settings->numrectangles; i++){
+            interface->rectangles[i] = backup_rectangles[i];
+        }   
+        interface->rectangles[settings->numrectangles].x = settings->posX;
+        interface->rectangles[settings->numrectangles].y = settings->posY;
+        interface->rectangles[settings->numrectangles].x1 = GetMouseX();
+        interface->rectangles[settings->numrectangles].y1 = GetMouseY();
+        interface->rectangles[settings->numrectangles].r = rand() % 256;
+        interface->rectangles[settings->numrectangles].g = rand() % 256;
+        interface->rectangles[settings->numrectangles].b = rand() % 256;
 }
 
 void export(settings_t *settings, interface_t *interface)
