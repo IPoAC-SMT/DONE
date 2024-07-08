@@ -637,7 +637,7 @@ void addRectangle(interface_t *interface, settings_t *settings)
 {
     if (settings->numrectangles == 0){
         interface->rectangles = (rectangle_t *)calloc(1, sizeof(rectangle_t));
-    }else
+    }else{
         rectangle_t *backup_rectangles = interface->rectangles;
         interface->rectangles = (rectangle_t *)calloc(settings->numrectangles + 1, sizeof(rectangle_t));
         for(int i = 0; i < settings->numrectangles; i++){
@@ -650,6 +650,7 @@ void addRectangle(interface_t *interface, settings_t *settings)
         interface->rectangles[settings->numrectangles].r = rand() % 256;
         interface->rectangles[settings->numrectangles].g = rand() % 256;
         interface->rectangles[settings->numrectangles].b = rand() % 256;
+    }
 }
 
 void export(settings_t *settings, interface_t *interface)
