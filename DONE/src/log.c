@@ -22,7 +22,7 @@ void logInfo(char *message, char *format, ...)
     va_start(args, format);
     vprintf(composite, args);
     va_end(args);
-    // free(composite);
+    free(composite);
 }
 
 void logSuccess(char *message, char *format, ...)
@@ -33,7 +33,7 @@ void logSuccess(char *message, char *format, ...)
     va_start(args, format);
     vprintf(composite, args);
     va_end(args);
-    // free(composite);
+    free(composite);
 }
 
 void logWarning(char *message, char *format, ...)
@@ -44,7 +44,7 @@ void logWarning(char *message, char *format, ...)
     va_start(args, format);
     vprintf(composite, args);
     va_end(args);
-    // free(composite);
+    free(composite);
 }
 
 void logError(char *message, char *format, ...)
@@ -55,5 +55,5 @@ void logError(char *message, char *format, ...)
     va_start(args, format);
     vprintf(composite, args);
     va_end(args);
-    // free(composite);
+    free(composite);
 }

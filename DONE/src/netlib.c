@@ -520,7 +520,7 @@ void freeInterfaces(interfaces *interfaces)
     free(interfaces);
 }
 
-// just a debug function
+// debug function
 void printNetInterfaces(interfaces *interfaces)
 {
     for (int i = 0; i < interfaces->interfaces; i++)

@@ -84,7 +84,6 @@ int main(int argc, char **argv)
     {
         BeginDrawing();
         ClearBackground(BACKGROUND_COLOR); // colore di sfondo, per crearne altri si deve usare CLITERAL(Color){R,G,B,A}, numeri interi da 0 a 255
-        //printf("%d\t%d\n",time(NULL),!(time(NULL)%5));
         if(settings.isClient && !((framecount++)%30)) getData(&settings,interface);
 
         DrawGUI(&settings, interface);

@@ -1066,8 +1066,10 @@ void DrawGUI(settings_t *settings, interface_t *interface)
     {
         if (settings->resetName)
         {
-            if (settings->filename != NULL)
+            if (settings->filename != NULL){
                 free(settings->filename);
+                settings->filename = NULL;
+            }
             settings->filename = (char *)calloc(200, sizeof(char));
             settings->resetName = 0;
         }

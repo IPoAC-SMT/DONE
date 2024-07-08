@@ -288,7 +288,7 @@ void start(settings_t *settings)
                 else
                 {
                     logError("error", "");
-                    //fclose(file);
+                    fclose(file);
                     return;
                 }
             }
@@ -344,14 +344,22 @@ void clearCanvas(settings_t *settings)
         settings->numrectangles = 0;
         settings->numTexts = 0;
         interface_t *interface = (interface_t *)settings->GUIdata;
-        if (settings->numlink)
+        if (settings->numlink){
             free(interface->links);
-        if (settings->numnodes)
+            interface->links = NULL;
+        }
+        if (settings->numnodes){
             free(interface->nodes);
-        if (settings->numrectangles)
+            interface->nodes = NULL;
+        }
+        if (settings->numrectangles){
             free(interface->rectangles);
-        if (settings->numTexts)
+            interface->rectangles = NULL;
+        }
+        if (settings->numTexts){
             free(interface->texts);
+            interface->texts = NULL;
+        }
         releaseWriteLock(settings);
     }
     logSuccess("Canvas cleared", "");
@@ -379,7 +387,8 @@ void openProject(settings_t *settings)
 
     if (settings->openProjectName)
     {
-        //free(settings->openProjectName); // freeing the old project name
+        free(settings->openProjectName); // freeing the old project name
+        settings->openProjectName = NULL;
     }
 
     char *filename = (char *)calloc(MAX_FILENAME, sizeof(char));
@@ -395,7 +404,7 @@ void openProject(settings_t *settings)
     if (file != NULL)
     {
         settings->openProjectName = strdup(filename); // updating the project name
-        //free(filename);
+        free(filename);
 
         fscanf(file, "%d\n%d\n%d\n%d\n", &numnodes, &numlinks, &numrectangles, &numtextboxes);
 
@@ -414,7 +423,7 @@ void openProject(settings_t *settings)
             fscanf(file, "%s\n%d\n%d %d\n", name, &type, &nodes[i].x, &nodes[i].y);
             nodes[i].type = type;
             // printf("%s\n", name);
-            nodes[i].name = (char *)malloc(strlen(name) * sizeof(char)); // allocating memory for node name
+            nodes[i].name = (char *)malloc((strlen(name) + 1) * sizeof(char)); // allocating memory for node name
             strcpy(nodes[i].name, name);
         }
 
@@ -484,7 +493,8 @@ void saveProject(settings_t *settings)
 
     if (settings->openProjectName)
     {
-        //free(settings->openProjectName); // freeing the old project name
+        free(settings->openProjectName); // freeing the old project name
+        settings->openProjectName = NULL;
     }
 
     char *filename = (char *)calloc(MAX_FILENAME, sizeof(char));
@@ -525,7 +535,7 @@ void saveProject(settings_t *settings)
             fprintf(file, "%s\n%d %d\n", current_text.text, current_text.x, current_text.y);
         }
 
-        //fclose(file);
+        fclose(file);
 
         // creating the config file template
         char *config_filename = (char *)calloc(strlen(filename) + 5, sizeof(char));
@@ -536,13 +546,13 @@ void saveProject(settings_t *settings)
         if (file != NULL)
         {
 
-            //fclose(file);
+            fclose(file);
             file = fopen(config_filename, "r");
 
             fseek(file, 0, SEEK_END);
             if (!ftell(file)) // if the file is empty
             {
-                //fclose(file);
+                fclose(file);
                 file = fopen(config_filename, "w");
                 for (int i = 0; i < settings->numnodes; i++)
                 { // saving every node
@@ -551,9 +561,9 @@ void saveProject(settings_t *settings)
                 }
             }
 
-            system("chmod 666 ./saves/*"); // temporary fix, i'd like to cry (Access control skill issues)
+            system("chmod 666 ./saves/*"); // permission fix
 
-            //fclose(file);
+            fclose(file);
 
             logSuccess("File successfully saved.", "");
         }
@@ -674,20 +684,3 @@ void releaseReadLock(settings_t *settings)
 {
     rwlock_release_readlock(settings->settingsLock);
 }
-
-
-/*void placeInternet(settings_t *settings)
-{
-    if (settings->isSimulating || settings->isClient)
-        return;
-    settings->placing_link = 0;
-    settings->drawing_rectangle = 0;
-    settings->moving_node = 0;
-    settings->placing_node = 1;
-    settings->node_type = 5;
-    settings->deletingNodes = 0;
-    settings->isClient = 0;
-    settings->placing_text = 0;
-    settings->gettingIp = 0;
-    logInfo("Ready to place a node", "type the Internet");
-}*/
