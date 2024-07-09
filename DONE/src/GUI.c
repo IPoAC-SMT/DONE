@@ -450,6 +450,7 @@ void getName(settings_t *settings)
     snprintf(toPrint, 300, "Insert the name of the file: ./saves/%s", settings->filename);
     DrawText(toPrint, 1100, 20, STD_FONT_SIZE, FIGURE_COLOR);
     free(toPrint);
+    toPrint = NULL;
 }
 
 void getServerIp(settings_t *settings, interface_t *interface) // the bug is not here
@@ -636,21 +637,24 @@ void DrawRectangleWrapper(rectangle_t *rectangle)
 void addRectangle(interface_t *interface, settings_t *settings)
 {
     if (settings->numrectangles == 0){
+        printf("hereee!\n");
         interface->rectangles = (rectangle_t *)calloc(1, sizeof(rectangle_t));
     }else{
         rectangle_t *backup_rectangles = interface->rectangles;
         interface->rectangles = (rectangle_t *)calloc(settings->numrectangles + 1, sizeof(rectangle_t));
         for(int i = 0; i < settings->numrectangles; i++){
+            printf("here\n");
             interface->rectangles[i] = backup_rectangles[i];
         }   
-        interface->rectangles[settings->numrectangles].x = settings->posX;
-        interface->rectangles[settings->numrectangles].y = settings->posY;
-        interface->rectangles[settings->numrectangles].x1 = GetMouseX();
-        interface->rectangles[settings->numrectangles].y1 = GetMouseY();
-        interface->rectangles[settings->numrectangles].r = rand() % 256;
-        interface->rectangles[settings->numrectangles].g = rand() % 256;
-        interface->rectangles[settings->numrectangles].b = rand() % 256;
     }
+    interface->rectangles[settings->numrectangles].x = settings->posX;
+    interface->rectangles[settings->numrectangles].y = settings->posY;
+    interface->rectangles[settings->numrectangles].x1 = GetMouseX();
+    interface->rectangles[settings->numrectangles].y1 = GetMouseY();
+    interface->rectangles[settings->numrectangles].r = rand() % 256;
+    interface->rectangles[settings->numrectangles].g = rand() % 256;
+    interface->rectangles[settings->numrectangles].b = rand() % 256;
+    printf("numrects: %d\n", settings->numrectangles);
 }
 
 void export(settings_t *settings, interface_t *interface)
@@ -675,7 +679,6 @@ void export(settings_t *settings, interface_t *interface)
     }
     if (settings->openProjectName)
     { // if a project is open, we need to eventually load configs
-
         char config_filename[50];
         strcpy(config_filename, settings->openProjectName);
         strcat(config_filename, ".conf");
@@ -968,6 +971,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
                 releaseWriteLock(settings);
 
                 free(stringa);
+                stringa = NULL;
             }
             else
             { // deleting (maybe) a link

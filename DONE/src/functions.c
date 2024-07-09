@@ -405,6 +405,7 @@ void openProject(settings_t *settings)
     {
         settings->openProjectName = strdup(filename); // updating the project name
         free(filename);
+        filename = NULL;
 
         fscanf(file, "%d\n%d\n%d\n%d\n", &numnodes, &numlinks, &numrectangles, &numtextboxes);
 
