@@ -5,7 +5,7 @@ all: main.o  ./obj/rw-zem.o ./obj/doneserver.o ./obj/functions.o ./obj/GUI.o ./o
 	gcc -Wall -Wextra -c $< -o $@
 
 ./obj/netlib.so: src/netlib.c
-	gcc -shared -Wall -Wextra src/netlib.c -o ./obj/netlib.so
+	gcc -shared -Wall -Wextra src/netlib.c src/log.c -o ./obj/netlib.so
 
 main.o:
 	gcc -Wall -Wextra -c main.c
