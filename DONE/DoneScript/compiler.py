@@ -83,7 +83,7 @@ def parseAddText(instruction:str):
 def parseCreate(instruction:str): # to be called only when no variables in names
     try:
         global structures
-        [type, coordsandname] = [i.strip() for i in instruction.split("create")[1].strip().split("at")]
+        [type, coordsandname] = [i.strip() for i in instruction.split("create")[1].strip().split(" at")]
         [coords,name] = [i.strip() for i in coordsandname.split("as")]
         [x,y] = [int(i) for i in coords.strip().split(" ")]
         if x<0 or x > 1900:
@@ -150,9 +150,11 @@ def parseCommand(lines:[],i:int):
         global commands
         global structures
         instruction = lines[i]
+        #print("> ")
         [to,command] = instruction.strip().split("to ")[1].strip().split(" ",1)
+        #print(to,command)
         if not isName(to):
-            return "ERROR: not a valid name: '"+to+"'"
+            return "ERROR: not a valid name: '"+to+"'",i+1
         elif "begin script" in command:
             tmpcommand = ""
             i += 1
@@ -160,9 +162,11 @@ def parseCommand(lines:[],i:int):
                 tmpcommand+="\n"+lines[i]
                 i+=1
             commands.append({"to":to,"command":tmpcommand[1:]})
+            #print(commands)
             return None, i+1
         else:
             commands.append({"to":to,"command":command})
+            #print(commands)
             return None, i+1
     except:
         return "ERROR: format invalid"
@@ -184,7 +188,7 @@ def parseFor(lines:[],i:int):
     # ora dobbiamo identificare il nome della variabile
     [_,varname,_,type] = [boh.strip() for boh in lines[i].split(" ",3)]
     if not varname.startswith("var"):
-        return "ERROR: variable names must start with 'var'"
+        return "ERROR: variable names must start with 'var'",i+1
     else:
         variables.append(varname)
     
@@ -202,12 +206,12 @@ def parseFor(lines:[],i:int):
         [start,end,_,step] = [q.strip() for q in type.split(" ",3)]
         [start,end,step] = [int(i) for i in [start,end,step]]
         names = [str(q) for q in range(start,end,step)]
-        print(names)
+        #print(names)
         for name in names:
             tmpLines = []
             for k in range(i+2,j):
                 tmpLines.append(lines[k].replace(varname,name))
-            print(tmpLines)
+            #print(tmpLines)
             parse(tmpLines)
             #print("done "+name)
             #if name=="89":
@@ -220,6 +224,7 @@ def parse(lines:[]):
     global commands
     i = 0
     while i < len(lines):
+        #print(lines[i])
         #print(i,lines[i])
         if lines[i] == "":
             i+=1

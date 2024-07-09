@@ -1,6 +1,0 @@
-create host at 0 0 as h1
-send command to h1 begin script
-ciao
-ciao
-quarantadue
-end script
