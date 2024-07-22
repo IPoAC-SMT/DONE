@@ -453,7 +453,7 @@ void getName(settings_t *settings)
     toPrint = NULL;
 }
 
-void getServerIp(settings_t *settings, interface_t *interface) // the bug is not here
+void getServerIp(settings_t *settings) // the bug is not here
 {
     char *toPrint = (char *)calloc(300, sizeof(char));
     char character = GetCharPressed();
@@ -1086,7 +1086,7 @@ void DrawGUI(settings_t *settings, interface_t *interface)
     }
     else if (settings->gettingIp)
     {
-        getServerIp(settings, interface);
+        getServerIp(settings);
     }
 
     // posiziono i rettangoli
