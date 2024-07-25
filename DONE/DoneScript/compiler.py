@@ -292,7 +292,7 @@ if __name__ == "__main__":
         name = os.fsdecode(file)
         print(name)
         with open("./DoneScript/sources/"+name,"r") as program:
-            lines = [i.strip().lower() for i in program.readlines()]
+            lines = [i.strip() for i in program.readlines()]
             parse(lines)
             with open("./DoneScript/compiled/"+name[:-3]+".done","w") as f:
                 f.write(serialize())

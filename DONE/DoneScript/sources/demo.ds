@@ -55,16 +55,10 @@ link r-41 and r-16
 link r-39 and r-41
 link s-10 and r-41
 link r-41 and s-12
-draw rectangle between 117 768 and 412 1002 with color 103 -58 105
-draw rectangle between 438 767 and 554 1002 with color 115 81 -1
-draw rectangle between 577 767 and 743 1004 with color -14 -5 -29
-draw rectangle between 924 486 and 1349 932 with color -24 -25 -115
-draw rectangle between 1241 236 and 1565 337 with color 103 -58 105
-draw rectangle between 1379 416 and 1597 759 with color 115 81 -1
 add text "ISP 1" at 494 292
-add text "Building A" at 123 1021
-add text "B" at 444 1025
-add text "C" at 581 1022
+add text "Building A" at 123 980
+add text "B" at 444 980
+add text "C" at 581 980
 add text "DHCP Server" at 1281 875
 add text "DNS Server" at 1531 745
 add text "Web Server" at 1507 219
